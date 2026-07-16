@@ -1,0 +1,40 @@
+<div class="container h-100 d-flex justify-content-center align-items-center mt-5">
+  <mat-card class="p-4 shadow-lg w-100" style="max-width: 450px;">
+    <mat-card-header class="justify-content-center mb-3">
+      <mat-card-title class="fs-3 fw-bold text-primary">Welcome Back</mat-card-title>
+      <mat-card-subtitle>Login to your account</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="d-flex flex-column gap-2">
+        
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Email Address</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="Ex. pat@example.com">
+          <mat-icon matSuffix>email</mat-icon>
+          <mat-error *ngIf="loginForm.get('email')?.hasError('required')">Email is required</mat-error>
+          <mat-error *ngIf="loginForm.get('email')?.hasError('email')">Please enter a valid email</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Password</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
+          <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword" type="button">
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Password is required</mat-error>
+        </mat-form-field>
+
+        <button mat-flat-button color="primary" class="w-100 py-4 mt-3" type="submit" [disabled]="loginForm.invalid || isLoading">
+          <span *ngIf="!isLoading">LOGIN</span>
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        </button>
+
+      </form>
+    </mat-card-content>
+
+    <mat-card-footer class="text-center pb-3">
+      <p class="mb-0 text-muted">Don't have an account? <a routerLink="/auth/register" class="text-primary text-decoration-none fw-bold">Sign up</a></p>
+    </mat-card-footer>
+  </mat-card>
+</div>

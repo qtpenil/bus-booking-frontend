@@ -1,0 +1,155 @@
+<div class="d-flex flex-column h-100 bg-light">
+  <div class="px-4 py-3 bg-white border-bottom d-flex justify-content-between align-items-center">
+    <h2 class="h5 mb-0 fw-bold text-dark">Layout Builder: {{ data.template.templateName }}</h2>
+    <button mat-icon-button mat-dialog-close>
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="p-4 flex-grow-1 overflow-auto">
+    <div class="row">
+      <!-- Form to Add Seat -->
+      <div class="col-md-4">
+        <mat-card class="shadow-sm border-0 mb-4">
+          <mat-card-header class="bg-light p-3 border-bottom">
+            <mat-card-title class="h6 mb-0 text-primary">Place a Seat</mat-card-title>
+          </mat-card-header>
+          <mat-card-content class="p-3 mt-2">
+            <form [formGroup]="seatForm" (ngSubmit)="addSeat()" class="d-flex flex-column gap-2">
+              
+              <div class="row">
+                <div class="col-6">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Row No</mat-label>
+                    <input matInput type="number" formControlName="rowNo">
+                  </mat-form-field>
+                </div>
+                <div class="col-6">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Col No</mat-label>
+                    <input matInput type="number" formControlName="columnNo">
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Seat Number (e.g. A1)</mat-label>
+                <input matInput formControlName="seatNumber">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Seat Type</mat-label>
+                <mat-select formControlName="seatType">
+                  <mat-option *ngFor="let type of seatTypes" [value]="type">{{type}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Deck</mat-label>
+                <mat-select formControlName="deckType">
+                  <mat-option *ngFor="let deck of deckTypes" [value]="deck">{{deck}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <button mat-flat-button color="primary" type="submit" [disabled]="seatForm.invalid" class="w-100 py-2">
+                <mat-icon>add</mat-icon> Place Seat
+              </button>
+            </form>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="shadow-sm border-0">
+          <mat-card-content class="p-3 text-center">
+            <h6 class="text-muted mb-3">Total Seats Configured: <strong>{{seats.length}}</strong> / {{data.template.totalSeats}}</h6>
+            <div class="btn-group w-100" role="group">
+              <input type="radio" class="btn-check" name="deckSwitch" id="lowerDeck" autocomplete="off" 
+                [checked]="currentDeck === 'LOWER'" (click)="currentDeck = deckTypes[0]">
+              <label class="btn btn-outline-primary" for="lowerDeck">LOWER DECK</label>
+            
+              <input type="radio" class="btn-check" name="deckSwitch" id="upperDeck" autocomplete="off"
+                [checked]="currentDeck === 'UPPER'" (click)="currentDeck = deckTypes[1]">
+              <label class="btn btn-outline-primary" for="upperDeck">UPPER DECK</label>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Visual Grid -->
+      <div class="col-md-8">
+        <mat-card class="shadow-sm border-0 h-100">
+          <mat-card-header class="bg-light p-3 border-bottom d-flex justify-content-between align-items-center">
+            <mat-card-title class="h6 mb-0 text-secondary">Visual Layout ({{currentDeck}})</mat-card-title>
+            <mat-icon class="text-muted">front_loader</mat-icon>
+          </mat-card-header>
+          <mat-card-content class="p-4 bg-light overflow-auto">
+            
+            <div *ngIf="isLoading" class="text-center p-5">Loading layout...</div>
+            
+            <div *ngIf="!isLoading" class="d-flex justify-content-center w-100 py-4">
+              
+              <!-- Bus Chassis Container -->
+              <div class="bus-chassis shadow-lg position-relative bg-white border border-3 border-secondary rounded-top-5 rounded-bottom-4">
+                
+                <!-- Bus Front Glass / Dash -->
+                <div class="bus-front border-bottom border-2 border-secondary bg-light rounded-top-4 position-relative d-flex" style="height: 80px;">
+                  <!-- Driver Area -->
+                  <div class="driver-area ms-auto d-flex align-items-center justify-content-center border-start border-2 border-secondary bg-white" style="width: 100px;">
+                    <mat-icon class="text-secondary opacity-75" style="font-size: 40px; width: 40px; height: 40px;">radio_button_unchecked</mat-icon>
+                    <mat-icon class="text-secondary position-absolute opacity-50" style="font-size: 24px; width: 24px; height: 24px;">directions_car</mat-icon>
+                  </div>
+                  <!-- Door Area -->
+                  <div class="door-area position-absolute bottom-0 start-0 border-end border-top border-2 border-secondary bg-white" style="width: 80px; height: 40px; border-top-right-radius: 8px;">
+                    <span class="d-block text-center mt-2 text-muted small fw-bold" style="font-size: 10px;">ENTRY</span>
+                  </div>
+                </div>
+
+                <!-- Seats Area -->
+                <div class="p-4 d-flex flex-column align-items-center">
+                  <!-- CSS Grid for the layout -->
+                  <div class="d-flex flex-column gap-3">
+                    <div *ngFor="let row of getSeatsForGrid(currentDeck); let r = index" class="d-flex gap-3 justify-content-center">
+                      <div *ngFor="let seat of row; let c = index" 
+                           class="position-relative transition-all d-flex align-items-center justify-content-center"
+                           [ngClass]="{
+                             'seat-placeholder': !seat,
+                             'seat-card': seat,
+                             'seat-seater': seat?.seatType === 'SEATER',
+                             'seat-sleeper': seat?.seatType === 'SLEEPER'
+                           }">
+                        
+                        <ng-container *ngIf="seat">
+                          <div class="d-flex flex-column align-items-center w-100 h-100 p-1 position-relative z-1 pt-2">
+                            <span class="fw-bold text-white text-center text-truncate w-100" style="font-size: 13px; line-height: 1;">{{seat.seatNumber}}</span>
+                            <mat-icon class="text-white opacity-75 seat-icon mt-1">
+                              {{ seat.seatType === 'SLEEPER' ? 'hotel' : 'airline_seat_recline_normal' }}
+                            </mat-icon>
+                            <span class="text-white opacity-75 mt-auto text-center" style="font-size: 9px; font-weight: 500; letter-spacing: 0.5px;">{{seat.seatType}}</span>
+                          </div>
+                          
+                          <!-- Premium Gradient Background -->
+                          <div class="position-absolute top-0 start-0 w-100 h-100 rounded-3 seat-bg z-0 shadow-sm"></div>
+
+                          <button class="btn btn-link p-0 position-absolute text-white m-0 delete-btn z-2" 
+                                  (click)="deleteSeat(seat.id)" title="Remove Seat">
+                            <mat-icon style="font-size: 14px; width: 14px; height: 14px;" class="bg-danger rounded-circle p-1 d-flex align-items-center justify-content-center shadow-sm">close</mat-icon>
+                          </button>
+                        </ng-container>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Bus Rear -->
+                <div class="bus-rear border-top border-2 border-secondary bg-light rounded-bottom-3 mt-4" style="height: 40px;"></div>
+
+              </div>
+            </div>
+            
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+    </div>
+  </div>
+</div>

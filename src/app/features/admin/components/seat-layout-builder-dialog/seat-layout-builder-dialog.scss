@@ -1,0 +1,83 @@
+.transition-all {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.seat-placeholder {
+  width: 60px;
+  height: 60px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.seat-card {
+  border-radius: 12px;
+  cursor: pointer;
+  
+  .delete-btn {
+    top: -8px;
+    right: -8px;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    transform: scale(0.8);
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    .delete-btn {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .seat-bg {
+    transition: filter 0.2s ease;
+  }
+  
+  &:hover .seat-bg {
+    filter: brightness(1.1);
+  }
+}
+
+/* SEATER Styling */
+.seat-seater {
+  width: 60px;
+  height: 60px;
+  
+  .seat-bg {
+    background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+  }
+
+  .seat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* SLEEPER Styling (Vertical Orientation for top-down bus view) */
+.seat-sleeper {
+  width: 60px;
+  height: 120px; /* Taller to represent a bed along the bus length */
+  
+  .seat-bg {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  }
+
+  .seat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    margin-top: 8px !important;
+  }
+}
+
+/* Bus Chassis Utilities */
+.rounded-top-5 { border-top-left-radius: 40px !important; border-top-right-radius: 40px !important; }
+.rounded-top-4 { border-top-left-radius: 36px !important; border-top-right-radius: 36px !important; }
+.rounded-bottom-4 { border-bottom-left-radius: 20px !important; border-bottom-right-radius: 20px !important; }
+.bus-chassis { min-width: 320px; max-width: max-content; }
+
+/* Z-Index utilities */
+.z-0 { z-index: 0; }
+.z-1 { z-index: 1; }
+.z-2 { z-index: 2; }

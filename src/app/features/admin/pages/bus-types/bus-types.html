@@ -1,0 +1,66 @@
+<div class="container-fluid p-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 fw-bold text-dark"><i class="bi bi-bookmark-star me-2"></i>Manage Bus Types</h1>
+  </div>
+
+  <div class="row">
+    <!-- Form Section -->
+    <div class="col-lg-4 mb-4">
+      <mat-card class="shadow-sm border-0">
+        <mat-card-header class="bg-light p-3 border-bottom">
+          <mat-card-title class="h5 mb-0 text-primary">Add New Bus Type</mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="p-3 mt-3">
+          <form [formGroup]="busTypeForm" (ngSubmit)="onSubmit()" class="d-flex flex-column gap-3">
+            
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Bus Type Name</mat-label>
+              <input matInput formControlName="name" placeholder="e.g. AC Sleeper 2+1">
+              <mat-icon matPrefix color="primary">directions_bus</mat-icon>
+              <mat-error *ngIf="busTypeForm.get('name')?.hasError('required')">Name is required</mat-error>
+              <mat-error *ngIf="busTypeForm.get('name')?.hasError('maxlength')">Max 100 characters allowed</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Description (Optional)</mat-label>
+              <textarea matInput formControlName="description" rows="3" placeholder="Enter amenities and layout details"></textarea>
+              <mat-icon matPrefix color="primary">description</mat-icon>
+              <mat-error *ngIf="busTypeForm.get('description')?.hasError('maxlength')">Max 255 characters allowed</mat-error>
+            </mat-form-field>
+
+            <button mat-flat-button color="primary" type="submit" [disabled]="busTypeForm.invalid" class="py-2 mt-2 fw-bold">
+              <mat-icon>add_circle</mat-icon> Create Bus Type
+            </button>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Data Table Section -->
+    <div class="col-lg-8">
+      <mat-card class="shadow-sm border-0 h-100">
+        <mat-card-header class="bg-light p-3 border-bottom">
+          <mat-card-title class="h5 mb-0 text-secondary">Existing Bus Types</mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="p-0">
+          
+          <div *ngIf="busTypes.length === 0" class="text-center p-5 text-muted">
+            <mat-icon style="font-size: 48px; width: 48px; height: 48px; opacity: 0.5;">info</mat-icon>
+            <p class="mt-3">No bus types found. Create one to get started.</p>
+          </div>
+
+          <app-data-table 
+            *ngIf="busTypes.length > 0"
+            [data]="busTypes" 
+            [columns]="columns" 
+            [showActions]="true"
+            [showView]="false"
+            (onEdit)="onEdit($event)"
+            (onDelete)="onDelete($event)">
+          </app-data-table>
+          
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>
