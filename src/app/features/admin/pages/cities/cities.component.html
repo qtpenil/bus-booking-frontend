@@ -1,0 +1,50 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0 fw-bold">Manage Cities</h2>
+  </div>
+
+  <div class="row">
+    <!-- Form Section -->
+    <div class="col-md-4 mb-4">
+      <mat-card class="mat-elevation-z4">
+        <mat-card-header class="mb-3 border-bottom pb-2">
+          <mat-card-title>Add New City</mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="pt-3">
+          <form [formGroup]="cityForm" (ngSubmit)="onSubmit()" class="d-flex flex-column gap-3">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>City Name</mat-label>
+              <input matInput type="text" formControlName="name" placeholder="Ex: Mumbai">
+              <mat-error *ngIf="cityForm.get('name')?.hasError('required')">City name is required</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>State</mat-label>
+              <input matInput type="text" formControlName="state" placeholder="Ex: Maharashtra">
+              <mat-error *ngIf="cityForm.get('state')?.hasError('required')">State is required</mat-error>
+            </mat-form-field>
+
+            <button mat-raised-button color="primary" type="submit" [disabled]="cityForm.invalid || isLoading" class="py-2">
+              <mat-icon>add</mat-icon> Save City
+            </button>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Data Table Section -->
+    <div class="col-md-8">
+      <mat-card class="mat-elevation-z4">
+        <mat-card-content class="p-0">
+          <app-data-table 
+            [data]="cities" 
+            [columns]="columns" 
+            [showActions]="true"
+            (onEdit)="onEdit($event)"
+            (onDelete)="onDelete($event)">
+          </app-data-table>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>
