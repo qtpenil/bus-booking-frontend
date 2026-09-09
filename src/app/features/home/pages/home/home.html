@@ -1,0 +1,61 @@
+<div class="hero-section d-flex align-items-center justify-content-center">
+  <div class="hero-overlay"></div>
+  
+  <div class="container text-center text-white position-relative z-1">
+    <h1 class="display-3 fw-bold mb-4">Your Journey Starts Here</h1>
+    <p class="lead mb-5">Book your bus tickets easily, securely, and travel in comfort.</p>
+    
+    <mat-card class="search-card mx-auto text-start p-4">
+      <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="d-flex flex-column flex-md-row gap-3">
+        
+        <!-- From City -->
+        <mat-form-field appearance="outline" class="flex-grow-1">
+          <mat-label>From</mat-label>
+          <mat-icon matPrefix class="text-primary me-2">location_on</mat-icon>
+          <mat-select formControlName="fromCityId" placeholder="Leaving from">
+            <mat-option *ngFor="let city of cities" [value]="city.id">
+              {{ city.name }}, {{ city.state }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="searchForm.get('fromCityId')?.hasError('required')">
+            Source city is required
+          </mat-error>
+        </mat-form-field>
+        
+        <!-- To City -->
+        <mat-form-field appearance="outline" class="flex-grow-1">
+          <mat-label>To</mat-label>
+          <mat-icon matPrefix class="text-primary me-2">location_city</mat-icon>
+          <mat-select formControlName="toCityId" placeholder="Going to">
+            <mat-option *ngFor="let city of cities" [value]="city.id">
+              {{ city.name }}, {{ city.state }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="searchForm.get('toCityId')?.hasError('required')">
+            Destination city is required
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Journey Date -->
+        <mat-form-field appearance="outline" class="flex-grow-1">
+          <mat-label>Journey Date</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="journeyDate" [min]="minDate" readonly (click)="picker.open()">
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="searchForm.get('journeyDate')?.hasError('required')">
+            Date is required
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Search Button -->
+        <div class="d-flex align-items-center mb-md-3">
+          <button mat-flat-button color="primary" type="submit" class="search-btn w-100">
+            <mat-icon>search</mat-icon>
+            Search Buses
+          </button>
+        </div>
+
+      </form>
+    </mat-card>
+  </div>
+</div>

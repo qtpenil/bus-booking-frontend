@@ -28,3 +28,22 @@ export interface UpdateScheduleRequest {
 export interface MessageResponse {
   message: string;
 }
+
+export interface ScheduleSeatResponse {
+  seatId: number;
+  seatNumber: string;
+  rowNo: number;
+  columnNo: number;
+  seatType: string;
+  deckType: string;
+  status: string;
+}
+
+export interface HoldSeatRequest {
+  seatIds: number[];
+}
+
+export interface HoldSeatResponse {
+  holdId: string;
+  expiresAt: string;
+}

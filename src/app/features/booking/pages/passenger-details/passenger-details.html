@@ -1,0 +1,144 @@
+<div class="passenger-details-wrapper py-5 bg-light min-vh-100">
+  <div class="container">
+    
+    <div *ngIf="isLoading" class="d-flex justify-content-center py-5">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+
+    <div class="row" *ngIf="!isLoading && schedule">
+      
+      <!-- Left Column: Forms -->
+      <div class="col-lg-8 mb-4 mb-lg-0">
+        <form [formGroup]="bookingForm" (ngSubmit)="submitBooking()">
+          
+          <!-- Contact Details -->
+          <mat-card class="mb-4 shadow-sm border-0">
+            <mat-card-header class="border-bottom pb-3 mb-4">
+              <mat-icon mat-card-avatar class="text-primary mt-2">contact_mail</mat-icon>
+              <mat-card-title class="fw-bold">Contact Details</mat-card-title>
+              <mat-card-subtitle>Your ticket will be sent to these contact details</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content class="px-4">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Email Address</mat-label>
+                    <input matInput formControlName="contactEmail" type="email" placeholder="example@email.com">
+                    <mat-error *ngIf="bookingForm.get('contactEmail')?.hasError('required')">Email is required</mat-error>
+                    <mat-error *ngIf="bookingForm.get('contactEmail')?.hasError('email')">Invalid email address</mat-error>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Phone Number</mat-label>
+                    <input matInput formControlName="contactPhone" type="tel" placeholder="10-digit number">
+                    <mat-error *ngIf="bookingForm.get('contactPhone')?.hasError('required')">Phone is required</mat-error>
+                    <mat-error *ngIf="bookingForm.get('contactPhone')?.hasError('pattern')">Must be 10 digits</mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Passenger Details -->
+          <mat-card class="mb-4 shadow-sm border-0">
+            <mat-card-header class="border-bottom pb-3 mb-4">
+              <mat-icon mat-card-avatar class="text-primary mt-2">people</mat-icon>
+              <mat-card-title class="fw-bold">Passenger Details</mat-card-title>
+              <mat-card-subtitle>Please enter details for all {{ selectedSeats.length }} passengers</mat-card-subtitle>
+            </mat-card-header>
+            
+            <mat-card-content class="px-4" formArrayName="passengers">
+              <div *ngFor="let control of passengerForms; let i = index" [formGroupName]="i" class="mb-4 pb-3" [class.border-bottom]="i < passengerForms.length - 1">
+                <h6 class="fw-bold text-muted mb-3">Passenger {{ i + 1 }} - Seat {{ selectedSeats[i].seatNumber }}</h6>
+                
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <mat-form-field appearance="outline" class="w-100">
+                      <mat-label>First Name</mat-label>
+                      <input matInput formControlName="firstName">
+                      <mat-error>Required</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <mat-form-field appearance="outline" class="w-100">
+                      <mat-label>Last Name</mat-label>
+                      <input matInput formControlName="lastName">
+                      <mat-error>Required</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-2 mb-3">
+                    <mat-form-field appearance="outline" class="w-100">
+                      <mat-label>Age</mat-label>
+                      <input matInput type="number" formControlName="age">
+                      <mat-error>Invalid</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-2 mb-3">
+                    <mat-form-field appearance="outline" class="w-100">
+                      <mat-label>Gender</mat-label>
+                      <mat-select formControlName="gender">
+                        <mat-option value="MALE">Male</mat-option>
+                        <mat-option value="FEMALE">Female</mat-option>
+                        <mat-option value="OTHER">Other</mat-option>
+                      </mat-select>
+                      <mat-error>Required</mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+        </form>
+      </div>
+
+      <!-- Right Column: Summary Panel -->
+      <div class="col-lg-4">
+        <mat-card class="shadow-sm border-0 position-sticky" style="top: 20px;">
+          <mat-card-content class="p-4">
+            
+            <h5 class="fw-bold mb-3 text-primary border-bottom pb-2">Booking Summary</h5>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Route</span>
+              <span class="fw-medium text-end">{{ routeDetails?.sourceCityName }} to {{ routeDetails?.destinationCityName }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Date</span>
+              <span class="fw-medium">{{ schedule.journeyDate | date:'mediumDate' }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Time</span>
+              <span class="fw-medium">{{ schedule.departureTime.substring(0,5) }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-4">
+              <span class="text-muted">Seats ({{ selectedSeats.length }})</span>
+              <span class="fw-medium text-end">
+                 <span *ngFor="let s of selectedSeats; let last = last">{{ s.seatNumber }}{{ !last ? ', ' : '' }}</span>
+              </span>
+            </div>
+
+            <h5 class="fw-bold mb-3 text-primary border-bottom pb-2">Fare Details</h5>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Base Fare (x{{ selectedSeats.length }})</span>
+              <span class="fw-medium">₹{{ totalFare }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-4 mt-3 pt-3 border-top">
+              <span class="fw-bold fs-5">Total Amount</span>
+              <span class="fw-bold fs-4 text-success">₹{{ totalFare }}</span>
+            </div>
+            
+            <button mat-flat-button color="accent" class="w-100 py-4 rounded" style="font-size: 1.1rem;" 
+                    [disabled]="bookingForm.invalid || isSubmitting" 
+                    (click)="submitBooking()">
+              <mat-spinner *ngIf="isSubmitting" diameter="24" class="me-2 d-inline-block align-middle"></mat-spinner>
+              {{ isSubmitting ? 'Processing...' : 'Proceed to Payment' }}
+            </button>
+            <p class="text-muted small text-center mt-3 mb-0">By clicking Proceed, you agree to our terms and conditions.</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,57 @@
+.hero-section {
+  position: relative;
+  min-height: calc(100vh - 64px); // Minus toolbar height
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 100%);
+  z-index: 0;
+}
+
+.search-card {
+  max-width: 900px;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  padding: 30px !important;
+  margin-top: 2rem;
+  
+  .mat-mdc-form-field {
+    width: 100%;
+  }
+
+  .search-btn {
+    height: 56px; // Match form field height
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: transform 0.2s;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+  }
+}
+
+// Adjust material form fields to look cleaner
+::ng-deep {
+  .mat-mdc-text-field-wrapper {
+    background-color: transparent !important;
+  }
+  
+  .mat-mdc-form-field-outline {
+    background-color: white;
+    border-radius: 8px;
+  }
+}

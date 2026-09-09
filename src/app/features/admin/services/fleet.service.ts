@@ -47,6 +47,10 @@ export class FleetService {
     return this.http.get<BusResponse[]>(`${API_URLS.FLEET}/buses`);
   }
 
+  getBusById(id: number): Observable<BusResponse> {
+    return this.http.get<BusResponse>(`${API_URLS.FLEET}/buses/${id}`);
+  }
+
   createBus(request: BusRequest): Observable<BusResponse> {
     return this.http.post<BusResponse>(`${API_URLS.FLEET}/buses`, request);
   }

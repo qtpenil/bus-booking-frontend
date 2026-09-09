@@ -1,0 +1,64 @@
+.text-muted-light {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.tracking-wider {
+  letter-spacing: 0.1em;
+}
+
+.ticket {
+  border: 1px solid #e9ecef;
+}
+
+.border-end-md {
+  @media (min-width: 768px) {
+    border-right: 1px dashed #dee2e6;
+  }
+}
+
+/* Perforation Effect */
+.perforation {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 20px;
+  background-image: radial-gradient(circle at 10px 20px, transparent 10px, #ffffff 11px);
+  background-size: 20px 20px;
+  background-repeat: repeat-x;
+  transform: translateY(50%);
+  z-index: 10;
+}
+
+@media print {
+  body {
+    background: white !important;
+  }
+  
+  .success-wrapper {
+    background: white !important;
+    padding: 0 !important;
+  }
+  
+  .hide-on-print {
+    display: none !important;
+  }
+  
+  .ticket {
+    box-shadow: none !important;
+    border: 2px solid #000 !important;
+    page-break-inside: avoid;
+  }
+  
+  .ticket-header {
+    background: #000 !important;
+    color: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  .bg-light {
+    background: #f8f9fa !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

@@ -1,0 +1,23 @@
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.payment-option {
+  transition: all 0.2s ease-in-out;
+  border-color: #dee2e6 !important;
+  
+  &:hover {
+    border-color: #0d6efd !important;
+    background-color: #f8f9fa;
+  }
+  
+  &.selected {
+    border-color: #198754 !important;
+    background-color: #f0fdf4;
+    box-shadow: 0 2px 4px rgba(25, 135, 84, 0.1);
+  }
+}
+
+.bg-primary {
+  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important;
+}
