@@ -1,57 +1,178 @@
-.hero-section {
-  position: relative;
-  min-height: calc(100vh - 64px); // Minus toolbar height
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+.home-wrapper {
+  background-color: #f8fafc;
+  min-height: calc(100vh - 64px);
+}
+
+.hero-banner {
+  min-height: 380px;
+  /* Render HomeBanner.webp crisp, vivid, and 100% clear without dark overlays */
+  background-image: url('/images/HomeBanner.webp'), url('/assets/images/HomeBanner.webp');
   background-size: cover;
-  background-position: center;
-  overflow: hidden;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  position: relative;
+  padding-bottom: 70px; // Padding inside hero banner so headline sits nicely above the join line
 }
 
-.hero-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle at center, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 100%);
-  z-index: 0;
+.hero-title {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-weight: 800;
+  color: #0f172a; // High-contrast dark title so it reads crisp on bright sky image
+  letter-spacing: -1px;
+  line-height: 1.15;
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.9);
 }
 
+.hero-subtitle {
+  font-weight: 500;
+  color: #334155;
+  max-width: 680px;
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9);
+}
+
+/* 50/50 Overlap Section: Shifts search card EXACTLY half into Blue Hero image & half into White section below */
+.search-overlap-section {
+  margin-top: -65px !important; // Exactly half of search card height for 50/50 vertical split
+  position: relative;
+  z-index: 25;
+}
+
+/* Perfect Flexbox Search Bar Layout (Blue & White Theme) */
 .search-card {
-  max-width: 900px;
-  border-radius: 20px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.2) !important;
-  background: rgba(255, 255, 255, 0.95) !important;
-  backdrop-filter: blur(10px);
-  padding: 30px !important;
-  margin-top: 2rem;
-  
-  .mat-mdc-form-field {
-    width: 100%;
+  border-radius: 20px !important;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14) !important;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+
+  .search-flex-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 12px;
   }
 
-  .search-btn {
-    height: 56px; // Match form field height
-    border-radius: 12px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    transition: transform 0.2s;
+  .search-item {
+    min-width: 200px;
+  }
+
+  .swap-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 6px;
+  }
+
+  .swap-btn {
+    border: 1px solid #cbd5e1;
+    background-color: #f8fafc;
+    transition: transform 0.25s ease, background-color 0.2s ease;
     
     &:hover {
+      transform: rotate(180deg);
+      background-color: #e2e8f0;
+    }
+  }
+
+  /* Spacious, clean spacing for Today & Tomorrow date chips */
+  .date-chips-wrapper {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px; // Clear, comfortable spacing from the Date input field
+    margin-bottom: 4px;
+  }
+
+  .date-chip {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 16px;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #2563eb;
+      color: #ffffff;
+      border-color: #2563eb;
+    }
+
+    &.btn-today {
+      border-color: #3b82f6;
+      color: #2563eb;
+      background: #eff6ff;
+    }
+  }
+
+  .search-btn-item {
+    min-width: 170px;
+    padding-top: 4px;
+  }
+
+  .main-search-btn {
+    height: 56px;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 14px !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4) !important;
     }
   }
 }
 
-// Adjust material form fields to look cleaner
-::ng-deep {
-  .mat-mdc-text-field-wrapper {
-    background-color: transparent !important;
+/* Material Form Field Subscript Fix for Clean Box Alignment */
+::ng-deep .search-card {
+  .mat-mdc-form-field-subscript-wrapper {
+    height: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
   }
   
-  .mat-mdc-form-field-outline {
-    background-color: white;
-    border-radius: 8px;
+  .mat-mdc-text-field-wrapper {
+    background-color: #ffffff !important;
+  }
+
+  .mat-mdc-form-field-flex {
+    height: 56px !important;
+    align-items: center !important;
+  }
+}
+
+/* Deals Section Spacing Below 50/50 Search Card */
+.deals-section {
+  padding-top: 60px;
+}
+
+/* Offer Cards Styling */
+.offer-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border-color: #e2e8f0 !important;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 25px rgba(15, 23, 42, 0.08) !important;
+  }
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+@media (max-width: 991px) {
+  .search-card .search-flex-row {
+    flex-direction: column;
+    
+    .search-item, .search-btn-item {
+      width: 100%;
+    }
+
+    .swap-item {
+      display: none;
+    }
   }
 }

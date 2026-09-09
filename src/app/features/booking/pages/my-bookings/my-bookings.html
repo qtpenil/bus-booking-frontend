@@ -1,0 +1,116 @@
+<div class="my-bookings-container container py-4">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+    <div>
+      <h2 class="fw-bold mb-1 d-flex align-items-center text-primary">
+        <mat-icon class="me-2 fs-2 text-primary">confirmation_number</mat-icon> My Booked Tickets
+      </h2>
+      <p class="text-muted mb-0">View your active travel tickets and boarding passes</p>
+    </div>
+    <a mat-raised-button color="primary" routerLink="/search" class="rounded-pill px-4">
+      <mat-icon class="me-1">search</mat-icon> Book New Ticket
+    </a>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <mat-spinner diameter="48" class="mx-auto mb-3"></mat-spinner>
+    <p class="text-muted fs-5">Loading your tickets...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="!isLoading && errorMessage" class="alert alert-danger shadow-sm d-flex align-items-center mb-4">
+    <mat-icon class="me-2">error</mat-icon>
+    <span class="flex-grow-1">{{ errorMessage }}</span>
+    <button mat-button class="text-danger fw-bold" (click)="fetchConfirmedTickets()">Retry</button>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && !errorMessage && confirmedTickets.length === 0" class="text-center py-5 empty-card shadow-sm rounded-4 bg-white">
+    <div class="icon-circle mx-auto mb-3 bg-light text-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+      <mat-icon class="fs-1">confirmation_number</mat-icon>
+    </div>
+    <h4 class="fw-bold text-dark">No Booked Tickets Found</h4>
+    <p class="text-muted mb-4">You do not have any active confirmed bus bookings at the moment.</p>
+    <a mat-flat-button color="primary" routerLink="/search" class="rounded-pill px-4">
+      Find Buses & Book Now
+    </a>
+  </div>
+
+  <!-- Tickets Summary Cards Grid -->
+  <div *ngIf="!isLoading && confirmedTickets.length > 0" class="row g-4">
+    <div *ngFor="let ticket of confirmedTickets" class="col-12 col-md-6">
+      <div class="summary-ticket-card shadow-sm bg-white rounded-4 overflow-hidden border h-100 d-flex flex-column">
+        
+        <!-- Card Header -->
+        <div class="ticket-header bg-dark text-white p-3 d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center">
+            <mat-icon class="text-warning me-2 fs-3">directions_bus</mat-icon>
+            <div>
+              <span class="text-muted-light small text-uppercase d-block">PNR / Reference</span>
+              <strong class="text-warning font-monospace fs-6">{{ ticket.bookingReference || ('BKG-' + ticket.bookingId) }}</strong>
+            </div>
+          </div>
+          <span class="badge bg-success px-3 py-2 text-uppercase fs-6">CONFIRMED</span>
+        </div>
+
+        <!-- Card Body -->
+        <div class="p-3 p-md-4 flex-grow-1 d-flex flex-column justify-content-between">
+          <div>
+            <!-- Seat & Price Row -->
+            <div class="row g-3 mb-3 pb-3 border-bottom">
+              <div class="col-6">
+                <span class="text-muted small d-block mb-1"><mat-icon class="align-middle fs-6 me-1 text-primary">airline_seat_recline_extra</mat-icon> Reserved Seats</span>
+                <span class="badge bg-primary fs-6 px-3 py-1">{{ getSeatsDisplay(ticket) }}</span>
+              </div>
+              <div class="col-6 text-end">
+                <span class="text-muted small d-block mb-1"><mat-icon class="align-middle fs-6 me-1 text-success">payments</mat-icon> Total Fare</span>
+                <span class="fs-4 fw-bold text-success">₹{{ ticket.totalAmount }}</span>
+              </div>
+            </div>
+
+            <!-- Trip Date & Time Details -->
+            <div class="row g-2 mb-3 bg-light rounded p-2 text-dark small">
+              <div class="col-6">
+                <span class="text-muted small d-block"><mat-icon class="align-middle fs-6 me-1 text-primary">event</mat-icon> Journey Date:</span>
+                <strong class="d-block mt-1">{{ ticket.journeyDate ? (ticket.journeyDate | date:'mediumDate') : 'Scheduled' }}</strong>
+              </div>
+              <div class="col-6 text-end">
+                <span class="text-muted small d-block"><mat-icon class="align-middle fs-6 me-1 text-primary">schedule</mat-icon> Departure:</span>
+                <strong class="d-block mt-1">{{ ticket.departureTime || 'TBD' }}</strong>
+              </div>
+            </div>
+
+            <!-- Passengers & Contact Info -->
+            <div class="row g-2 mb-3 text-muted small">
+              <div class="col-12" *ngIf="ticket.passengers && ticket.passengers.length > 0">
+                <span class="fw-semibold text-dark"><mat-icon class="align-middle fs-6 me-1 text-primary">person</mat-icon> Passengers:</span>
+                <span class="text-dark ms-1 fw-medium">{{ getPassengerNames(ticket) }}</span>
+              </div>
+              <div class="col-12" *ngIf="ticket.contactEmail">
+                <span class="fw-semibold text-dark"><mat-icon class="align-middle fs-6 me-1 text-primary">email</mat-icon> Contact Email:</span>
+                <span class="text-dark ms-1">{{ ticket.contactEmail }}</span>
+              </div>
+              <div class="col-12" *ngIf="ticket.bookingDate">
+                <span class="fw-semibold text-dark"><mat-icon class="align-middle fs-6 me-1 text-secondary">history</mat-icon> Booked On:</span>
+                <span class="text-muted ms-1">{{ ticket.bookingDate | date:'short' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Action Buttons -->
+          <div class="pt-2 border-top d-flex gap-2">
+            <button mat-flat-button color="primary" class="flex-grow-1 rounded-pill py-2" (click)="openTicketDetails(ticket)">
+              <mat-icon class="me-1">receipt_long</mat-icon> View Ticket
+            </button>
+            <button mat-stroked-button color="warn" class="rounded-pill px-3 py-2 text-danger border-danger" (click)="cancelTicket(ticket, $event)">
+              <mat-icon class="me-1">cancel</mat-icon> Cancel
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

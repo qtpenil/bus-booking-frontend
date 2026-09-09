@@ -13,6 +13,14 @@ export interface CreateBookingRequest {
   passengers: PassengerRequest[];
 }
 
+export interface PassengerResponse {
+  seatNumber: string;
+  firstName: string;
+  lastName: string;
+  age: number;
+  gender: string;
+}
+
 export interface BookingResponse {
   bookingId: number;
   userId: number;
@@ -21,4 +29,28 @@ export interface BookingResponse {
   totalAmount: number;
   status: string;
   seats: string[];
+  contactEmail?: string;
+  contactPhone?: string;
+  journeyDate?: string;
+  departureTime?: string;
+  arrivalTime?: string;
+  bookingDate?: string;
+  passengers?: PassengerResponse[];
 }
+
+export interface BookingListResponse {
+  bookingId: number;
+  bookingReference?: string;
+  scheduleId: number;
+  status: string;
+  totalAmount: number;
+  contactEmail?: string;
+  contactPhone?: string;
+  journeyDate?: string;
+  departureTime?: string;
+  arrivalTime?: string;
+  bookingDate?: string;
+  seats?: string[];
+  passengers?: PassengerResponse[];
+}
+

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CreateBookingRequest, BookingResponse } from '../models/booking.models';
+import { CreateBookingRequest, BookingResponse, BookingListResponse } from '../models/booking.models';
 import { API_URLS } from '../../../core/constants/api.constants';
 
 @Injectable({
@@ -20,11 +20,12 @@ export class BookingService {
     return this.http.get<BookingResponse>(`${this.apiUrl}/${id}`);
   }
 
-  getMyBookings(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/my`);
+  getMyBookings(): Observable<BookingListResponse[]> {
+    return this.http.get<BookingListResponse[]>(`${this.apiUrl}/my`);
   }
 
   cancelBooking(id: number): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${id}/cancel`, {});
+    return this.http.put(`${this.apiUrl}/${id}/cancel`, {}, { responseType: 'text' as 'json' });
   }
 }
+
