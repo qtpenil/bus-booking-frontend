@@ -1,0 +1,111 @@
+<div class="payment-wrapper py-5 bg-light min-vh-100">
+  <div class="container">
+    
+    <div *ngIf="isLoading" class="d-flex justify-content-center py-5">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+
+    <div class="row justify-content-center" *ngIf="!isLoading && bookingDetails">
+      
+      <div class="col-lg-6 col-md-8">
+        <mat-card class="shadow-sm border-0 mb-4 rounded-4 overflow-hidden">
+          <div class="bg-primary text-white p-4 text-center">
+            <h2 class="fw-bold mb-1">Secure Checkout</h2>
+            <p class="mb-0 opacity-75">Complete your payment to confirm tickets</p>
+          </div>
+          
+          <mat-card-content class="p-4">
+            
+            <!-- Booking Summary -->
+            <div class="bg-light rounded p-3 mb-4">
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Booking Reference</span>
+                <span class="fw-bold">{{ bookingDetails.bookingReference }}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Total Seats</span>
+                <span class="fw-medium">{{ bookingDetails.seats?.length || bookingDetails.passengers?.length }}</span>
+              </div>
+              <div class="d-flex justify-content-between mt-3 pt-3 border-top">
+                <span class="fw-bold fs-5 text-dark">Amount to Pay</span>
+                <span class="fw-bold fs-4 text-success">₹{{ bookingDetails.totalAmount }}</span>
+              </div>
+            </div>
+
+            <h5 class="fw-bold mb-3 mt-4">Select Payment Method</h5>
+            
+            <!-- Payment Methods -->
+            <div class="d-flex flex-column gap-3 mb-4">
+              
+              <div class="payment-option border rounded p-3 d-flex align-items-center cursor-pointer" 
+                   [class.selected]="selectedPaymentMethod === 'CREDIT_CARD'"
+                   (click)="selectMethod('CREDIT_CARD')">
+                <mat-icon class="text-primary me-3">credit_card</mat-icon>
+                <div class="flex-grow-1">
+                  <h6 class="mb-0 fw-bold">Credit / Debit Card</h6>
+                  <small class="text-muted">Visa, Mastercard, RuPay</small>
+                </div>
+                <mat-icon *ngIf="selectedPaymentMethod === 'CREDIT_CARD'" class="text-success">check_circle</mat-icon>
+              </div>
+
+              <div class="payment-option border rounded p-3 d-flex align-items-center cursor-pointer" 
+                   [class.selected]="selectedPaymentMethod === 'UPI'"
+                   (click)="selectMethod('UPI')">
+                <mat-icon class="text-primary me-3">qr_code_scanner</mat-icon>
+                <div class="flex-grow-1">
+                  <h6 class="mb-0 fw-bold">UPI / QR</h6>
+                  <small class="text-muted">GPay, PhonePe, Paytm</small>
+                </div>
+                <mat-icon *ngIf="selectedPaymentMethod === 'UPI'" class="text-success">check_circle</mat-icon>
+              </div>
+
+              <div class="payment-option border rounded p-3 d-flex align-items-center cursor-pointer" 
+                   [class.selected]="selectedPaymentMethod === 'NET_BANKING'"
+                   (click)="selectMethod('NET_BANKING')">
+                <mat-icon class="text-primary me-3">account_balance</mat-icon>
+                <div class="flex-grow-1">
+                  <h6 class="mb-0 fw-bold">Net Banking</h6>
+                  <small class="text-muted">All major banks</small>
+                </div>
+                <mat-icon *ngIf="selectedPaymentMethod === 'NET_BANKING'" class="text-success">check_circle</mat-icon>
+              </div>
+
+            </div>
+
+            <!-- Fake Form Details (To make it look real) -->
+            <div *ngIf="selectedPaymentMethod === 'CREDIT_CARD'" class="mb-4">
+              <div class="form-group mb-3">
+                <label class="form-label small text-muted">Card Number</label>
+                <input type="text" class="form-control" placeholder="0000 0000 0000 0000">
+              </div>
+              <div class="row">
+                <div class="col-6">
+                  <label class="form-label small text-muted">Expiry</label>
+                  <input type="text" class="form-control" placeholder="MM/YY">
+                </div>
+                <div class="col-6">
+                  <label class="form-label small text-muted">CVV</label>
+                  <input type="text" class="form-control" placeholder="123">
+                </div>
+              </div>
+            </div>
+
+            <button mat-flat-button color="primary" class="w-100 py-4 rounded-3 mt-2" style="font-size: 1.1rem;" 
+                    [disabled]="isProcessing" 
+                    (click)="processPayment()">
+              <mat-spinner *ngIf="isProcessing" diameter="24" class="me-2 d-inline-block align-middle"></mat-spinner>
+              {{ isProcessing ? 'Processing Payment...' : 'Pay ₹' + bookingDetails.totalAmount }}
+            </button>
+            
+            <div class="text-center mt-3 text-muted small">
+              <mat-icon class="align-middle me-1" style="font-size: 16px; width: 16px; height: 16px;">lock</mat-icon>
+              <span>Payments are 100% secure and encrypted</span>
+            </div>
+
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+    </div>
+  </div>
+</div>

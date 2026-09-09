@@ -1,0 +1,54 @@
+.search-results-wrapper {
+  background-color: #f8f9fa;
+  min-height: calc(100vh - 64px);
+}
+
+.header-section {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.schedule-card {
+  border-radius: 16px;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+  transition: transform 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+  }
+}
+
+.journey-line {
+  height: 2px;
+  background-color: #dee2e6;
+  width: 100%;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.journey-icon {
+  position: relative;
+  z-index: 2;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+}
+
+.border-md-end {
+  @media (min-width: 768px) {
+    border-right: 1px dashed #dee2e6;
+  }
+}
+
+.border-md-start {
+  @media (min-width: 768px) {
+    border-left: 1px dashed #dee2e6;
+  }
+}

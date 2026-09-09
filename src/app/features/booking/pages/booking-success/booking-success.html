@@ -1,0 +1,121 @@
+<div class="success-wrapper py-5 bg-light min-vh-100">
+  <div class="container d-flex flex-column align-items-center">
+    
+    <div *ngIf="isLoading" class="py-5">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+
+    <!-- Ticket Container (Only shown when not loading) -->
+    <div class="ticket-container w-100" *ngIf="!isLoading && bookingDetails" style="max-width: 800px;">
+      
+      <!-- Success Header -->
+      <div class="text-center mb-4 hide-on-print">
+        <div class="success-icon-wrap mb-3 mx-auto bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+          <mat-icon style="font-size: 48px; width: 48px; height: 48px;">check_circle</mat-icon>
+        </div>
+        <h1 class="fw-bold text-success mb-1">Payment Successful!</h1>
+        <p class="text-muted fs-5">Your booking is confirmed. Here is your boarding pass.</p>
+      </div>
+
+      <!-- THE TICKET -->
+      <div class="ticket shadow bg-white rounded-4 overflow-hidden position-relative mb-4">
+        
+        <!-- Ticket Header -->
+        <div class="ticket-header bg-dark text-white p-4 d-flex justify-content-between align-items-center">
+          <div>
+            <span class="text-uppercase tracking-wider small text-muted-light">Boarding Pass</span>
+            <h3 class="mb-0 fw-bold mt-1">Bus Booking Service</h3>
+          </div>
+          <div class="text-end">
+            <span class="text-uppercase tracking-wider small text-muted-light">Booking Ref</span>
+            <h4 class="mb-0 fw-bold text-warning mt-1">{{ bookingDetails.bookingReference }}</h4>
+          </div>
+        </div>
+
+        <!-- Ticket Body -->
+        <div class="ticket-body p-4 p-md-5 d-flex flex-column flex-md-row gap-4">
+          
+          <!-- Left side: Route & Passenger Info -->
+          <div class="flex-grow-1 border-end-md pe-md-4">
+            
+            <div class="row mb-4">
+              <div class="col-6">
+                <span class="text-muted small text-uppercase fw-bold">Date</span>
+                <p class="fs-5 fw-bold text-dark mb-0">Coming Soon</p>
+              </div>
+              <div class="col-6">
+                <span class="text-muted small text-uppercase fw-bold">Time</span>
+                <p class="fs-5 fw-bold text-dark mb-0">TBD</p>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <span class="text-muted small text-uppercase fw-bold">Passengers ({{ bookingDetails.passengers?.length || 0 }})</span>
+              <div class="table-responsive mt-2">
+                <table class="table table-borderless table-sm mb-0">
+                  <thead class="border-bottom">
+                    <tr>
+                      <th class="text-muted ps-0">Name</th>
+                      <th class="text-muted">Age</th>
+                      <th class="text-muted">Gender</th>
+                      <th class="text-muted text-end pe-0">Seat</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let p of bookingDetails.passengers">
+                      <td class="fw-bold text-dark ps-0">{{ p.firstName }} {{ p.lastName }}</td>
+                      <td>{{ p.age }}</td>
+                      <td>{{ p.gender }}</td>
+                      <td class="fw-bold text-primary text-end pe-0">{{ p.seatNumber }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <div class="row bg-light rounded p-3 m-0">
+              <div class="col-6 p-0">
+                <span class="text-muted small d-block">Contact Email</span>
+                <span class="fw-medium">{{ bookingDetails.contactEmail }}</span>
+              </div>
+              <div class="col-6 p-0 text-end">
+                <span class="text-muted small d-block">Contact Phone</span>
+                <span class="fw-medium">{{ bookingDetails.contactPhone }}</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right side: QR & Summary -->
+          <div class="ticket-sidebar d-flex flex-column justify-content-between align-items-center text-center" style="min-width: 180px;">
+            <div class="mb-4">
+              <span class="text-muted small text-uppercase fw-bold d-block mb-2">Scan to Board</span>
+              <!-- Placeholder for QR Code, ideally generated via library -->
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{bookingDetails.bookingReference}}" alt="QR Code" class="img-fluid border p-1 rounded" width="120">
+            </div>
+            
+            <div class="w-100 bg-light p-3 rounded">
+              <span class="text-muted small text-uppercase d-block mb-1">Total Paid</span>
+              <h3 class="text-success fw-bold mb-0">₹{{ bookingDetails.totalAmount }}</h3>
+            </div>
+          </div>
+          
+        </div>
+        
+        <!-- Ticket Perforation Effect -->
+        <div class="perforation position-absolute"></div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="d-flex justify-content-center gap-3 hide-on-print">
+        <button mat-stroked-button color="primary" class="px-4 py-2" (click)="goHome()">
+          <mat-icon>home</mat-icon> Back to Home
+        </button>
+        <button mat-flat-button color="primary" class="px-4 py-2" (click)="printTicket()">
+          <mat-icon>print</mat-icon> Print Ticket
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

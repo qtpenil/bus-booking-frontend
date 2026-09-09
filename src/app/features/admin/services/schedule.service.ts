@@ -18,6 +18,12 @@ export class ScheduleService {
     return this.http.get<ScheduleResponse[]>(this.apiUrl);
   }
 
+  searchSchedules(routeId: number, journeyDate: string): Observable<ScheduleResponse[]> {
+    return this.http.get<ScheduleResponse[]>(`${this.apiUrl}/search`, {
+      params: { routeId, journeyDate }
+    });
+  }
+
   getScheduleById(id: number): Observable<ScheduleResponse> {
     return this.http.get<ScheduleResponse>(`${this.apiUrl}/${id}`);
   }
@@ -32,5 +38,13 @@ export class ScheduleService {
 
   cancelSchedule(id: number): Observable<MessageResponse> {
     return this.http.put<MessageResponse>(`${this.apiUrl}/${id}/cancel`, {});
+  }
+
+  getScheduleSeats(scheduleId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/${scheduleId}/seats`);
+  }
+
+  holdSeats(scheduleId: number, request: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/${scheduleId}/hold`, request);
   }
 }

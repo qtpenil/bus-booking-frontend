@@ -1,3 +1,48 @@
 .user-wrapper {
-  // Styles for user layout
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.premium-header {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 0 1rem;
+}
+
+.navbar-brand {
+  transition: opacity 0.2s ease-in-out;
+  
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.nav-links {
+  .mat-mdc-button {
+    font-size: 1rem;
+    padding: 0 16px;
+    margin: 0 4px;
+    border-radius: 20px;
+    
+    &.active-link {
+      background-color: rgba(255, 255, 255, 0.15);
+      font-weight: 500;
+    }
+  }
+}
+
+.auth-buttons {
+  .mat-mdc-unelevated-button, .mat-mdc-outlined-button {
+    border-radius: 20px;
+    padding: 0 24px;
+    font-weight: 500;
+  }
+}
+
+footer {
+  .footer-links a {
+    transition: color 0.2s;
+    &:hover {
+      color: #ffd740 !important; // Match accent color
+    }
+  }
 }
