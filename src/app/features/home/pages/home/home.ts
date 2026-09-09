@@ -50,6 +50,27 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCities();
+    // Default journeyDate to Today
+    this.searchForm.patchValue({ journeyDate: new Date() });
+  }
+
+  selectToday(): void {
+    this.searchForm.patchValue({ journeyDate: new Date() });
+  }
+
+  selectTomorrow(): void {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    this.searchForm.patchValue({ journeyDate: tomorrow });
+  }
+
+  swapCities(): void {
+    const from = this.searchForm.get('fromCityId')?.value;
+    const to = this.searchForm.get('toCityId')?.value;
+    this.searchForm.patchValue({
+      fromCityId: to,
+      toCityId: from
+    });
   }
 
   loadCities(): void {

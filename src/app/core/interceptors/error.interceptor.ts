@@ -11,16 +11,12 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       
-      if (error.status === 401 || error.status === 403) {
-        // Clear token and redirect to login
+      if (error.status === 401 && !req.url.includes('/auth/login')) {
+        // Clear token and redirect to login only on 401 (unauthorized/expired token)
         localStorage.removeItem(STORAGE_KEYS.JWT_TOKEN);
         localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
         router.navigate(['/auth/login']);
       }
-
-      // We can also extract the ApiErrorResponse here to display a generic toast notification
-      // const apiError: ApiErrorResponse = error.error;
-      // console.error('Backend Error:', apiError.message);
 
       return throwError(() => error);
     })
