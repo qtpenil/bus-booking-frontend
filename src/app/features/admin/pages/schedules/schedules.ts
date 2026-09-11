@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -39,6 +39,7 @@ export class SchedulesComponent implements OnInit {
   private fleetService = inject(FleetService);
   private routeService = inject(RouteService);
   private toast = inject(ToastService);
+  private cdr = inject(ChangeDetectorRef);
 
   schedules: ScheduleResponse[] = [];
   buses: BusResponse[] = [];
@@ -59,8 +60,6 @@ export class SchedulesComponent implements OnInit {
     { def: 'status', header: 'Status', cell: (element: ScheduleResponse) => `${element.status}` }
   ];
 
-
-
   constructor() {
     this.scheduleForm = this.fb.group({
       routeId: ['', Validators.required],
@@ -80,13 +79,27 @@ export class SchedulesComponent implements OnInit {
     this.isLoading = true;
     
     this.routeService.getAllRoutes().subscribe({
-      next: (routes) => this.routes = routes,
-      error: () => this.toast.error('Failed to load routes')
+      next: (routes) => {
+        this.routes = [...routes];
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.toast.error('Failed to load routes');
+        this.cdr.detectChanges();
+      }
     });
 
     this.fleetService.getAllBuses().subscribe({
-      next: (buses) => this.buses = buses,
-      error: () => this.toast.error('Failed to load buses')
+      next: (buses) => {
+        this.buses = [...buses];
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.toast.error('Failed to load buses');
+        this.cdr.detectChanges();
+      }
     });
 
     this.loadSchedules();
@@ -95,12 +108,15 @@ export class SchedulesComponent implements OnInit {
   loadSchedules(): void {
     this.scheduleService.getAllSchedules().subscribe({
       next: (schedules) => {
-        this.schedules = schedules;
+        this.schedules = [...schedules];
         this.isLoading = false;
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       },
       error: () => {
         this.toast.error('Failed to load schedules');
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -117,6 +133,7 @@ export class SchedulesComponent implements OnInit {
         },
         error: (err) => {
           this.toast.error(err.error?.message || 'Failed to create schedule');
+          this.cdr.detectChanges();
         }
       });
     }
@@ -129,7 +146,10 @@ export class SchedulesComponent implements OnInit {
           this.toast.success('Schedule cancelled successfully');
           this.loadSchedules();
         },
-        error: (err) => this.toast.error(err.error?.message || 'Failed to cancel schedule')
+        error: (err) => {
+          this.toast.error(err.error?.message || 'Failed to cancel schedule');
+          this.cdr.detectChanges();
+        }
       });
     }
   }

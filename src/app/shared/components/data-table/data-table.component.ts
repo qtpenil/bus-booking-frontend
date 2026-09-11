@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild, ChangeDetectorRef, inject, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -49,7 +49,9 @@ export interface TableColumn {
     </div>
   `
 })
-export class DataTableComponent implements OnChanges {
+export class DataTableComponent implements OnChanges, AfterViewInit {
+  private cdr = inject(ChangeDetectorRef);
+
   @Input() data: any[] = [];
   @Input() columns: TableColumn[] = [];
   @Input() showActions = true;
@@ -69,31 +71,30 @@ export class DataTableComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['data'] && this.data) {
-      this.dataSource.data = this.data;
+      this.dataSource.data = [...this.data];
       if (this.paginator) {
         this.dataSource.paginator = this.paginator;
-        this.paginator.firstPage();
       }
       if (this.sort) {
         this.dataSource.sort = this.sort;
       }
+      this.cdr.markForCheck();
     }
     if (changes['columns'] && this.columns) {
       this.displayedColumns = this.columns.map(c => c.def);
       if (this.showActions) {
         this.displayedColumns.push('actions');
       }
+      this.cdr.markForCheck();
     }
   }
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
-    // Force a refresh of the data source now that the paginator is attached
     if (this.data && this.data.length > 0) {
-      setTimeout(() => {
-        this.dataSource.data = [...this.data];
-      });
+      this.dataSource.data = [...this.data];
     }
+    this.cdr.detectChanges();
   }
 }

@@ -1,40 +1,210 @@
-<div class="container h-100 d-flex justify-content-center align-items-center mt-5">
-  <mat-card class="p-4 shadow-lg w-100" style="max-width: 450px;">
-    <mat-card-header class="justify-content-center mb-3">
-      <mat-card-title class="fs-3 fw-bold text-primary">Welcome Back</mat-card-title>
-      <mat-card-subtitle>Login to your account</mat-card-subtitle>
-    </mat-card-header>
+<div class="auth-page-hero d-flex flex-column justify-content-between h-100-vh px-4 px-md-5 py-3 py-md-4 overflow-hidden">
+  
+  <!-- Top Navigation Bar -->
+  <div class="top-nav-bar d-flex align-items-center justify-content-between w-100 flex-shrink-0">
+    <!-- Brand Logo -->
+    <div class="d-flex align-items-center gap-3">
+      <div class="brand-logo-icon d-flex align-items-center justify-content-center rounded-3 bg-white bg-opacity-15 backdrop-blur p-2">
+        <mat-icon class="text-white fs-3 w-auto h-auto">directions_bus</mat-icon>
+      </div>
+      <div>
+        <h1 class="brand-title mb-0 fs-4 fw-bold text-white tracking-wide">BusBook</h1>
+        <p class="brand-tagline mb-0 extra-small text-white-50">Travel More. Worry Less.</p>
+      </div>
+    </div>
+    
+    <!-- Top Right Features Tagline -->
+    <div class="top-features-tag d-none d-md-flex align-items-center gap-3 text-white-75 fs-6 fw-medium">
+      <span>Safe</span>
+      <span class="divider opacity-50">|</span>
+      <span>Comfortable</span>
+      <span class="divider opacity-50">|</span>
+      <span>On Time</span>
+    </div>
+  </div>
 
-    <mat-card-content>
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="d-flex flex-column gap-2">
-        
-        <mat-form-field appearance="outline" class="w-100">
-          <mat-label>Email Address</mat-label>
-          <input matInput type="email" formControlName="email" placeholder="Ex. pat@example.com">
-          <mat-icon matSuffix>email</mat-icon>
-          <mat-error *ngIf="loginForm.get('email')?.hasError('required')">Email is required</mat-error>
-          <mat-error *ngIf="loginForm.get('email')?.hasError('email')">Please enter a valid email</mat-error>
-        </mat-form-field>
+  <!-- Main Hero Grid: Left Content & Right Floating Login Card -->
+  <div class="container-fluid px-0 my-auto py-2 flex-grow-1 d-flex align-items-center">
+    <div class="row align-items-center justify-content-between w-100 g-4 mx-0">
+      
+      <!-- Left Hero Text & Headings (Shifted Higher Into Sky Area) -->
+      <div class="col-lg-6 col-xl-6 text-white pe-lg-4 hero-text-col">
+        <h1 class="hero-welcome-title display-4 fw-extrabold mb-3">
+          Welcome <span class="highlight-blue">Back!</span>
+        </h1>
+        <p class="hero-subtitle fs-5 text-white-80 max-w-lg mb-0" style="max-width: 480px; line-height: 1.5;">
+          Your journey, your way. Book your favorite bus tickets and explore new destinations with ease.
+        </p>
+      </div>
 
-        <mat-form-field appearance="outline" class="w-100">
-          <mat-label>Password</mat-label>
-          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
-          <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword" type="button">
-            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-          </button>
-          <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Password is required</mat-error>
-        </mat-form-field>
 
-        <button mat-flat-button color="primary" class="w-100 py-4 mt-3" type="submit" [disabled]="loginForm.invalid || isLoading">
-          <span *ngIf="!isLoading">LOGIN</span>
-          <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-        </button>
+      <!-- Right Floating Login Card (Glassmorphism Panel) -->
+      <div class="col-lg-5 col-xl-5 ms-auto pe-lg-4 pe-xl-5">
+        <div class="auth-floating-card glass-panel p-4 p-sm-4 ms-auto me-lg-4 me-xl-5">
+          
+          <!-- Card Title & Subtitle -->
+          <div class="d-flex align-items-start gap-3 mb-3">
+            <div class="card-icon-badge rounded-circle p-2 p-sm-3 d-flex align-items-center justify-content-center">
+              <mat-icon class="fs-4 w-auto h-auto">person_outline</mat-icon>
+            </div>
+            <div>
+              <h3 class="fw-bold text-white mb-1 fs-5">Login to Continue</h3>
+              <p class="text-white-70 extra-small mb-0">Access your account to book tickets and manage your trips.</p>
+            </div>
+          </div>
 
-      </form>
-    </mat-card-content>
+          <!-- Portal Selection Tabs -->
+          <div class="portal-switch-tabs d-flex p-1 rounded-3 mb-3">
+            <button 
+              type="button" 
+              class="portal-tab-btn flex-fill d-flex align-items-center justify-content-center gap-2 py-2 px-2 rounded-3 border-0 fw-semibold small"
+              [class.active]="selectedPortal === 'USER'"
+              (click)="selectPortal('USER')">
+              <mat-icon class="fs-6 w-auto h-auto">person_outline</mat-icon>
+              <span>User Portal</span>
+            </button>
+            <button 
+              type="button" 
+              class="portal-tab-btn flex-fill d-flex align-items-center justify-content-center gap-2 py-2 px-2 rounded-3 border-0 fw-semibold small"
+              [class.active]="selectedPortal === 'ADMIN'"
+              (click)="selectPortal('ADMIN')">
+              <mat-icon class="fs-6 w-auto h-auto">shield</mat-icon>
+              <span>Admin Portal</span>
+            </button>
+          </div>
 
-    <mat-card-footer class="text-center pb-3">
-      <p class="mb-0 text-muted">Don't have an account? <a routerLink="/auth/register" class="text-primary text-decoration-none fw-bold">Sign up</a></p>
-    </mat-card-footer>
-  </mat-card>
+          <!-- Login Form -->
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="d-flex flex-column gap-2">
+            
+            <div class="form-group">
+              <label class="form-label fw-bold text-white-90 extra-small mb-1">Email Address <span class="text-danger-custom">*</span></label>
+              <div class="input-with-icon position-relative">
+                <mat-icon class="input-prefix-icon">mail_outline</mat-icon>
+                <input 
+                  type="email" 
+                  formControlName="email" 
+                  class="form-control custom-input" 
+                  placeholder="Enter your email address">
+              </div>
+              <div *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid" class="text-warning extra-small mt-1">
+                <span *ngIf="loginForm.get('email')?.hasError('required')">Email is required</span>
+                <span *ngIf="loginForm.get('email')?.hasError('email')">Please enter a valid email address</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label fw-bold text-white-90 extra-small mb-1">Password <span class="text-danger-custom">*</span></label>
+              <div class="input-with-icon position-relative">
+                <mat-icon class="input-prefix-icon">lock_outline</mat-icon>
+                <input 
+                  [type]="hidePassword ? 'password' : 'text'" 
+                  formControlName="password" 
+                  class="form-control custom-input" 
+                  placeholder="Enter your password">
+                <button 
+                  type="button" 
+                  class="btn-eye-toggle position-absolute end-0 top-50 translate-middle-y border-0 bg-transparent me-2"
+                  (click)="hidePassword = !hidePassword">
+                  <mat-icon class="fs-6 w-auto h-auto">{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                </button>
+              </div>
+              <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" class="text-warning extra-small mt-1">
+                <span *ngIf="loginForm.get('password')?.hasError('required')">Password is required</span>
+              </div>
+            </div>
+
+            <!-- Remember me & Forgot password -->
+            <div class="d-flex align-items-center justify-content-between pt-1">
+              <mat-checkbox color="primary" class="remember-checkbox">
+                <span class="extra-small text-white-80 fw-medium">Remember me</span>
+              </mat-checkbox>
+              <a href="javascript:void(0)" class="forgot-link text-decoration-none extra-small fw-bold">Forgot password?</a>
+            </div>
+
+            <!-- Submit Button -->
+            <button 
+              type="submit" 
+              class="btn btn-primary theme-login-btn w-100 py-2.5 rounded-3 mt-1 shadow-sm d-flex align-items-center justify-content-center gap-2 fw-bold"
+              [disabled]="loginForm.invalid || isLoading">
+              <span *ngIf="!isLoading" class="d-flex align-items-center justify-content-center gap-2">
+                <span>Login</span>
+                <mat-icon class="fs-5 w-auto h-auto">arrow_forward</mat-icon>
+              </span>
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            </button>
+
+          </form>
+
+          <!-- Card Footer -->
+          <div class="card-footer-wrap text-center mt-3 pt-2">
+            <p class="mb-0 text-white-70 extra-small">
+              Don't have an account? 
+              <a routerLink="/auth/register" class="register-link text-decoration-none fw-bold ms-1">Create Account</a>
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+
+  <!-- Bottom Left Feature Highlights Bar -->
+  <div class="bottom-features-bar w-100 flex-shrink-0 pt-2">
+    <div class="row g-3 text-white">
+      
+      <div class="col-6 col-md-3">
+        <div class="d-flex align-items-center gap-2.5 feature-item">
+          <div class="feature-icon-box rounded-circle bg-white bg-opacity-15 backdrop-blur p-2 d-flex align-items-center justify-content-center">
+            <mat-icon class="text-white fs-5 w-auto h-auto">confirmation_number</mat-icon>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-0 text-white small">Easy Booking</h6>
+            <p class="mb-0 text-white-50 extra-small">Book in just a few clicks</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="d-flex align-items-center gap-2.5 feature-item border-start-md">
+          <div class="feature-icon-box rounded-circle bg-white bg-opacity-15 backdrop-blur p-2 d-flex align-items-center justify-content-center">
+            <mat-icon class="text-white fs-5 w-auto h-auto">verified_user</mat-icon>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-0 text-white small">Safe & Secure</h6>
+            <p class="mb-0 text-white-50 extra-small">Your data is protected</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="d-flex align-items-center gap-3 feature-item border-start-md">
+          <div class="feature-icon-box rounded-circle bg-white bg-opacity-15 backdrop-blur p-2 d-flex align-items-center justify-content-center">
+            <mat-icon class="text-white fs-5 w-auto h-auto">location_on</mat-icon>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-0 text-white small">Wide Network</h6>
+            <p class="mb-0 text-white-50 extra-small">Multiple routes & cities</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="d-flex align-items-center gap-3 feature-item border-start-md">
+          <div class="feature-icon-box rounded-circle bg-white bg-opacity-15 backdrop-blur p-2 d-flex align-items-center justify-content-center">
+            <mat-icon class="text-white fs-5 w-auto h-auto">headset_mic</mat-icon>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-0 text-white small">24/7 Support</h6>
+            <p class="mb-0 text-white-50 extra-small">We're here to help</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </div>
+
+

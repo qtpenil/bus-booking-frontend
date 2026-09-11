@@ -35,15 +35,16 @@ export class MyBookingsComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
   private cdr = inject(ChangeDetectorRef);
 
-  confirmedTickets: any[] = [];
+  allBookings: any[] = [];
+  activeTab: 'CONFIRMED' | 'CANCELLED' | 'ALL' = 'CONFIRMED';
   isLoading = true;
   errorMessage = '';
 
   ngOnInit(): void {
-    this.fetchConfirmedTickets();
+    this.fetchBookings();
   }
 
-  fetchConfirmedTickets(): void {
+  fetchBookings(): void {
     this.isLoading = true;
     this.errorMessage = '';
     this.cdr.detectChanges();
@@ -51,12 +52,7 @@ export class MyBookingsComponent implements OnInit {
     this.bookingService.getMyBookings().subscribe({
       next: (list) => {
         console.log('Fetched My Bookings:', list);
-        const bookingsList = Array.isArray(list) ? list : [];
-        
-        this.confirmedTickets = bookingsList.filter(b => 
-          b && b.status && b.status.toString().toUpperCase() === 'CONFIRMED'
-        );
-
+        this.allBookings = Array.isArray(list) ? list : [];
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -67,6 +63,28 @@ export class MyBookingsComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  get filteredTickets(): any[] {
+    if (this.activeTab === 'CONFIRMED') {
+      return this.allBookings.filter(b => b && b.status && b.status.toString().toUpperCase() === 'CONFIRMED');
+    }
+    if (this.activeTab === 'CANCELLED') {
+      return this.allBookings.filter(b => b && b.status && b.status.toString().toUpperCase() === 'CANCELLED');
+    }
+    return this.allBookings;
+  }
+
+  get confirmedCount(): number {
+    return this.allBookings.filter(b => b && b.status && b.status.toString().toUpperCase() === 'CONFIRMED').length;
+  }
+
+  get cancelledCount(): number {
+    return this.allBookings.filter(b => b && b.status && b.status.toString().toUpperCase() === 'CANCELLED').length;
+  }
+
+  fetchConfirmedTickets(): void {
+    this.fetchBookings();
   }
 
   openTicketDetails(ticket: any): void {

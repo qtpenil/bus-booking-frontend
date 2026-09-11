@@ -1,1 +1,259 @@
-// Register styles
+.auth-page-hero {
+  width: 100%;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  /* Dark-blue transparent gradient behind panel connecting right side naturally */
+  background: linear-gradient(90deg, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.35) 45%, rgba(15, 42, 74, 0.65) 100%), 
+              url('/images/login_bg.png') no-repeat center center / cover;
+  position: relative;
+
+  &.h-100-vh {
+    height: 100vh;
+  }
+
+  .backdrop-blur {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .brand-logo-icon {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.18) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff !important;
+
+    mat-icon {
+      color: #ffffff !important;
+    }
+  }
+
+  .tracking-wide {
+    letter-spacing: 0.5px;
+  }
+
+  /* Shift Left Headline Upper Into Open Blue Sky Area */
+  .hero-text-col {
+    transform: translateY(-230px);
+
+    @media (max-width: 991px) {
+      transform: translateY(0);
+    }
+  }
+
+  .hero-welcome-title {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.15;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+
+    .highlight-blue {
+      color: #3b82f6;
+    }
+  }
+
+  .hero-subtitle {
+    color: rgba(255, 255, 255, 0.92);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+    font-size: 1rem;
+    max-width: 450px;
+  }
+
+  /* Glassmorphism Auth Floating Panel */
+  .auth-floating-card.glass-panel {
+    background: rgba(15, 30, 55, 0.42) !important;
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35) !important;
+    max-width: 380px !important;
+    width: 100%;
+    transition: all 0.3s ease;
+
+    .card-icon-badge {
+      width: 44px;
+      height: 44px;
+      background: rgba(37, 99, 235, 0.25) !important;
+      border: 1px solid rgba(37, 99, 235, 0.4);
+      color: #ffffff !important;
+      flex-shrink: 0;
+
+      mat-icon {
+        color: #ffffff !important;
+      }
+    }
+
+    .text-white-90 {
+      color: rgba(255, 255, 255, 0.92) !important;
+    }
+
+    .text-white-80 {
+      color: rgba(255, 255, 255, 0.82) !important;
+    }
+
+    .text-white-70 {
+      color: rgba(255, 255, 255, 0.70) !important;
+    }
+
+    .text-danger-custom {
+      color: #f87171 !important;
+    }
+
+    /* Glass Portal Switcher Tabs */
+    .portal-switch-tabs {
+      background: rgba(10, 20, 38, 0.5) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 4px;
+      border-radius: 12px;
+
+      .portal-tab-btn {
+        background: transparent;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.86rem;
+        font-weight: 600;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+
+        mat-icon {
+          color: rgba(255, 255, 255, 0.7);
+          transition: color 0.2s ease;
+        }
+
+        &.active {
+          background-color: #2563eb !important;
+          color: #ffffff !important;
+          box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+
+          mat-icon {
+            color: #ffffff !important;
+          }
+        }
+
+        &:hover:not(.active) {
+          color: #ffffff;
+          mat-icon {
+            color: #ffffff;
+          }
+        }
+      }
+    }
+
+    /* Glass Form Inputs */
+    .custom-input {
+      height: 44px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.22) !important;
+      font-size: 0.9rem;
+      background: rgba(255, 255, 255, 0.10) !important;
+      color: #ffffff !important;
+      padding-left: 14px;
+      padding-right: 14px;
+      transition: all 0.2s ease;
+
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.5) !important;
+      }
+
+      &:focus {
+        border-color: #2563eb !important;
+        background: rgba(255, 255, 255, 0.16) !important;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35) !important;
+        outline: none;
+      }
+    }
+
+    .input-with-icon {
+      .input-prefix-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 2;
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        color: rgba(255, 255, 255, 0.7) !important;
+        pointer-events: none;
+      }
+
+      .custom-input {
+        padding-left: 42px;
+        padding-right: 42px;
+      }
+
+      .btn-eye-toggle {
+        cursor: pointer;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255, 255, 255, 0.7) !important;
+
+        &:hover {
+          color: #ffffff !important;
+        }
+      }
+    }
+
+    .forgot-link, .register-link {
+      color: #60a5fa !important;
+      transition: color 0.2s ease;
+      &:hover {
+        color: #93c5fd !important;
+      }
+    }
+
+    .card-footer-wrap {
+      border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+    }
+
+    .extra-small {
+      font-size: 0.78rem;
+    }
+
+    /* Primary Action Button */
+    .theme-login-btn {
+      height: 46px;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+      border: none !important;
+      color: #ffffff !important;
+      font-size: 0.95rem;
+      border-radius: 12px !important;
+      transition: all 0.25s ease;
+
+      &:hover:not([disabled]) {
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.45) !important;
+        transform: translateY(-1px);
+      }
+    }
+  }
+
+  /* Bottom Feature Highlights Bar */
+  .bottom-features-bar {
+    .feature-icon-box {
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.18) !important;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      flex-shrink: 0;
+
+      mat-icon {
+        color: #ffffff !important;
+      }
+    }
+
+    .extra-small {
+      font-size: 0.76rem;
+    }
+
+    @media (min-width: 768px) {
+      .border-start-md {
+        border-left: 1px solid rgba(255, 255, 255, 0.2);
+        padding-left: 1.25rem;
+      }
+    }
+  }
+}

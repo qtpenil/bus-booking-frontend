@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -29,6 +29,7 @@ export class CitiesComponent implements OnInit {
   private fb = inject(FormBuilder);
   private routeService = inject(RouteService);
   private toast = inject(ToastService);
+  private cdr = inject(ChangeDetectorRef);
 
   cities: CityResponse[] = [];
   isLoading = false;
@@ -52,14 +53,18 @@ export class CitiesComponent implements OnInit {
     this.isLoading = true;
     this.routeService.getAllCities().subscribe({
       next: (data) => {
-        this.cities = data;
+        this.cities = [...data];
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       },
       error: () => {
         this.toast.error('Failed to load cities');
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       complete: () => {
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -73,13 +78,16 @@ export class CitiesComponent implements OnInit {
           this.cityForm.reset();
           // Prepend new city to array for instant feedback or reload from server
           this.cities = [newCity, ...this.cities];
+          this.cdr.detectChanges();
         },
         error: (err) => {
           this.toast.error(err?.error?.message || 'Failed to add city');
           this.isLoading = false;
+          this.cdr.detectChanges();
         },
         complete: () => {
           this.isLoading = false;
+          this.cdr.detectChanges();
         }
       });
     }

@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../features/auth/services/auth.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -9,5 +10,9 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
   styleUrl: './admin-layout.component.scss'
 })
 export class AdminLayoutComponent {
+  private authService = inject(AuthService);
 
+  logout(): void {
+    this.authService.logout();
+  }
 }

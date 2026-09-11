@@ -63,11 +63,11 @@
             <h6 class="text-muted mb-3">Total Seats Configured: <strong>{{seats.length}}</strong> / {{data.template.totalSeats}}</h6>
             <div class="btn-group w-100" role="group">
               <input type="radio" class="btn-check" name="deckSwitch" id="lowerDeck" autocomplete="off" 
-                [checked]="currentDeck === 'LOWER'" (click)="currentDeck = deckTypes[0]">
+                [checked]="currentDeck === 'LOWER'" (click)="switchDeck(deckTypes[0])">
               <label class="btn btn-outline-primary" for="lowerDeck">LOWER DECK</label>
             
               <input type="radio" class="btn-check" name="deckSwitch" id="upperDeck" autocomplete="off"
-                [checked]="currentDeck === 'UPPER'" (click)="currentDeck = deckTypes[1]">
+                [checked]="currentDeck === 'UPPER'" (click)="switchDeck(deckTypes[1])">
               <label class="btn btn-outline-primary" for="upperDeck">UPPER DECK</label>
             </div>
           </mat-card-content>

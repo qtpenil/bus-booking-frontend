@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -35,6 +35,7 @@ export class RoutesComponent implements OnInit {
   private routeService = inject(RouteService);
   private toast = inject(ToastService);
   private dialog = inject(MatDialog);
+  private cdr = inject(ChangeDetectorRef);
 
   routes: RouteResponse[] = [];
   cities: CityResponse[] = [];
@@ -88,11 +89,14 @@ export class RoutesComponent implements OnInit {
       cities: this.routeService.getAllCities()
     }).subscribe({
       next: (data) => {
-        this.routes = data.routes;
-        this.cities = data.cities;
+        this.routes = [...data.routes];
+        this.cities = [...data.cities];
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       },
       error: () => {
         this.toast.error('Failed to load routes and cities');
+        this.cdr.detectChanges();
       }
     });
   }
@@ -117,21 +121,25 @@ export class RoutesComponent implements OnInit {
                 this.toast.success('Route and stops created successfully!');
                 this.resetForm();
                 this.routes = [newRoute, ...this.routes];
+                this.cdr.detectChanges();
               },
               error: () => {
                 this.toast.error('Route created but failed to add some stops');
                 this.resetForm();
                 this.routes = [newRoute, ...this.routes];
+                this.cdr.detectChanges();
               }
             });
           } else {
             this.toast.success('Route created successfully!');
             this.resetForm();
             this.routes = [newRoute, ...this.routes];
+            this.cdr.detectChanges();
           }
         },
         error: (err) => {
           this.toast.error(err?.error?.message || 'Failed to create route');
+          this.cdr.detectChanges();
         }
       });
     }
