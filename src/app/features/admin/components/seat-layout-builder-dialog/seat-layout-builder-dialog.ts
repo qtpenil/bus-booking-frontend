@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, inject } from '@angular/core';
+import { Component, Inject, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
@@ -35,6 +35,7 @@ export class SeatLayoutBuilderDialog implements OnInit {
   private fb = inject(FormBuilder);
   private fleetService = inject(FleetService);
   private toast = inject(ToastService);
+  private cdr = inject(ChangeDetectorRef);
 
   seats: SeatTemplateResponse[] = [];
   isLoading = false;
@@ -65,12 +66,15 @@ export class SeatLayoutBuilderDialog implements OnInit {
     this.isLoading = true;
     this.fleetService.getSeatsByTemplateId(this.data.template.id).subscribe({
       next: (seats) => {
-        this.seats = seats;
+        this.seats = [...seats];
         this.isLoading = false;
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       },
       error: () => {
         this.toast.error('Failed to load seats');
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -100,6 +104,12 @@ export class SeatLayoutBuilderDialog implements OnInit {
     return grid;
   }
 
+  switchDeck(deck: DeckType): void {
+    this.currentDeck = deck;
+    this.cdr.markForCheck();
+    this.cdr.detectChanges();
+  }
+
   addSeat(): void {
     if (this.seatForm.valid) {
       const request: SeatTemplateRequest = {
@@ -120,9 +130,12 @@ export class SeatLayoutBuilderDialog implements OnInit {
           } else {
             this.seatForm.patchValue({ rowNo: currentRow + 1, columnNo: 1, seatNumber: '' });
           }
+          this.cdr.markForCheck();
+          this.cdr.detectChanges();
         },
         error: (err) => {
           this.toast.error(err?.error?.message || 'Failed to add seat');
+          this.cdr.detectChanges();
         }
       });
     }
@@ -133,9 +146,12 @@ export class SeatLayoutBuilderDialog implements OnInit {
       next: () => {
         this.toast.success('Seat removed');
         this.seats = this.seats.filter(s => s.id !== seatId);
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.toast.error(err?.error?.message || 'Failed to remove seat');
+        this.cdr.detectChanges();
       }
     });
   }

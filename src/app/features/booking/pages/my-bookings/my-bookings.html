@@ -25,21 +25,34 @@
     <button mat-button class="text-danger fw-bold" (click)="fetchConfirmedTickets()">Retry</button>
   </div>
 
+  <!-- Status Filter Tabs -->
+  <div *ngIf="!isLoading && !errorMessage && allBookings.length > 0" class="d-flex gap-2 mb-4">
+    <button class="btn rounded-pill px-4" [ngClass]="activeTab === 'CONFIRMED' ? 'btn-primary' : 'btn-outline-secondary'" (click)="activeTab = 'CONFIRMED'">
+      Confirmed ({{ confirmedCount }})
+    </button>
+    <button class="btn rounded-pill px-4" [ngClass]="activeTab === 'CANCELLED' ? 'btn-danger' : 'btn-outline-secondary'" (click)="activeTab = 'CANCELLED'">
+      Cancelled ({{ cancelledCount }})
+    </button>
+    <button class="btn rounded-pill px-4" [ngClass]="activeTab === 'ALL' ? 'btn-dark' : 'btn-outline-secondary'" (click)="activeTab = 'ALL'">
+      All Tickets ({{ allBookings.length }})
+    </button>
+  </div>
+
   <!-- Empty State -->
-  <div *ngIf="!isLoading && !errorMessage && confirmedTickets.length === 0" class="text-center py-5 empty-card shadow-sm rounded-4 bg-white">
+  <div *ngIf="!isLoading && !errorMessage && filteredTickets.length === 0" class="text-center py-5 empty-card shadow-sm rounded-4 bg-white">
     <div class="icon-circle mx-auto mb-3 bg-light text-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
       <mat-icon class="fs-1">confirmation_number</mat-icon>
     </div>
-    <h4 class="fw-bold text-dark">No Booked Tickets Found</h4>
-    <p class="text-muted mb-4">You do not have any active confirmed bus bookings at the moment.</p>
+    <h4 class="fw-bold text-dark">No Tickets Found</h4>
+    <p class="text-muted mb-4">You do not have any {{ activeTab.toLowerCase() }} bus bookings at the moment.</p>
     <a mat-flat-button color="primary" routerLink="/search" class="rounded-pill px-4">
       Find Buses & Book Now
     </a>
   </div>
 
   <!-- Tickets Summary Cards Grid -->
-  <div *ngIf="!isLoading && confirmedTickets.length > 0" class="row g-4">
-    <div *ngFor="let ticket of confirmedTickets" class="col-12 col-md-6">
+  <div *ngIf="!isLoading && filteredTickets.length > 0" class="row g-4">
+    <div *ngFor="let ticket of filteredTickets" class="col-12 col-md-6">
       <div class="summary-ticket-card shadow-sm bg-white rounded-4 overflow-hidden border h-100 d-flex flex-column">
         
         <!-- Card Header -->
@@ -51,7 +64,10 @@
               <strong class="text-warning font-monospace fs-6">{{ ticket.bookingReference || ('BKG-' + ticket.bookingId) }}</strong>
             </div>
           </div>
-          <span class="badge bg-success px-3 py-2 text-uppercase fs-6">CONFIRMED</span>
+          <span class="badge px-3 py-2 text-uppercase fs-6" 
+                [ngClass]="ticket.status === 'CONFIRMED' ? 'bg-success' : (ticket.status === 'CANCELLED' ? 'bg-danger' : 'bg-warning')">
+            {{ ticket.status }}
+          </span>
         </div>
 
         <!-- Card Body -->
@@ -103,7 +119,7 @@
             <button mat-flat-button color="primary" class="flex-grow-1 rounded-pill py-2" (click)="openTicketDetails(ticket)">
               <mat-icon class="me-1">receipt_long</mat-icon> View Ticket
             </button>
-            <button mat-stroked-button color="warn" class="rounded-pill px-3 py-2 text-danger border-danger" (click)="cancelTicket(ticket, $event)">
+            <button *ngIf="ticket.status === 'CONFIRMED' || ticket.status === 'PENDING_PAYMENT'" mat-stroked-button color="warn" class="rounded-pill px-3 py-2 text-danger border-danger" (click)="cancelTicket(ticket, $event)">
               <mat-icon class="me-1">cancel</mat-icon> Cancel
             </button>
           </div>

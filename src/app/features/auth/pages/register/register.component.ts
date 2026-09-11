@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -21,6 +21,7 @@ export class RegisterComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
   private toast = inject(ToastService);
+  private cdr = inject(ChangeDetectorRef);
 
   registerForm: FormGroup = this.fb.group({
     firstName: ['', [Validators.required]],
@@ -36,6 +37,7 @@ export class RegisterComponent {
   onSubmit() {
     if (this.registerForm.valid) {
       this.isLoading = true;
+      this.cdr.detectChanges();
       this.authService.register(this.registerForm.value).subscribe({
         next: () => {
           this.toast.success('Registration successful!');
@@ -44,9 +46,11 @@ export class RegisterComponent {
         error: (err) => {
           this.toast.error(err?.error?.message || 'Registration failed.');
           this.isLoading = false;
+          this.cdr.detectChanges();
         },
         complete: () => {
           this.isLoading = false;
+          this.cdr.detectChanges();
         }
       });
     }

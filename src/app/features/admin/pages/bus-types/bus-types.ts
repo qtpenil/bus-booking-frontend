@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -31,6 +31,7 @@ export class BusTypes implements OnInit {
   private fb = inject(FormBuilder);
   private fleetService = inject(FleetService);
   private toast = inject(ToastService);
+  private cdr = inject(ChangeDetectorRef);
 
   busTypes: BusTypeResponse[] = [];
   
@@ -52,10 +53,13 @@ export class BusTypes implements OnInit {
   loadBusTypes(): void {
     this.fleetService.getAllBusTypes().subscribe({
       next: (data) => {
-        this.busTypes = data;
+        this.busTypes = [...data];
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       },
       error: () => {
         this.toast.error('Failed to load bus types');
+        this.cdr.detectChanges();
       }
     });
   }
@@ -67,9 +71,11 @@ export class BusTypes implements OnInit {
           this.toast.success('Bus type added successfully!');
           this.busTypeForm.reset();
           this.busTypes = [newBusType, ...this.busTypes];
+          this.cdr.detectChanges();
         },
         error: (err) => {
           this.toast.error(err?.error?.message || 'Failed to add bus type');
+          this.cdr.detectChanges();
         }
       });
     }
@@ -84,9 +90,11 @@ export class BusTypes implements OnInit {
       next: () => {
         this.toast.success('Bus type deleted successfully');
         this.busTypes = this.busTypes.filter(bt => bt.id !== type.id);
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.toast.error(err?.error?.message || 'Failed to delete bus type');
+        this.cdr.detectChanges();
       }
     });
   }

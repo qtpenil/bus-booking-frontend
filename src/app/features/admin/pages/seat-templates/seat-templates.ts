@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -39,6 +39,7 @@ export class SeatTemplates implements OnInit {
   private fleetService = inject(FleetService);
   private toast = inject(ToastService);
   private dialog = inject(MatDialog);
+  private cdr = inject(ChangeDetectorRef);
 
   templates: SeatLayoutTemplateResponse[] = [];
   busTypes: BusTypeResponse[] = [];
@@ -69,10 +70,13 @@ export class SeatTemplates implements OnInit {
   loadTemplates(): void {
     this.fleetService.getAllSeatTemplates().subscribe({
       next: (data) => {
-        this.templates = data;
+        this.templates = [...data];
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       },
       error: () => {
         this.toast.error('Failed to load seat templates');
+        this.cdr.detectChanges();
       }
     });
   }
@@ -80,10 +84,13 @@ export class SeatTemplates implements OnInit {
   loadBusTypes(): void {
     this.fleetService.getAllBusTypes().subscribe({
       next: (data) => {
-        this.busTypes = data;
+        this.busTypes = [...data];
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       },
       error: () => {
         this.toast.error('Failed to load bus types for dropdown');
+        this.cdr.detectChanges();
       }
     });
   }
@@ -95,9 +102,11 @@ export class SeatTemplates implements OnInit {
           this.toast.success('Seat template added successfully!');
           this.templateForm.reset({ isActive: true, totalSeats: 0 });
           this.templates = [newTemplate, ...this.templates];
+          this.cdr.detectChanges();
         },
         error: (err) => {
           this.toast.error(err?.error?.message || 'Failed to add seat template');
+          this.cdr.detectChanges();
         }
       });
     }
@@ -122,9 +131,11 @@ export class SeatTemplates implements OnInit {
       next: () => {
         this.toast.success('Seat template deleted successfully');
         this.templates = this.templates.filter(t => t.id !== template.id);
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.toast.error(err?.error?.message || 'Failed to delete seat template');
+        this.cdr.detectChanges();
       }
     });
   }

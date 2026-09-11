@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -33,6 +33,7 @@ export class Buses implements OnInit {
   private fb = inject(FormBuilder);
   private fleetService = inject(FleetService);
   private toast = inject(ToastService);
+  private cdr = inject(ChangeDetectorRef);
 
   buses: BusResponse[] = [];
   busTypes: BusTypeResponse[] = [];
@@ -69,22 +70,43 @@ export class Buses implements OnInit {
 
   loadBuses(): void {
     this.fleetService.getAllBuses().subscribe({
-      next: (data) => this.buses = data,
-      error: () => this.toast.error('Failed to load buses')
+      next: (data) => {
+        this.buses = [...data];
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.toast.error('Failed to load buses');
+        this.cdr.detectChanges();
+      }
     });
   }
 
   loadBusTypes(): void {
     this.fleetService.getAllBusTypes().subscribe({
-      next: (data) => this.busTypes = data,
-      error: () => this.toast.error('Failed to load bus types')
+      next: (data) => {
+        this.busTypes = [...data];
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.toast.error('Failed to load bus types');
+        this.cdr.detectChanges();
+      }
     });
   }
 
   loadSeatTemplates(): void {
     this.fleetService.getAllSeatTemplates().subscribe({
-      next: (data) => this.seatTemplates = data,
-      error: () => this.toast.error('Failed to load seat templates')
+      next: (data) => {
+        this.seatTemplates = [...data];
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.toast.error('Failed to load seat templates');
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -95,9 +117,11 @@ export class Buses implements OnInit {
           this.toast.success('Bus added successfully!');
           this.busForm.reset({ status: BusStatus.ACTIVE, totalSeats: 0 });
           this.buses = [newBus, ...this.buses];
+          this.cdr.detectChanges();
         },
         error: (err) => {
           this.toast.error(err?.error?.message || 'Failed to add bus');
+          this.cdr.detectChanges();
         }
       });
     }
@@ -112,9 +136,11 @@ export class Buses implements OnInit {
       next: () => {
         this.toast.success('Bus deleted successfully');
         this.buses = this.buses.filter(b => b.id !== bus.id);
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.toast.error(err?.error?.message || 'Failed to delete bus');
+        this.cdr.detectChanges();
       }
     });
   }

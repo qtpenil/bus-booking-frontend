@@ -112,6 +112,23 @@ export class SearchComponent implements OnInit {
                 if (!schedules || !Array.isArray(schedules) || schedules.length === 0) {
                   return of([]); // return empty schedules array
                 }
+
+                // Filter out past schedules if searching for today's date
+                const todayStr = new Date().toISOString().split('T')[0];
+                if (date === todayStr) {
+                  const now = new Date();
+                  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+                  schedules = schedules.filter(s => {
+                    if (!s.departureTime) return true;
+                    const parts = s.departureTime.split(':');
+                    const hrs = Number(parts[0]);
+                    const mins = Number(parts[1]);
+                    const scheduleMinutes = hrs * 60 + mins;
+                    return scheduleMinutes > currentMinutes;
+                  });
+                }
+
                 return this.fleetService.getAllBuses().pipe(
                   map(buses => {
                     console.log('Buses fetched:', buses?.length);

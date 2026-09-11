@@ -1,46 +1,57 @@
 .home-wrapper {
-  background-color: #f8fafc;
-  min-height: calc(100vh - 64px);
+  background-color: #f5f8fc;
+  min-height: calc(100vh - 68px);
 }
 
+/* 1. Hero Banner (Dark Travel Blue Overlay & Clean Headline) */
 .hero-banner {
   min-height: 380px;
-  /* Render HomeBanner.webp crisp, vivid, and 100% clear without dark overlays */
-  background-image: url('/images/HomeBanner.webp'), url('/assets/images/HomeBanner.webp');
+  background-image: 
+    linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(15, 42, 74, 0.72) 100%), 
+    url('/images/HomeBanner.webp');
   background-size: cover;
   background-position: center bottom;
   background-repeat: no-repeat;
   position: relative;
-  padding-bottom: 70px; // Padding inside hero banner so headline sits nicely above the join line
+  padding-bottom: 75px;
+
+  /* Fallback if public path is structured under assets */
+  @supports not (background-image: url('/images/HomeBanner.webp')) {
+    background-image: 
+      linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(15, 42, 74, 0.72) 100%), 
+      url('/assets/images/HomeBanner.webp');
+  }
 }
 
 .hero-title {
   font-family: 'Inter', 'Roboto', sans-serif;
-  font-weight: 800;
-  color: #0f172a; // High-contrast dark title so it reads crisp on bright sky image
-  letter-spacing: -1px;
-  line-height: 1.15;
-  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.9);
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.highlight-blue {
+  color: #3b82f6;
 }
 
 .hero-subtitle {
-  font-weight: 500;
-  color: #334155;
-  max-width: 680px;
-  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9);
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 600px;
 }
 
-/* 50/50 Overlap Section: Shifts search card EXACTLY half into Blue Hero image & half into White section below */
+/* 2. 50/50 Overlap Section: Floating Search Card */
 .search-overlap-section {
-  margin-top: -65px !important; // Exactly half of search card height for 50/50 vertical split
+  margin-top: -65px !important;
   position: relative;
   z-index: 25;
 }
 
-/* Perfect Flexbox Search Bar Layout (Blue & White Theme) */
+/* Premium White Glass Search Panel */
 .search-card {
-  border-radius: 20px !important;
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 8px 30px rgba(15, 42, 74, 0.08) !important;
   background: #ffffff !important;
   border: 1px solid #e2e8f0 !important;
 
@@ -63,32 +74,39 @@
   }
 
   .swap-btn {
-    border: 1px solid #cbd5e1;
-    background-color: #f8fafc;
-    transition: transform 0.25s ease, background-color 0.2s ease;
+    border: 1px solid #e2e8f0;
+    background-color: #eff6ff;
+    border-radius: 10px;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.25s ease, background-color 0.2s ease, border-color 0.2s ease;
     
     &:hover {
       transform: rotate(180deg);
-      background-color: #e2e8f0;
+      background-color: #dbeafe;
+      border-color: #bfdbfe;
     }
   }
 
-  /* Spacious, clean spacing for Today & Tomorrow date chips */
+  /* Date chips (Today & Tomorrow) */
   .date-chips-wrapper {
     display: flex;
-    gap: 10px;
-    margin-top: 10px; // Clear, comfortable spacing from the Date input field
+    gap: 8px;
+    margin-top: 8px;
     margin-bottom: 4px;
   }
 
   .date-chip {
     font-size: 0.8rem;
     font-weight: 600;
-    padding: 4px 14px;
-    border-radius: 16px;
-    border: 1px solid #cbd5e1;
-    background: #f8fafc;
-    color: #334155;
+    padding: 4px 12px;
+    border-radius: 8px;
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
+    color: #2563eb;
     cursor: pointer;
     transition: all 0.2s ease;
 
@@ -96,12 +114,6 @@
       background-color: #2563eb;
       color: #ffffff;
       border-color: #2563eb;
-    }
-
-    &.btn-today {
-      border-color: #3b82f6;
-      color: #2563eb;
-      background: #eff6ff;
     }
   }
 
@@ -111,21 +123,28 @@
   }
 
   .main-search-btn {
-    height: 56px;
-    font-size: 1rem;
-    font-weight: 700;
-    border-radius: 14px !important;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    height: 52px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35) !important;
+    transition: all 0.2s ease;
 
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4) !important;
+      background-color: #1d4ed8 !important;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45) !important;
     }
   }
 }
 
-/* Material Form Field Subscript Fix for Clean Box Alignment */
+.text-primary-blue {
+  color: #2563eb !important;
+}
+
+/* Material Form Field Control Customizations */
 ::ng-deep .search-card {
   .mat-mdc-form-field-subscript-wrapper {
     height: 0 !important;
@@ -135,27 +154,110 @@
   
   .mat-mdc-text-field-wrapper {
     background-color: #ffffff !important;
+    border-radius: 10px !important;
   }
 
   .mat-mdc-form-field-flex {
-    height: 56px !important;
+    height: 52px !important;
     align-items: center !important;
+  }
+
+  .mat-mdc-floating-label {
+    color: #0f172a !important;
+    font-weight: 600 !important;
+  }
+
+  .mat-mdc-select-value-text, .mat-mdc-input-element {
+    color: #0f172a !important;
+    font-weight: 500 !important;
+  }
+
+  .mdc-notched-outline__leading,
+  .mdc-notched-outline__notch,
+  .mdc-notched-outline__trailing {
+    border-color: #e2e8f0 !important;
+  }
+
+  .mat-mdc-form-field-focused {
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: #2563eb !important;
+      border-width: 2px !important;
+    }
   }
 }
 
-/* Deals Section Spacing Below 50/50 Search Card */
+/* 3. Promotional Offers & Deals Section */
 .deals-section {
   padding-top: 60px;
 }
 
+.section-title {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.section-subtitle {
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
 /* Offer Cards Styling */
 .offer-card {
+  background-color: #ffffff;
+  border-radius: 16px !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 8px 30px rgba(15, 42, 74, 0.08) !important;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
-  border-color: #e2e8f0 !important;
   
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 25px rgba(15, 23, 42, 0.08) !important;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(15, 42, 74, 0.12) !important;
+  }
+
+  .offer-badge {
+    display: inline-block;
+    background-color: #eff6ff;
+    color: #2563eb;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid #dbeafe;
+    letter-spacing: 0.5px;
+  }
+
+  .offer-title {
+    color: #0f172a;
+    font-weight: 700;
+    font-size: 1.05rem;
+    line-height: 1.35;
+  }
+
+  .offer-desc {
+    color: #64748b;
+    line-height: 1.5;
+  }
+
+  .code-tag {
+    color: #2563eb;
+    background-color: #f1f5f9;
+    padding: 2px 8px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .offer-action-btn {
+    color: #2563eb;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #1d4ed8;
+      text-decoration: underline;
+    }
   }
 }
 
@@ -176,3 +278,4 @@
     }
   }
 }
+
