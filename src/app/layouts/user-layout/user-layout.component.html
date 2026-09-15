@@ -1,23 +1,23 @@
 <div class="user-wrapper d-flex flex-column min-vh-100">
-  <mat-toolbar color="primary" class="premium-header">
-    <div class="container d-flex justify-content-between align-items-center w-100">
+  <mat-toolbar class="premium-header">
+    <div class="container-fluid px-3 px-md-5 d-flex justify-content-between align-items-center w-100">
       <a routerLink="/home" class="navbar-brand d-flex align-items-center text-white text-decoration-none">
         <div class="brand-icon-box d-flex align-items-center justify-content-center me-2">
           <mat-icon class="brand-bus-icon">directions_bus</mat-icon>
         </div>
-        <span class="fs-4 fw-bold logo-text">BusBooking</span>
+        <span class="fs-4 fw-bold logo-text">Bus<span class="highlight-brand">Booking</span></span>
       </a>
 
       <div class="nav-links d-none d-md-flex align-items-center">
-        <a mat-button routerLink="/home" routerLinkActive="active-link" class="nav-btn">Home</a>
+        <a mat-button routerLink="/home" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" class="nav-btn">Home</a>
         <a mat-button routerLink="/search" routerLinkActive="active-link" class="nav-btn">Find Buses</a>
-        <a mat-button routerLink="/booking/my-bookings" routerLinkActive="active-link" class="nav-btn" *ngIf="isLoggedIn">My Bookings</a>
+        <a mat-button (click)="onMyBookingsClick()" routerLinkActive="active-link" class="nav-btn">My Bookings</a>
       </div>
 
       <div class="auth-buttons d-flex align-items-center">
         <ng-container *ngIf="!isLoggedIn; else userProfileMenu">
-          <a mat-stroked-button color="accent" routerLink="/auth/login" class="me-2 login-btn">Login</a>
-          <a mat-flat-button color="accent" routerLink="/auth/register" class="signup-btn">Sign Up</a>
+          <button mat-button (click)="openAuthModal('login')" class="me-2 login-btn">Login</button>
+          <button mat-flat-button (click)="openAuthModal('register')" class="signup-btn">Sign Up</button>
         </ng-container>
 
         <ng-template #userProfileMenu>
@@ -55,7 +55,7 @@
     <router-outlet></router-outlet>
   </main>
 
-  <footer class="bg-dark text-white text-center py-4 mt-auto">
+  <footer class="bg-dark text-white text-center py-4 mt-auto" *ngIf="!isHomePage">
     <div class="container d-flex justify-content-between align-items-center flex-column flex-md-row">
       <p class="mb-0">&copy; 2024 Bus Booking System. All rights reserved.</p>
       <div class="footer-links mt-3 mt-md-0">

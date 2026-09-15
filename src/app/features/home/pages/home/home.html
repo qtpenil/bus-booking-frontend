@@ -1,153 +1,101 @@
 <div class="home-wrapper">
-  <!-- 1. Hero Banner (Dark Travel Blue Overlay & Clean Headline) -->
-  <div class="hero-banner d-flex align-items-center">
-    <div class="container py-5">
-      <div class="row align-items-center text-center text-md-start">
-        <div class="col-12 col-lg-8">
+  <div class="container-fluid hero-container px-3 px-md-5 h-100">
+    <div class="row h-100 py-4 py-lg-0">
+      
+      <!-- Left Column: Hero Headline (Upper Left Side) -->
+      <div class="col-12 col-lg-6 col-xl-6 hero-text-col pt-2 pt-lg-5 mb-4 mb-lg-0">
+        <div class="hero-headline-wrap text-start">
           <h1 class="hero-title display-4 fw-bold mb-3 text-white">
             Your Journey, <span class="highlight-blue">Your Way.</span>
           </h1>
-          <p class="hero-subtitle lead text-white-80 mb-0">
+          <p class="hero-subtitle lead text-white-90 mb-0">
             Book comfortable buses across India with ease and confidence.
           </p>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- 2. Floating Search Card (Premium White Glass Card with 50/50 Overlap) -->
-  <div class="search-overlap-section">
-    <div class="container">
-      <mat-card class="search-card border-0 p-3 p-md-4">
-        <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
-          <div class="search-flex-row">
-            
-            <!-- Source City -->
-            <div class="search-item flex-grow-1">
-              <mat-form-field appearance="outline" class="w-100 search-field">
-                <mat-label>From</mat-label>
-                <mat-icon matPrefix class="text-primary-blue me-2">directions_bus</mat-icon>
-                <mat-select formControlName="fromCityId" placeholder="Leaving from">
-                  <mat-option *ngFor="let city of cities" [value]="city.id">
-                    {{ city.name }}, {{ city.state }}
-                  </mat-option>
-                </mat-select>
-                <mat-error *ngIf="searchForm.get('fromCityId')?.hasError('required')">
-                  Source city required
-                </mat-error>
-              </mat-form-field>
-            </div>
+      <!-- Right Column: Vertical Glass Search Card (Positioned in Sky Area on Right) -->
+      <div class="col-12 col-lg-6 col-xl-6 d-flex justify-content-center justify-content-lg-end align-self-center pe-lg-4 pe-xl-5 search-card-col">
+        <mat-card class="search-card border-0 p-4">
+          
+          <div class="search-card-header mb-3">
+            <h3 class="search-title text-white fw-bold mb-0 d-flex align-items-center">
+              <mat-icon class="text-primary-blue me-2">search</mat-icon> Search Buses
+            </h3>
+          </div>
 
-            <!-- Swap Button -->
-            <div class="swap-item text-center">
-              <button type="button" mat-icon-button class="swap-btn shadow-sm" (click)="swapCities()" title="Swap Cities">
-                <mat-icon class="text-primary-blue">swap_horiz</mat-icon>
-              </button>
-            </div>
-
-            <!-- Destination City -->
-            <div class="search-item flex-grow-1">
-              <mat-form-field appearance="outline" class="w-100 search-field">
-                <mat-label>To</mat-label>
-                <mat-icon matPrefix class="text-primary-blue me-2">location_on</mat-icon>
-                <mat-select formControlName="toCityId" placeholder="Going to">
-                  <mat-option *ngFor="let city of cities" [value]="city.id">
-                    {{ city.name }}, {{ city.state }}
-                  </mat-option>
-                </mat-select>
-                <mat-error *ngIf="searchForm.get('toCityId')?.hasError('required')">
-                  Destination city required
-                </mat-error>
-              </mat-form-field>
-            </div>
-
-            <!-- Date Selection -->
-            <div class="search-item flex-grow-1 position-relative">
-              <mat-form-field appearance="outline" class="w-100 search-field">
-                <mat-label>Date of Journey</mat-label>
-                <input matInput [matDatepicker]="picker" formControlName="journeyDate" [min]="minDate" readonly (click)="picker.open()">
-                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-datepicker #picker></mat-datepicker>
-                <mat-error *ngIf="searchForm.get('journeyDate')?.hasError('required')">
-                  Date required
-                </mat-error>
-              </mat-form-field>
-
-              <div class="date-chips-wrapper">
-                <button type="button" class="date-chip btn-today" (click)="selectToday()">Today</button>
-                <button type="button" class="date-chip btn-tomorrow" (click)="selectTomorrow()">Tomorrow</button>
+          <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+            <div class="search-flex-col d-flex flex-column gap-3">
+              
+              <!-- Source City -->
+              <div class="search-item">
+                <mat-form-field appearance="outline" class="w-100 search-field">
+                  <mat-label>From</mat-label>
+                  <mat-icon matPrefix class="text-primary-blue me-2">directions_bus</mat-icon>
+                  <mat-select formControlName="fromCityId" placeholder="Leaving from">
+                    <mat-option *ngFor="let city of cities" [value]="city.id">
+                      {{ city.name }}, {{ city.state }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="searchForm.get('fromCityId')?.hasError('required')">
+                    Source city required
+                  </mat-error>
+                </mat-form-field>
               </div>
+
+              <!-- Swap Button (Vertical) -->
+              <div class="swap-item text-center my-0">
+                <button type="button" mat-icon-button class="swap-btn shadow-sm" (click)="swapCities()" title="Swap Cities">
+                  <mat-icon class="text-primary-blue">swap_vert</mat-icon>
+                </button>
+              </div>
+
+              <!-- Destination City -->
+              <div class="search-item">
+                <mat-form-field appearance="outline" class="w-100 search-field">
+                  <mat-label>To</mat-label>
+                  <mat-icon matPrefix class="text-primary-blue me-2">location_on</mat-icon>
+                  <mat-select formControlName="toCityId" placeholder="Going to">
+                    <mat-option *ngFor="let city of cities" [value]="city.id">
+                      {{ city.name }}, {{ city.state }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="searchForm.get('toCityId')?.hasError('required')">
+                    Destination city required
+                  </mat-error>
+                </mat-form-field>
+              </div>
+
+              <!-- Date Selection -->
+              <div class="search-item position-relative mb-2">
+                <mat-form-field appearance="outline" class="w-100 search-field">
+                  <mat-label>Date of Journey</mat-label>
+                  <input matInput [matDatepicker]="picker" formControlName="journeyDate" [min]="minDate" readonly (click)="picker.open()">
+                  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                  <mat-error *ngIf="searchForm.get('journeyDate')?.hasError('required')">
+                    Date required
+                  </mat-error>
+                </mat-form-field>
+
+                <div class="date-chips-wrapper">
+                  <button type="button" class="date-chip btn-today" (click)="selectToday()">Today</button>
+                  <button type="button" class="date-chip btn-tomorrow" (click)="selectTomorrow()">Tomorrow</button>
+                </div>
+              </div>
+
+              <!-- Search Button -->
+              <div class="search-btn-item mt-2">
+                <button mat-flat-button class="main-search-btn w-100" type="submit">
+                  <mat-icon class="me-1">search</mat-icon> Search Buses
+                </button>
+              </div>
+
             </div>
-
-            <!-- Search Button -->
-            <div class="search-btn-item">
-              <button mat-flat-button class="main-search-btn w-100" type="submit">
-                <mat-icon class="me-1">search</mat-icon> Search Buses
-              </button>
-            </div>
-
-          </div>
-        </form>
-      </mat-card>
-    </div>
-  </div>
-
-  <!-- 3. Promotional Offers & Festival Section -->
-  <div class="container deals-section pb-5">
-    <div class="d-flex align-items-center justify-content-between mb-4">
-      <div>
-        <h3 class="section-title fw-bold mb-1">
-          <mat-icon class="text-primary-blue align-middle me-2">local_offer</mat-icon> Special Offers & Deals
-        </h3>
-        <p class="section-subtitle mb-0">Save big on your next journey with our exclusive promo codes</p>
-      </div>
-    </div>
-
-    <div class="row g-4">
-      <!-- Offer 1 -->
-      <div class="col-12 col-md-4">
-        <div class="offer-card p-4 d-flex flex-column justify-content-between h-100">
-          <div>
-            <span class="offer-badge mb-2">FESTIVAL OFFER</span>
-            <h5 class="offer-title fw-bold mb-2">Save up to ₹250 on Festival Bus Travel</h5>
-            <p class="offer-desc small mb-0">Use promo code <strong class="code-tag font-monospace">SUPERB60</strong> during checkout.</p>
-          </div>
-          <div class="pt-3 border-top mt-3 d-flex justify-content-between align-items-center">
-            <span class="small text-muted">Valid till 30 Sep</span>
-            <span class="offer-action-btn fw-bold cursor-pointer">Copy Code</span>
-          </div>
-        </div>
+          </form>
+        </mat-card>
       </div>
 
-      <!-- Offer 2 -->
-      <div class="col-12 col-md-4">
-        <div class="offer-card p-4 d-flex flex-column justify-content-between h-100">
-          <div>
-            <span class="offer-badge mb-2">NEW USER</span>
-            <h5 class="offer-title fw-bold mb-2">Flat 15% OFF on First Booking</h5>
-            <p class="offer-desc small mb-0">Enjoy extra discount on your first journey with code <strong class="code-tag font-monospace">FIRST100</strong>.</p>
-          </div>
-          <div class="pt-3 border-top mt-3 d-flex justify-content-between align-items-center">
-            <span class="small text-muted">Valid for new users</span>
-            <span class="offer-action-btn fw-bold cursor-pointer">Copy Code</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Offer 3 -->
-      <div class="col-12 col-md-4">
-        <div class="offer-card p-4 d-flex flex-column justify-content-between h-100">
-          <div>
-            <span class="offer-badge mb-2">WOMEN SPECIAL</span>
-            <h5 class="offer-title fw-bold mb-2">Booking for Women Travelers</h5>
-            <p class="offer-desc small mb-0">Exclusive seats reserved for women travelers with extra safety & comfort guaranteed.</p>
-          </div>
-          <div class="pt-3 border-top mt-3 d-flex justify-content-between align-items-center">
-            <span class="small text-muted">Safe Travel</span>
-            <span class="offer-action-btn fw-bold cursor-pointer">Know More</span>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </div>

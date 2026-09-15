@@ -10,6 +10,8 @@ export interface CreateBookingRequest {
   scheduleId: number;
   contactEmail: string;
   contactPhone: string;
+  sourceCityId?: number;
+  destinationCityId?: number;
   passengers: PassengerRequest[];
 }
 
@@ -53,4 +55,3 @@ export interface BookingListResponse {
   seats?: string[];
   passengers?: PassengerResponse[];
 }
-

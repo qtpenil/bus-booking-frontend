@@ -45,7 +45,13 @@
               <!-- Bus Details -->
               <div class="col-md-3 border-md-end text-center text-md-start mb-3 mb-md-0">
                 <h5 class="fw-bold text-primary mb-1">{{ schedule?.bus?.busTypeName || 'Standard Bus' }}</h5>
-                <p class="text-muted small mb-0"><mat-icon inline="true">airline_seat_recline_extra</mat-icon> {{ schedule?.bus?.totalSeats || 'N/A' }} Seats</p>
+                <p class="text-success fw-bold small mb-1 d-flex align-items-center justify-content-center justify-content-md-start">
+                  <mat-icon inline="true" class="me-1">event_seat</mat-icon>
+                  <span>{{ schedule?.availableSeats != null ? schedule.availableSeats : (schedule?.bus?.totalSeats || '0') }} Seats Available</span>
+                </p>
+                <p class="text-muted mb-0" style="font-size: 0.78rem;" *ngIf="schedule?.bus?.totalSeats">
+                  <span>Total Capacity: {{ schedule.bus.totalSeats }} Seats</span>
+                </p>
                 <span class="badge bg-light text-dark border mt-2">{{ schedule?.bus?.registrationNumber || 'Unknown' }}</span>
               </div>
               
