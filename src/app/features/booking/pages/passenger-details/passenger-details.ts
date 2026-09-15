@@ -56,9 +56,14 @@ export class PassengerDetailsComponent implements OnInit {
     private snackBar: MatSnackBar
   ) {}
 
+  sourceCityId?: number;
+  destinationCityId?: number;
+
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       this.scheduleId = Number(params['scheduleId']);
+      this.sourceCityId = params['sourceCityId'] ? Number(params['sourceCityId']) : undefined;
+      this.destinationCityId = params['destinationCityId'] ? Number(params['destinationCityId']) : undefined;
       const seatsParam = params['seats'];
       
       if (!this.scheduleId || !seatsParam) {
@@ -78,7 +83,7 @@ export class PassengerDetailsComponent implements OnInit {
         this.schedule = schedule;
         
         return Promise.all([
-          this.scheduleService.getScheduleSeats(this.scheduleId).toPromise(),
+          this.scheduleService.getScheduleSeats(this.scheduleId, this.sourceCityId, this.destinationCityId).toPromise(),
           this.routeService.getRouteById(this.schedule.routeId).toPromise()
         ]);
       }),
@@ -133,8 +138,12 @@ export class PassengerDetailsComponent implements OnInit {
     
     this.isSubmitting = true;
     
-    // Step 1: Hold the seats
-    this.scheduleService.holdSeats(this.scheduleId, { seatIds: this.seatIds }).subscribe({
+    // Step 1: Hold the seats for requested segment
+    this.scheduleService.holdSeats(this.scheduleId, {
+      seatIds: this.seatIds,
+      sourceCityId: this.sourceCityId,
+      destinationCityId: this.destinationCityId
+    }).subscribe({
       next: (holdResponse) => {
         // Step 2: Create Booking
         const formValue = this.bookingForm.value;
@@ -148,6 +157,8 @@ export class PassengerDetailsComponent implements OnInit {
 
         this.bookingService.createBooking({
           scheduleId: this.scheduleId,
+          sourceCityId: this.sourceCityId,
+          destinationCityId: this.destinationCityId,
           contactEmail: formValue.contactEmail,
           contactPhone: formValue.contactPhone,
           passengers: passengers
@@ -165,8 +176,12 @@ export class PassengerDetailsComponent implements OnInit {
         });
       },
       error: (err) => {
-        this.snackBar.open(err.error?.message || 'Selected seats are no longer available.', 'Close', { duration: 3000 });
+        const errorMsg = err.error?.message || 'One or more selected seats are no longer available. Please select another seat.';
+        this.snackBar.open(errorMsg, 'Close', { duration: 4000 });
         this.isSubmitting = false;
+        this.cdr.detectChanges();
+        // Redirect back to seat selection so user can choose available seats
+        this.router.navigate(['/booking/seats'], { queryParams: { scheduleId: this.scheduleId } });
       }
     });
   }

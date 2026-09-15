@@ -22,58 +22,90 @@
           <mat-card-header class="border-bottom pb-3 mb-4">
             <mat-card-title class="fw-bold">Select Your Seats</mat-card-title>
             <mat-card-subtitle>
-              <div class="d-flex align-items-center gap-3 mt-2 legend-bar">
-                <span class="d-flex align-items-center"><div class="legend-box available"></div> Available</span>
-                <span class="d-flex align-items-center"><div class="legend-box selected"></div> Selected</span>
-                <span class="d-flex align-items-center"><div class="legend-box booked"></div> Booked</span>
+              <div class="d-flex align-items-center gap-4 mt-2 legend-bar">
+                <!-- Available legend -->
+                <span class="d-flex align-items-center gap-1">
+                  <svg class="legend-seat available" viewBox="0 0 20 22" width="16" height="18">
+                    <rect x="1" y="1" width="18" height="15" rx="3"/>
+                    <rect x="3" y="17" width="5" height="4" rx="1.5"/>
+                    <rect x="12" y="17" width="5" height="4" rx="1.5"/>
+                  </svg>
+                  Available
+                </span>
+                <!-- Selected legend -->
+                <span class="d-flex align-items-center gap-1">
+                  <svg class="legend-seat selected" viewBox="0 0 20 22" width="16" height="18">
+                    <rect x="1" y="1" width="18" height="15" rx="3"/>
+                    <rect x="3" y="17" width="5" height="4" rx="1.5"/>
+                    <rect x="12" y="17" width="5" height="4" rx="1.5"/>
+                  </svg>
+                  Selected
+                </span>
+                <!-- Sold legend -->
+                <span class="d-flex align-items-center gap-1">
+                  <svg class="legend-seat booked" viewBox="0 0 20 22" width="16" height="18">
+                    <rect x="1" y="1" width="18" height="15" rx="3"/>
+                    <rect x="3" y="17" width="5" height="4" rx="1.5"/>
+                    <rect x="12" y="17" width="5" height="4" rx="1.5"/>
+                  </svg>
+                  Sold
+                </span>
               </div>
             </mat-card-subtitle>
           </mat-card-header>
 
           <mat-card-content class="px-2 px-md-4">
-            <div class="text-center text-muted mb-4">
-              <mat-icon class="align-middle" style="transform: rotate(90deg);">directions_bus</mat-icon>
-              <div class="small text-uppercase">Front of Bus</div>
+            <!-- Deck Tabs (only shown if both upper & lower decks exist) -->
+            <div *ngIf="hasMultipleDecks" class="deck-tabs mb-4">
+              <button class="deck-tab" [class.active]="activeDeck === 'LOWER'" (click)="switchDeck('LOWER')">Lower Deck</button>
+              <button class="deck-tab" [class.active]="activeDeck === 'UPPER'" (click)="switchDeck('UPPER')">Upper Deck</button>
             </div>
 
-            <!-- Lower Deck -->
-            <div *ngIf="lowerDeckSeats.length > 0" class="deck-container mb-5">
-              <h5 class="deck-title mb-3 text-muted">Lower Deck</h5>
-              <div class="bus-body border rounded p-4 mx-auto bg-white position-relative shadow-sm" style="max-width: 400px;">
-                <div class="driver-wheel position-absolute end-0 top-0 mt-2 me-4 text-muted">
-                   <mat-icon>radio_button_unchecked</mat-icon>
-                </div>
-                <div class="mt-4" [ngStyle]="getGridStyle(lowerDeckSeats)">
-                  <div *ngFor="let seat of lowerDeckSeats"
-                       class="seat-wrapper"
-                       [ngStyle]="getSeatStyle(seat)"
-                       [ngClass]="getSeatClass(seat)"
-                       (click)="toggleSeat(seat)"
-                       [matTooltip]="seat.seatNumber + ' - ₹' + schedule.baseFare"
-                       matTooltipPosition="above">
-                    <mat-icon class="seat-icon">{{ seat.seatType === 'SLEEPER' ? 'airline_seat_flat' : 'airline_seat_recline_normal' }}</mat-icon>
-                    <div class="seat-label">{{ seat.seatNumber }}</div>
-                  </div>
-                </div>
+            <!-- Bus Body Container -->
+            <div class="bus-body">
+              <!-- Steering Wheel Icon (top-right) -->
+              <div class="steering-wheel">
+                <svg viewBox="0 0 28 28" width="28" height="28">
+                  <circle cx="14" cy="14" r="12" fill="none" stroke="#9e9e9e" stroke-width="2"/>
+                  <circle cx="14" cy="14" r="3" fill="none" stroke="#9e9e9e" stroke-width="1.5"/>
+                  <line x1="14" y1="5" x2="14" y2="11" stroke="#9e9e9e" stroke-width="1.5"/>
+                  <line x1="5.5" y1="18" x2="11" y2="15" stroke="#9e9e9e" stroke-width="1.5"/>
+                  <line x1="22.5" y1="18" x2="17" y2="15" stroke="#9e9e9e" stroke-width="1.5"/>
+                </svg>
               </div>
-            </div>
 
-            <!-- Upper Deck -->
-            <div *ngIf="upperDeckSeats.length > 0" class="deck-container">
-              <h5 class="deck-title mb-3 text-muted">Upper Deck</h5>
-              <div class="bus-body border rounded p-4 mx-auto bg-white shadow-sm" style="max-width: 400px;">
-                <div [ngStyle]="getGridStyle(upperDeckSeats)">
-                  <div *ngFor="let seat of upperDeckSeats"
-                       class="seat-wrapper"
-                       [ngStyle]="getSeatStyle(seat)"
+              <!-- Seat Grid (columns with aisle gap computed dynamically) -->
+              <div class="seat-grid" [ngStyle]="gridStyle">
+                <ng-container *ngFor="let seat of displayedSeats">
+                  <div class="seat-item"
                        [ngClass]="getSeatClass(seat)"
+                       [ngStyle]="getSeatGridPosition(seat)"
                        (click)="toggleSeat(seat)"
                        [matTooltip]="seat.seatNumber + ' - ₹' + schedule.baseFare"
                        matTooltipPosition="above">
-                    <mat-icon class="seat-icon">{{ seat.seatType === 'SLEEPER' ? 'airline_seat_flat' : 'airline_seat_recline_normal' }}</mat-icon>
-                    <div class="seat-label">{{ seat.seatNumber }}</div>
+
+                    <!-- Seater Seat SVG (chair with armrests) -->
+                    <ng-container *ngIf="seat.seatType !== 'SLEEPER'">
+                      <svg class="seat-svg" viewBox="0 0 30 34" width="32" height="36">
+                        <rect x="1" y="1" width="28" height="24" rx="5" ry="5"/>
+                        <rect x="4" y="27" width="7" height="6" rx="2" ry="2"/>
+                        <rect x="19" y="27" width="7" height="6" rx="2" ry="2"/>
+                      </svg>
+                    </ng-container>
+
+                    <!-- Sleeper Berth SVG (tall rounded rectangle) -->
+                    <ng-container *ngIf="seat.seatType === 'SLEEPER'">
+                      <svg class="seat-svg sleeper-svg" viewBox="0 0 30 52" width="32" height="54">
+                        <rect x="1" y="1" width="28" height="50" rx="6" ry="6"/>
+                      </svg>
+                    </ng-container>
+
+                    <!-- Price label for available / selected seats -->
+                    <span *ngIf="seat.status !== 'BOOKED' && seat.status !== 'HOLD'" class="seat-price">₹{{ schedule.baseFare }}</span>
+                    <!-- Sold label for booked seats -->
+                    <span *ngIf="seat.status === 'BOOKED' || seat.status === 'HOLD'" class="seat-sold">Sold</span>
                   </div>
-                </div>
+                </ng-container>
               </div>
             </div>
 

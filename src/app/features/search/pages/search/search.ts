@@ -97,14 +97,16 @@ export class SearchComponent implements OnInit {
             if (!routes || !Array.isArray(routes) || routes.length === 0) {
               return throwError(() => new Error('No routes found between these cities.'));
             }
-            const routeId = routes[0].id;
-            
-            return forkJoin({
-              schedules: this.scheduleService.searchSchedules(routeId, date),
-              routeStops: this.routeService.getStopsForRoute(routeId).pipe(catchError(() => of([])))
-            }).pipe(
-              switchMap(({ schedules, routeStops }) => {
-                console.log('Schedules fetched:', schedules);
+            // Query schedules for ALL matching routes (handles direct and intermediate routes)
+            const scheduleObservables = routes.map(r => 
+              this.scheduleService.searchSchedules(r.id, date).pipe(catchError(() => of([])))
+            );
+            const routeStopsObs = this.routeService.getStopsForRoute(routes[0].id).pipe(catchError(() => of([])));
+
+            return forkJoin([forkJoin(scheduleObservables), routeStopsObs]).pipe(
+              switchMap(([allScheduleLists, routeStops]) => {
+                let schedules = allScheduleLists.flat();
+                console.log('Schedules fetched across routes:', schedules);
                 console.log('Route Stops fetched:', routeStops);
                 
                 this.routeStops = (routeStops && Array.isArray(routeStops)) ? routeStops.sort((a,b) => a.stopOrder - b.stopOrder) : [];
@@ -164,8 +166,14 @@ export class SearchComponent implements OnInit {
   }
 
   viewSeats(scheduleId: number) {
+    const fromId = this.route.snapshot.queryParams['from'];
+    const toId = this.route.snapshot.queryParams['to'];
     this.router.navigate(['/booking/seats'], {
-      queryParams: { scheduleId: scheduleId }
+      queryParams: { 
+        scheduleId: scheduleId,
+        sourceCityId: fromId,
+        destinationCityId: toId
+      }
     });
   }
 

@@ -1,0 +1,156 @@
+::ng-deep .cdk-overlay-pane.auth-modal-pane {
+  max-width: 480px !important;
+  width: 90vw !important;
+
+  .mat-mdc-dialog-container .mdc-dialog__surface {
+    background: rgba(15, 30, 55, 0.95) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5) !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+  }
+}
+
+.auth-modal-wrapper {
+  color: #ffffff;
+  font-family: 'Inter', 'Roboto', sans-serif;
+}
+
+.btn-close-modal {
+  cursor: pointer;
+  z-index: 10;
+  transition: opacity 0.2s;
+  
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.alert-banner {
+  background: rgba(37, 99, 235, 0.15);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  color: #eff6ff;
+}
+
+.brand-badge {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.mode-tab-toggle {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  .tab-btn {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.2s ease;
+
+    &.active {
+      background: #2563eb;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+    }
+  }
+}
+
+.portal-toggle-wrap {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  .portal-btn {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.65);
+    transition: all 0.2s ease;
+
+    &.active {
+      background: rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+    }
+  }
+}
+
+.border-white-10 {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.text-white-90 {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.text-white-70 {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.extra-small {
+  font-size: 0.82rem;
+}
+
+.text-danger-custom {
+  color: #f87171;
+}
+
+.text-primary-blue {
+  color: #3b82f6 !important;
+}
+
+/* Custom Glass Form Inputs */
+.custom-input {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+  border-radius: 10px !important;
+  height: 44px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.45) !important;
+  }
+
+  &:focus {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+    outline: none !important;
+  }
+}
+
+.input-with-icon {
+  .input-prefix-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+  }
+
+  .custom-input {
+    padding-left: 38px;
+  }
+}
+
+.btn-eye-toggle {
+  color: rgba(255, 255, 255, 0.6);
+  &:hover {
+    color: #ffffff;
+  }
+}
+
+.theme-login-btn {
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
+  color: #ffffff !important;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background-color: #1d4ed8 !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.5) !important;
+  }
+}

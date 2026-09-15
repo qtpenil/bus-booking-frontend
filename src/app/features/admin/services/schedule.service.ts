@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../../environments/environment';
 import { ScheduleResponse, CreateScheduleRequest, UpdateScheduleRequest, MessageResponse } from '../models/schedule.models';
 import { API_URLS } from '../../../core/constants/api.constants';
 
@@ -40,8 +39,11 @@ export class ScheduleService {
     return this.http.put<MessageResponse>(`${this.apiUrl}/${id}/cancel`, {});
   }
 
-  getScheduleSeats(scheduleId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/${scheduleId}/seats`);
+  getScheduleSeats(scheduleId: number, sourceCityId?: number, destinationCityId?: number): Observable<any[]> {
+    let params: any = {};
+    if (sourceCityId) params['sourceCityId'] = sourceCityId;
+    if (destinationCityId) params['destinationCityId'] = destinationCityId;
+    return this.http.get<any[]>(`${this.apiUrl}/${scheduleId}/seats`, { params });
   }
 
   holdSeats(scheduleId: number, request: any): Observable<any> {
