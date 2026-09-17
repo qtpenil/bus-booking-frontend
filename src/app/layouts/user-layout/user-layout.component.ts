@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -34,6 +34,7 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private dialog = inject(MatDialog);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
   private destroy$ = new Subject<void>();
 
   currentUser: UserPayload | null = null;
@@ -44,6 +45,7 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
     this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(user => {
       this.currentUser = user;
       this.isLoggedIn = !!user;
+      this.cdr.markForCheck();
     });
 
     this.checkIsHomePage(this.router.url);
@@ -52,6 +54,7 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe((event: any) => {
       this.checkIsHomePage(event.urlAfterRedirects || event.url);
+      this.cdr.markForCheck();
     });
   }
 
@@ -63,6 +66,7 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
   openAuthModal(initialMode: 'login' | 'register' = 'login'): void {
     this.dialog.open(AuthModalComponent, {
       panelClass: 'auth-modal-pane',
+      backdropClass: 'auth-modal-backdrop',
       data: { initialMode }
     });
   }
@@ -85,6 +89,9 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
+    this.currentUser = null;
+    this.isLoggedIn = false;
+    this.cdr.detectChanges();
     this.authService.logout();
   }
 

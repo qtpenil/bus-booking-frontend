@@ -12,6 +12,10 @@ export interface CreateBookingRequest {
   contactPhone: string;
   sourceCityId?: number;
   destinationCityId?: number;
+  sourceCityName?: string;
+  destinationCityName?: string;
+  boardingStopId?: number;
+  droppingStopId?: number;
   passengers: PassengerRequest[];
 }
 
@@ -33,6 +37,15 @@ export interface BookingResponse {
   seats: string[];
   contactEmail?: string;
   contactPhone?: string;
+  sourceCityName?: string;
+  destinationCityName?: string;
+  boardingStopName?: string;
+  droppingStopName?: string;
+  boardingStopId?: number;
+  droppingStopId?: number;
+  boardingTime?: string;
+  droppingTime?: string;
+  routeName?: string;
   journeyDate?: string;
   departureTime?: string;
   arrivalTime?: string;
@@ -48,6 +61,15 @@ export interface BookingListResponse {
   totalAmount: number;
   contactEmail?: string;
   contactPhone?: string;
+  sourceCityName?: string;
+  destinationCityName?: string;
+  boardingStopName?: string;
+  droppingStopName?: string;
+  boardingStopId?: number;
+  droppingStopId?: number;
+  boardingTime?: string;
+  droppingTime?: string;
+  routeName?: string;
   journeyDate?: string;
   departureTime?: string;
   arrivalTime?: string;

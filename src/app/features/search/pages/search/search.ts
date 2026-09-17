@@ -99,8 +99,9 @@ export class SearchComponent implements OnInit {
             }
             // Query schedules for ALL matching routes (handles direct and intermediate routes)
             const scheduleObservables = routes.map(r => 
-              this.scheduleService.searchSchedules(r.id, date).pipe(catchError(() => of([])))
+              this.scheduleService.searchSchedules(r.id, date, fromId, toId).pipe(catchError(() => of([])))
             );
+
             const routeStopsObs = this.routeService.getStopsForRoute(routes[0].id).pipe(catchError(() => of([])));
 
             return forkJoin([forkJoin(scheduleObservables), routeStopsObs]).pipe(
@@ -130,6 +131,16 @@ export class SearchComponent implements OnInit {
                     return scheduleMinutes > currentMinutes;
                   });
                 }
+
+                // Sort schedules chronologically by departure time (earliest first)
+                schedules.sort((a, b) => {
+                  const toMinutes = (timeStr?: string) => {
+                    if (!timeStr) return 9999;
+                    const parts = timeStr.split(':');
+                    return (Number(parts[0]) || 0) * 60 + (Number(parts[1]) || 0);
+                  };
+                  return toMinutes(a.departureTime) - toMinutes(b.departureTime);
+                });
 
                 return this.fleetService.getAllBuses().pipe(
                   map(buses => {
@@ -179,5 +190,61 @@ export class SearchComponent implements OnInit {
 
   goBack() {
     this.router.navigate(['/home']);
+  }
+
+  parseTimeToMinutes(timeStr?: string): number {
+    if (!timeStr) return 0;
+    const parts = timeStr.split(':');
+    const h = parseInt(parts[0], 10) || 0;
+    const m = parseInt(parts[1], 10) || 0;
+    return h * 60 + m;
+  }
+
+  isOvernight(departureTime?: string, arrivalTime?: string): boolean {
+    if (!departureTime || !arrivalTime) return false;
+    const depMinutes = this.parseTimeToMinutes(departureTime);
+    const arrMinutes = this.parseTimeToMinutes(arrivalTime);
+    return arrMinutes < depMinutes;
+  }
+
+  getDuration(departureTime?: string, arrivalTime?: string): string {
+    if (!departureTime || !arrivalTime) return '';
+    const depMinutes = this.parseTimeToMinutes(departureTime);
+    const arrMinutes = this.parseTimeToMinutes(arrivalTime);
+    
+    let diffMinutes: number;
+    if (arrMinutes < depMinutes) {
+      // Overnight trip: (24h - departure) + arrival
+      diffMinutes = (24 * 60 - depMinutes) + arrMinutes;
+    } else {
+      diffMinutes = arrMinutes - depMinutes;
+    }
+
+    const hours = Math.floor(diffMinutes / 60);
+    const mins = diffMinutes % 60;
+    if (hours > 0 && mins > 0) {
+      return `${hours}h ${mins}m`;
+    } else if (hours > 0) {
+      return `${hours}h`;
+    } else {
+      return `${mins}m`;
+    }
+  }
+
+  getBusTypeClass(busTypeName?: string): string {
+    const type = (busTypeName || '').toUpperCase();
+    if (type.includes('SEMI')) return 'tint-semi-sleeper';
+    if (type.includes('SLEEPER')) return 'tint-sleeper';
+    if (type.includes('NON-AC') || type.includes('NON AC')) return 'tint-non-ac';
+    if (type.includes('SEATER')) return 'tint-seater';
+    return 'tint-ac';
+  }
+
+  getBusTypeIcon(busTypeName?: string): string {
+    const type = (busTypeName || '').toUpperCase();
+    if (type.includes('SEMI')) return 'airline_seat_recline_extra';
+    if (type.includes('SLEEPER')) return 'airline_seat_individual_suite';
+    if (type.includes('SEATER')) return 'event_seat';
+    return 'directions_bus';
   }
 }

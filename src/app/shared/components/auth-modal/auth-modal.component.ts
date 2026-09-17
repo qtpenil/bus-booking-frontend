@@ -37,8 +37,9 @@ export class AuthModalComponent {
 
   activeMode: 'login' | 'register' = 'login';
   message = '';
-  selectedPortal: 'USER' | 'ADMIN' = 'USER';
   hidePassword = true;
+  hideRegisterPassword = true;
+  hideConfirmPassword = true;
   isLoading = false;
 
   loginForm: FormGroup = this.fb.group({
@@ -51,8 +52,19 @@ export class AuthModalComponent {
     lastName: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],
     mobileNumber: ['', [Validators.required, Validators.pattern('^[0-9+]+$')]],
-    password: ['', [Validators.required, Validators.minLength(6)]]
-  });
+    password: ['', [Validators.required, Validators.minLength(6)]],
+    confirmPassword: ['', [Validators.required]]
+  }, { validators: this.passwordMatchValidator });
+
+  passwordMatchValidator(form: FormGroup) {
+    const password = form.get('password')?.value;
+    const confirm = form.get('confirmPassword')?.value;
+    if (password && confirm && password !== confirm) {
+      form.get('confirmPassword')?.setErrors({ passwordMismatch: true });
+      return { passwordMismatch: true };
+    }
+    return null;
+  }
 
   constructor(
     @Optional() public dialogRef: MatDialogRef<AuthModalComponent>,
@@ -71,10 +83,6 @@ export class AuthModalComponent {
   setMode(mode: 'login' | 'register') {
     this.activeMode = mode;
     this.cdr.detectChanges();
-  }
-
-  selectPortal(portal: 'USER' | 'ADMIN') {
-    this.selectedPortal = portal;
   }
 
   onLoginSubmit() {
@@ -111,7 +119,13 @@ export class AuthModalComponent {
     this.isLoading = true;
     this.cdr.detectChanges();
 
-    this.authService.register(this.registerForm.value).subscribe({
+    this.authService.register({
+      firstName: this.registerForm.value.firstName,
+      lastName: this.registerForm.value.lastName,
+      email: this.registerForm.value.email,
+      mobileNumber: this.registerForm.value.mobileNumber,
+      password: this.registerForm.value.password
+    }).subscribe({
       next: () => {
         this.toast.success('Account created successfully!');
         this.isLoading = false;

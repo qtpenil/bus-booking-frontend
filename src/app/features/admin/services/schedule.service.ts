@@ -17,14 +17,19 @@ export class ScheduleService {
     return this.http.get<ScheduleResponse[]>(this.apiUrl);
   }
 
-  searchSchedules(routeId: number, journeyDate: string): Observable<ScheduleResponse[]> {
-    return this.http.get<ScheduleResponse[]>(`${this.apiUrl}/search`, {
-      params: { routeId, journeyDate }
-    });
+  searchSchedules(routeId: number, journeyDate: string, sourceCityId?: number, destinationCityId?: number): Observable<ScheduleResponse[]> {
+    let params: any = { routeId, journeyDate };
+    if (sourceCityId) params['sourceCityId'] = sourceCityId;
+    if (destinationCityId) params['destinationCityId'] = destinationCityId;
+    return this.http.get<ScheduleResponse[]>(`${this.apiUrl}/search`, { params });
   }
 
-  getScheduleById(id: number): Observable<ScheduleResponse> {
-    return this.http.get<ScheduleResponse>(`${this.apiUrl}/${id}`);
+
+  getScheduleById(id: number, sourceCityId?: number, destinationCityId?: number): Observable<ScheduleResponse> {
+    let params: any = {};
+    if (sourceCityId) params['sourceCityId'] = sourceCityId;
+    if (destinationCityId) params['destinationCityId'] = destinationCityId;
+    return this.http.get<ScheduleResponse>(`${this.apiUrl}/${id}`, { params });
   }
 
   createSchedule(request: CreateScheduleRequest): Observable<ScheduleResponse> {

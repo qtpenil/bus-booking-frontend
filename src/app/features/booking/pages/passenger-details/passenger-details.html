@@ -101,7 +101,7 @@
             <h5 class="fw-bold mb-3 text-primary border-bottom pb-2">Booking Summary</h5>
             <div class="d-flex justify-content-between mb-2">
               <span class="text-muted">Route</span>
-              <span class="fw-medium text-end">{{ routeDetails?.sourceCityName }} to {{ routeDetails?.destinationCityName }}</span>
+              <span class="fw-medium text-end">{{ schedule?.sourceCityName || routeDetails?.sourceCityName }} to {{ schedule?.destinationCityName || routeDetails?.destinationCityName }}</span>
             </div>
             <div class="d-flex justify-content-between mb-2">
               <span class="text-muted">Date</span>

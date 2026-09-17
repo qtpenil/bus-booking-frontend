@@ -60,7 +60,7 @@ export class AuthService {
     localStorage.removeItem(STORAGE_KEYS.JWT_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
     this.currentUserSubject.next(null);
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/home']);
   }
 
   private handleAuthentication(response: AuthResponse): void {

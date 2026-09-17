@@ -1,131 +1,219 @@
-<div class="my-bookings-container container py-4">
-  <!-- Page Header -->
-  <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
-    <div>
-      <h2 class="fw-bold mb-1 d-flex align-items-center text-primary">
-        <mat-icon class="me-2 fs-2 text-primary">confirmation_number</mat-icon> My Booked Tickets
-      </h2>
-      <p class="text-muted mb-0">View your active travel tickets and boarding passes</p>
-    </div>
-    <a mat-raised-button color="primary" routerLink="/search" class="rounded-pill px-4">
-      <mat-icon class="me-1">search</mat-icon> Book New Ticket
-    </a>
-  </div>
-
-  <!-- Loading State -->
-  <div *ngIf="isLoading" class="text-center py-5">
-    <mat-spinner diameter="48" class="mx-auto mb-3"></mat-spinner>
-    <p class="text-muted fs-5">Loading your tickets...</p>
-  </div>
-
-  <!-- Error Message -->
-  <div *ngIf="!isLoading && errorMessage" class="alert alert-danger shadow-sm d-flex align-items-center mb-4">
-    <mat-icon class="me-2">error</mat-icon>
-    <span class="flex-grow-1">{{ errorMessage }}</span>
-    <button mat-button class="text-danger fw-bold" (click)="fetchConfirmedTickets()">Retry</button>
-  </div>
-
-  <!-- Status Filter Tabs -->
-  <div *ngIf="!isLoading && !errorMessage && allBookings.length > 0" class="d-flex gap-2 mb-4">
-    <button class="btn rounded-pill px-4" [ngClass]="activeTab === 'CONFIRMED' ? 'btn-primary' : 'btn-outline-secondary'" (click)="activeTab = 'CONFIRMED'">
-      Confirmed ({{ confirmedCount }})
-    </button>
-    <button class="btn rounded-pill px-4" [ngClass]="activeTab === 'CANCELLED' ? 'btn-danger' : 'btn-outline-secondary'" (click)="activeTab = 'CANCELLED'">
-      Cancelled ({{ cancelledCount }})
-    </button>
-    <button class="btn rounded-pill px-4" [ngClass]="activeTab === 'ALL' ? 'btn-dark' : 'btn-outline-secondary'" (click)="activeTab = 'ALL'">
-      All Tickets ({{ allBookings.length }})
-    </button>
-  </div>
-
-  <!-- Empty State -->
-  <div *ngIf="!isLoading && !errorMessage && filteredTickets.length === 0" class="text-center py-5 empty-card shadow-sm rounded-4 bg-white">
-    <div class="icon-circle mx-auto mb-3 bg-light text-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
-      <mat-icon class="fs-1">confirmation_number</mat-icon>
-    </div>
-    <h4 class="fw-bold text-dark">No Tickets Found</h4>
-    <p class="text-muted mb-4">You do not have any {{ activeTab.toLowerCase() }} bus bookings at the moment.</p>
-    <a mat-flat-button color="primary" routerLink="/search" class="rounded-pill px-4">
-      Find Buses & Book Now
-    </a>
-  </div>
-
-  <!-- Tickets Summary Cards Grid -->
-  <div *ngIf="!isLoading && filteredTickets.length > 0" class="row g-4">
-    <div *ngFor="let ticket of filteredTickets" class="col-12 col-md-6">
-      <div class="summary-ticket-card shadow-sm bg-white rounded-4 overflow-hidden border h-100 d-flex flex-column">
-        
-        <!-- Card Header -->
-        <div class="ticket-header bg-dark text-white p-3 d-flex justify-content-between align-items-center">
-          <div class="d-flex align-items-center">
-            <mat-icon class="text-warning me-2 fs-3">directions_bus</mat-icon>
-            <div>
-              <span class="text-muted-light small text-uppercase d-block">PNR / Reference</span>
-              <strong class="text-warning font-monospace fs-6">{{ ticket.bookingReference || ('BKG-' + ticket.bookingId) }}</strong>
-            </div>
-          </div>
-          <span class="badge px-3 py-2 text-uppercase fs-6" 
-                [ngClass]="ticket.status === 'CONFIRMED' ? 'bg-success' : (ticket.status === 'CANCELLED' ? 'bg-danger' : 'bg-warning')">
-            {{ ticket.status }}
+<div class="my-bookings-page-wrapper">
+  <div class="my-bookings-container container py-4">
+    <!-- Page Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4 pb-3 bookings-page-header">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="bookings-badge">
+            <mat-icon class="badge-icon">confirmation_number</mat-icon> Dashboard
           </span>
         </div>
+        <h1 class="fw-bold mb-1 page-title display-6 d-flex align-items-center flex-wrap">
+          <span>My Booked</span> <span class="highlight-blue ms-2">Tickets</span>
+        </h1>
+        <p class="page-subtitle mb-0">View your active travel passes, scheduled journeys, and boarding history</p>
+      </div>
+      <div class="header-action-wrap mt-2 mt-md-0">
+        <a mat-flat-button routerLink="/search" class="home-btn-primary btn-book-ticket">
+          <mat-icon class="me-1">search</mat-icon> Book New Ticket
+        </a>
+      </div>
+    </div>
 
-        <!-- Card Body -->
-        <div class="p-3 p-md-4 flex-grow-1 d-flex flex-column justify-content-between">
-          <div>
-            <!-- Seat & Price Row -->
-            <div class="row g-3 mb-3 pb-3 border-bottom">
-              <div class="col-6">
-                <span class="text-muted small d-block mb-1"><mat-icon class="align-middle fs-6 me-1 text-primary">airline_seat_recline_extra</mat-icon> Reserved Seats</span>
-                <span class="badge bg-primary fs-6 px-3 py-1">{{ getSeatsDisplay(ticket) }}</span>
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="text-center py-5">
+      <mat-spinner diameter="48" class="bookings-spinner mx-auto mb-3"></mat-spinner>
+      <p class="text-muted fs-6">Loading your travel passes...</p>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="!isLoading && errorMessage" class="light-alert-card text-center mx-auto p-4 mb-4">
+      <mat-icon class="display-5 text-warning mb-2">error_outline</mat-icon>
+      <h4 class="fw-bold text-dark mb-1">Notice</h4>
+      <p class="text-muted mb-3">{{ errorMessage }}</p>
+      <button mat-flat-button class="home-btn-primary" (click)="fetchBookings()">
+        <mat-icon class="me-1">refresh</mat-icon> Retry
+      </button>
+    </div>
+
+    <!-- Status Filter Tabs (Pill controls with count badges) -->
+    <div *ngIf="!isLoading && !errorMessage && allBookings.length > 0" class="filter-tabs-wrapper d-flex gap-2 mb-4 flex-wrap">
+      <button class="pill-tab-btn" [class.active]="activeTab === 'CONFIRMED'" (click)="activeTab = 'CONFIRMED'">
+        <mat-icon class="tab-icon">check_circle</mat-icon>
+        <span>Confirmed</span>
+        <span class="tab-count">{{ confirmedCount }}</span>
+      </button>
+      <button class="pill-tab-btn" [class.active]="activeTab === 'CANCELLED'" (click)="activeTab = 'CANCELLED'">
+        <mat-icon class="tab-icon">cancel</mat-icon>
+        <span>Cancelled</span>
+        <span class="tab-count">{{ cancelledCount }}</span>
+      </button>
+      <button class="pill-tab-btn" [class.active]="activeTab === 'ALL'" (click)="activeTab = 'ALL'">
+        <mat-icon class="tab-icon">view_list</mat-icon>
+        <span>All Tickets</span>
+        <span class="tab-count">{{ allBookings.length }}</span>
+      </button>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && !errorMessage && filteredTickets.length === 0" class="light-empty-card text-center py-5 px-4 mx-auto my-4">
+      <div class="empty-icon-circle mx-auto mb-3">
+        <mat-icon class="empty-ticket-icon">confirmation_number</mat-icon>
+      </div>
+      <h4 class="fw-bold text-dark mb-2">{{ getEmptyStateMessage() }}</h4>
+      <p class="text-muted mb-4 mx-auto" style="max-width: 440px;">
+        {{ activeTab === 'ALL' ? 'You have not booked any bus tickets yet. Find your route and reserve seats now.' : 'You have no tickets currently under this tab.' }}
+      </p>
+      <a mat-flat-button class="home-btn-primary px-4" routerLink="/search">
+        <mat-icon class="me-1">search</mat-icon> Find Buses & Book Now
+      </a>
+    </div>
+
+    <!-- Tickets Summary Cards Grid -->
+    <div *ngIf="!isLoading && filteredTickets.length > 0" class="row g-4">
+      <div *ngFor="let ticket of filteredTickets" class="col-12 col-md-6">
+        <div class="booking-ticket-card overflow-hidden h-100 d-flex flex-column"
+             [ngClass]="{
+               'card-status-confirmed': ticket.status === 'CONFIRMED',
+               'card-status-cancelled': ticket.status === 'CANCELLED',
+               'card-status-pending': ticket.status === 'PENDING_PAYMENT' || ticket.status === 'PENDING'
+             }">
+          
+          <!-- Card Header -->
+          <div class="ticket-header p-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+              <div class="pnr-icon-box me-2 d-flex align-items-center justify-content-center">
+                <mat-icon class="bus-badge-icon">confirmation_number</mat-icon>
               </div>
-              <div class="col-6 text-end">
-                <span class="text-muted small d-block mb-1"><mat-icon class="align-middle fs-6 me-1 text-success">payments</mat-icon> Total Fare</span>
-                <span class="fs-4 fw-bold text-success">₹{{ ticket.totalAmount }}</span>
+              <div>
+                <span class="pnr-label d-block">PNR / Reference</span>
+                <strong class="pnr-code font-monospace fs-6">{{ ticket.bookingReference || ('BKG-' + ticket.bookingId) }}</strong>
               </div>
             </div>
-
-            <!-- Trip Date & Time Details -->
-            <div class="row g-2 mb-3 bg-light rounded p-2 text-dark small">
-              <div class="col-6">
-                <span class="text-muted small d-block"><mat-icon class="align-middle fs-6 me-1 text-primary">event</mat-icon> Journey Date:</span>
-                <strong class="d-block mt-1">{{ ticket.journeyDate ? (ticket.journeyDate | date:'mediumDate') : 'Scheduled' }}</strong>
-              </div>
-              <div class="col-6 text-end">
-                <span class="text-muted small d-block"><mat-icon class="align-middle fs-6 me-1 text-primary">schedule</mat-icon> Departure:</span>
-                <strong class="d-block mt-1">{{ ticket.departureTime || 'TBD' }}</strong>
-              </div>
-            </div>
-
-            <!-- Passengers & Contact Info -->
-            <div class="row g-2 mb-3 text-muted small">
-              <div class="col-12" *ngIf="ticket.passengers && ticket.passengers.length > 0">
-                <span class="fw-semibold text-dark"><mat-icon class="align-middle fs-6 me-1 text-primary">person</mat-icon> Passengers:</span>
-                <span class="text-dark ms-1 fw-medium">{{ getPassengerNames(ticket) }}</span>
-              </div>
-              <div class="col-12" *ngIf="ticket.contactEmail">
-                <span class="fw-semibold text-dark"><mat-icon class="align-middle fs-6 me-1 text-primary">email</mat-icon> Contact Email:</span>
-                <span class="text-dark ms-1">{{ ticket.contactEmail }}</span>
-              </div>
-              <div class="col-12" *ngIf="ticket.bookingDate">
-                <span class="fw-semibold text-dark"><mat-icon class="align-middle fs-6 me-1 text-secondary">history</mat-icon> Booked On:</span>
-                <span class="text-muted ms-1">{{ ticket.bookingDate | date:'short' }}</span>
-              </div>
-            </div>
+            <span class="badge px-3 py-2 text-uppercase fs-6 status-pill" 
+                  [ngClass]="ticket.status === 'CONFIRMED' ? 'status-confirmed' : (ticket.status === 'CANCELLED' ? 'status-cancelled' : 'status-pending')">
+              {{ ticket.status }}
+            </span>
           </div>
 
-          <!-- Card Action Buttons -->
-          <div class="pt-2 border-top d-flex gap-2">
-            <button mat-flat-button color="primary" class="flex-grow-1 rounded-pill py-2" (click)="openTicketDetails(ticket)">
-              <mat-icon class="me-1">receipt_long</mat-icon> View Ticket
-            </button>
-            <button *ngIf="ticket.status === 'CONFIRMED' || ticket.status === 'PENDING_PAYMENT'" mat-stroked-button color="warn" class="rounded-pill px-3 py-2 text-danger border-danger" (click)="cancelTicket(ticket, $event)">
-              <mat-icon class="me-1">cancel</mat-icon> Cancel
-            </button>
+          <!-- Card Body -->
+          <div class="p-3 p-md-4 flex-grow-1 d-flex flex-column justify-content-between">
+            <div>
+              <!-- 1. Route Information (Prominently directly below PNR row) -->
+              <div class="card-route-strip mb-3 pb-3 border-card-bottom" *ngIf="getRouteDisplay(ticket)">
+                <div class="d-flex align-items-center flex-wrap gap-2">
+                  <span class="route-city">{{ getRouteSource(ticket) }}</span>
+                  <mat-icon class="route-arrow">trending_flat</mat-icon>
+                  <span class="route-city">{{ getRouteDestination(ticket) }}</span>
+                </div>
+              </div>
+
+              <!-- 2. Seat & Total Fare Row -->
+              <div class="row g-3 mb-3 pb-3 border-card-bottom align-items-center">
+                <div class="col-6">
+                  <div class="d-flex align-items-center mb-1">
+                    <span class="icon-badge-tint me-2">
+                      <mat-icon>airline_seat_recline_extra</mat-icon>
+                    </span>
+                    <span class="field-label">Reserved Seats</span>
+                  </div>
+                  <div class="ms-1 pt-1">
+                    <span class="seat-badge-pill">{{ getSeatsDisplay(ticket) }}</span>
+                  </div>
+                </div>
+                <div class="col-6 text-end">
+                  <div class="d-flex align-items-center justify-content-end mb-1">
+                    <span class="icon-badge-tint me-2">
+                      <mat-icon>payments</mat-icon>
+                    </span>
+                    <span class="field-label">Total Fare</span>
+                  </div>
+                  <div class="fare-amount">₹{{ ticket.totalAmount }}</div>
+                </div>
+              </div>
+
+              <!-- 3. Journey Date & Departure Time Strip -->
+              <div class="journey-info-strip p-3 mb-3">
+                <div class="row g-2 align-items-center">
+                  <div class="col-6">
+                    <div class="d-flex align-items-center mb-1">
+                      <span class="icon-badge-tint me-2">
+                        <mat-icon>event</mat-icon>
+                      </span>
+                      <span class="field-label">Journey Date</span>
+                    </div>
+                    <strong class="d-block text-dark value-text ps-1">
+                      {{ (ticket.boardingTime ? (ticket.boardingTime | date:'mediumDate') : (ticket.journeyDate ? (ticket.journeyDate | date:'mediumDate') : 'Scheduled')) }}
+                    </strong>
+                  </div>
+                  <div class="col-6 text-end">
+                    <div class="d-flex align-items-center justify-content-end mb-1">
+                      <span class="icon-badge-tint me-2">
+                        <mat-icon>schedule</mat-icon>
+                      </span>
+                      <span class="field-label">Departure</span>
+                    </div>
+                    <strong class="d-block text-dark value-text pe-1">
+                      {{ getDepartureTimeDisplay(ticket) }}
+                    </strong>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4. Passengers & Contact Metadata with Icon Badges -->
+              <div class="card-meta-list d-flex flex-column gap-2 mb-3">
+                <div class="d-flex align-items-center" *ngIf="ticket.passengers && ticket.passengers.length > 0">
+                  <span class="icon-badge-tint me-2">
+                    <mat-icon>person</mat-icon>
+                  </span>
+                  <div class="d-flex align-items-center flex-wrap gap-1">
+                    <span class="meta-label">Passengers:</span>
+                    <span class="text-dark fw-semibold small">{{ getPassengerNames(ticket) }}</span>
+                  </div>
+                </div>
+
+                <div class="d-flex align-items-center" *ngIf="ticket.contactEmail">
+                  <span class="icon-badge-tint me-2">
+                    <mat-icon>email</mat-icon>
+                  </span>
+                  <div class="d-flex align-items-center flex-wrap gap-1">
+                    <span class="meta-label">Contact Email:</span>
+                    <span class="text-dark small text-truncate">{{ ticket.contactEmail }}</span>
+                  </div>
+                </div>
+
+                <div class="d-flex align-items-center" *ngIf="ticket.bookingDate">
+                  <span class="icon-badge-tint me-2">
+                    <mat-icon>history</mat-icon>
+                  </span>
+                  <div class="d-flex align-items-center flex-wrap gap-1">
+                    <span class="meta-label">Booked On:</span>
+                    <span class="text-muted small">{{ ticket.bookingDate | date:'medium' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Action Buttons -->
+            <div class="pt-3 border-card-top d-flex gap-2 align-items-center">
+              <button mat-flat-button class="home-btn-primary flex-grow-1" (click)="openTicketDetails(ticket)">
+                <mat-icon class="me-1">receipt_long</mat-icon> View Ticket
+              </button>
+              
+              <!-- Conditional Cancel Button: disabled if journey has already passed -->
+              <button *ngIf="ticket.status === 'CONFIRMED' || ticket.status === 'PENDING_PAYMENT'" 
+                      mat-button 
+                      class="btn-cancel-ticket"
+                      [disabled]="isJourneyPassed(ticket.journeyDate)"
+                      [title]="isJourneyPassed(ticket.journeyDate) ? 'Journey already completed' : 'Cancel Ticket'"
+                      (click)="!isJourneyPassed(ticket.journeyDate) && cancelTicket(ticket, $event)">
+                <mat-icon class="me-1">cancel</mat-icon> Cancel
+              </button>
+            </div>
+
           </div>
 
         </div>
-
       </div>
     </div>
   </div>

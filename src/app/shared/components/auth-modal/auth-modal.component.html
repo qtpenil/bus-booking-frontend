@@ -1,6 +1,6 @@
-<div class="auth-modal-wrapper text-white p-3 p-md-4 position-relative">
+<div class="auth-modal-wrapper position-relative">
   <!-- Close Button -->
-  <button type="button" class="btn-close-modal position-absolute top-0 end-0 m-3 border-0 bg-transparent text-white-50" (click)="closeModal()">
+  <button type="button" class="btn-close-modal position-absolute top-0 end-0 m-3 border-0 bg-transparent" (click)="closeModal()" aria-label="Close dialog">
     <mat-icon>close</mat-icon>
   </button>
 
@@ -12,28 +12,29 @@
 
   <!-- Modal Header & Tabs -->
   <div class="text-center mb-3 pt-1">
-    <div class="brand-badge d-inline-flex align-items-center justify-content-center p-2 rounded-3 mb-2">
-      <mat-icon class="text-white fs-4">directions_bus</mat-icon>
+    <!-- Circular Tinted Badge (~56-64px with #2563EB bus icon) -->
+    <div class="brand-badge-circle d-inline-flex align-items-center justify-content-center mb-2">
+      <mat-icon class="brand-badge-icon">directions_bus</mat-icon>
     </div>
-    <h4 class="fw-bold text-white mb-1">
+    <h4 class="modal-title fw-bold mb-1">
       {{ activeMode === 'login' ? 'Login to Continue' : 'Join BusBook Today' }}
     </h4>
-    <p class="text-white-70 extra-small mb-3">
+    <p class="modal-subtitle extra-small mb-3">
       {{ activeMode === 'login' ? 'Access your account to book tickets and manage your trips.' : 'Create your passenger account in seconds.' }}
     </p>
 
-    <!-- Tab Toggle -->
-    <div class="mode-tab-toggle d-flex p-1 rounded-3 mx-auto max-w-sm mb-3">
+    <!-- Tab Toggle (Segmented Control: Light gray track with white pill and blue indicator) -->
+    <div class="mode-tab-toggle d-flex p-1 rounded-3 mx-auto max-w-sm mb-4">
       <button 
         type="button" 
-        class="tab-btn flex-grow-1 py-1.5 rounded-2 fw-semibold extra-small border-0"
+        class="tab-btn flex-grow-1 py-2 rounded-2 fw-semibold extra-small border-0"
         [class.active]="activeMode === 'login'"
         (click)="setMode('login')">
         Sign In
       </button>
       <button 
         type="button" 
-        class="tab-btn flex-grow-1 py-1.5 rounded-2 fw-semibold extra-small border-0"
+        class="tab-btn flex-grow-1 py-2 rounded-2 fw-semibold extra-small border-0"
         [class.active]="activeMode === 'register'"
         (click)="setMode('register')">
         Create Account
@@ -43,44 +44,32 @@
 
   <!-- LOGIN FORM -->
   <form *ngIf="activeMode === 'login'" [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()" class="d-flex flex-column gap-3">
-    
-    <!-- Portal Toggle (User / Admin) -->
-    <div class="portal-toggle-wrap d-flex rounded-3 p-1 mb-1 bg-black bg-opacity-25">
-      <button 
-        type="button" 
-        class="portal-btn flex-grow-1 py-1.5 rounded-2 border-0 extra-small fw-bold d-flex align-items-center justify-content-center gap-1.5"
-        [class.active]="selectedPortal === 'USER'"
-        (click)="selectPortal('USER')">
-        <mat-icon class="fs-6 w-auto h-auto">person_outline</mat-icon> User Portal
-      </button>
-      <button 
-        type="button" 
-        class="portal-btn flex-grow-1 py-1.5 rounded-2 border-0 extra-small fw-bold d-flex align-items-center justify-content-center gap-1.5"
-        [class.active]="selectedPortal === 'ADMIN'"
-        (click)="selectPortal('ADMIN')">
-        <mat-icon class="fs-6 w-auto h-auto">admin_panel_settings</mat-icon> Admin Portal
-      </button>
-    </div>
 
+    <!-- Email Address -->
     <div class="form-group">
-      <label class="form-label fw-bold text-white-90 extra-small mb-1">Email Address <span class="text-danger-custom">*</span></label>
+      <label class="form-label fw-bold extra-small mb-1">Email Address <span class="text-danger-custom">*</span></label>
       <div class="input-with-icon position-relative">
-        <mat-icon class="input-prefix-icon">mail_outline</mat-icon>
+        <div class="input-prefix-badge">
+          <mat-icon>mail_outline</mat-icon>
+        </div>
         <input 
           type="email" 
           formControlName="email" 
           class="form-control custom-input" 
           placeholder="Enter your email address">
       </div>
-      <div *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid" class="text-warning extra-small mt-1">
+      <div *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid" class="text-danger-custom extra-small mt-1">
         Valid email required
       </div>
     </div>
 
+    <!-- Password -->
     <div class="form-group">
-      <label class="form-label fw-bold text-white-90 extra-small mb-1">Password <span class="text-danger-custom">*</span></label>
+      <label class="form-label fw-bold extra-small mb-1">Password <span class="text-danger-custom">*</span></label>
       <div class="input-with-icon position-relative">
-        <mat-icon class="input-prefix-icon">lock_outline</mat-icon>
+        <div class="input-prefix-badge">
+          <mat-icon>lock_outline</mat-icon>
+        </div>
         <input 
           [type]="hidePassword ? 'password' : 'text'" 
           formControlName="password" 
@@ -89,23 +78,27 @@
         <button 
           type="button" 
           class="btn-eye-toggle position-absolute end-0 top-50 translate-middle-y border-0 bg-transparent me-2"
-          (click)="hidePassword = !hidePassword">
+          (click)="hidePassword = !hidePassword"
+          aria-label="Toggle password visibility">
           <mat-icon class="fs-6 w-auto h-auto">{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
         </button>
       </div>
-      <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" class="text-warning extra-small mt-1">
+      <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" class="text-danger-custom extra-small mt-1">
         Password is required
       </div>
     </div>
 
     <div class="d-flex justify-content-between align-items-center extra-small">
-      <mat-checkbox class="custom-checkbox text-white-70">Remember me</mat-checkbox>
+      <mat-checkbox class="custom-checkbox" color="primary">
+        <span class="remember-label">Remember me</span>
+      </mat-checkbox>
       <a href="javascript:void(0)" class="text-primary-blue text-decoration-none fw-semibold">Forgot password?</a>
     </div>
 
+    <!-- Login CTA Button -->
     <button 
       type="submit" 
-      class="btn btn-primary theme-login-btn w-100 py-2.5 rounded-3 mt-1 shadow-sm d-flex align-items-center justify-content-center gap-2 fw-bold"
+      class="btn btn-primary theme-login-btn w-100 rounded-3 mt-1 shadow-sm d-flex align-items-center justify-content-center gap-2 fw-bold"
       [disabled]="loginForm.invalid || isLoading">
       <span *ngIf="!isLoading" class="d-flex align-items-center justify-content-center gap-2">
         <span>Login & Continue</span>
@@ -114,109 +107,160 @@
       <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
     </button>
 
-    <div class="text-center pt-2 border-top border-white-10">
-      <span class="text-white-70 extra-small">Don't have an account? </span>
+    <div class="text-center pt-3 border-top border-light-subtle">
+      <span class="text-muted extra-small">Don't have an account? </span>
       <a href="javascript:void(0)" class="text-primary-blue text-decoration-none fw-bold extra-small" (click)="setMode('register')">Create Account</a>
     </div>
   </form>
 
   <!-- REGISTER FORM -->
-  <form *ngIf="activeMode === 'register'" [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()" class="d-flex flex-column gap-2">
+  <form *ngIf="activeMode === 'register'" [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()" class="d-flex flex-column gap-3">
+    
+    <!-- First Name & Last Name (Side-by-side 2-column row) -->
     <div class="row g-2">
-      <div class="col-md-6">
+      <div class="col-12 col-sm-6">
         <div class="form-group">
-          <label class="form-label fw-bold text-white-90 extra-small mb-1">First Name <span class="text-danger-custom">*</span></label>
-          <input 
-            type="text" 
-            formControlName="firstName" 
-            class="form-control custom-input" 
-            placeholder="First name">
-          <div *ngIf="registerForm.get('firstName')?.touched && registerForm.get('firstName')?.invalid" class="text-warning extra-small mt-1">
-            Required
+          <label class="form-label fw-bold extra-small mb-1">First Name <span class="text-danger-custom">*</span></label>
+          <div class="input-with-icon position-relative">
+            <div class="input-prefix-badge">
+              <mat-icon>person_outline</mat-icon>
+            </div>
+            <input 
+              type="text" 
+              formControlName="firstName" 
+              class="form-control custom-input" 
+              placeholder="First name">
+          </div>
+          <div *ngIf="registerForm.get('firstName')?.touched && registerForm.get('firstName')?.invalid" class="text-danger-custom extra-small mt-1">
+            First name required
           </div>
         </div>
       </div>
-      <div class="col-md-6">
+
+      <div class="col-12 col-sm-6">
         <div class="form-group">
-          <label class="form-label fw-bold text-white-90 extra-small mb-1">Last Name <span class="text-danger-custom">*</span></label>
-          <input 
-            type="text" 
-            formControlName="lastName" 
-            class="form-control custom-input" 
-            placeholder="Last name">
-          <div *ngIf="registerForm.get('lastName')?.touched && registerForm.get('lastName')?.invalid" class="text-warning extra-small mt-1">
-            Required
+          <label class="form-label fw-bold extra-small mb-1">Last Name <span class="text-danger-custom">*</span></label>
+          <div class="input-with-icon position-relative">
+            <div class="input-prefix-badge">
+              <mat-icon>person_outline</mat-icon>
+            </div>
+            <input 
+              type="text" 
+              formControlName="lastName" 
+              class="form-control custom-input" 
+              placeholder="Last name">
+          </div>
+          <div *ngIf="registerForm.get('lastName')?.touched && registerForm.get('lastName')?.invalid" class="text-danger-custom extra-small mt-1">
+            Last name required
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Email Address -->
     <div class="form-group">
-      <label class="form-label fw-bold text-white-90 extra-small mb-1">Email Address <span class="text-danger-custom">*</span></label>
+      <label class="form-label fw-bold extra-small mb-1">Email Address <span class="text-danger-custom">*</span></label>
       <div class="input-with-icon position-relative">
-        <mat-icon class="input-prefix-icon">mail_outline</mat-icon>
+        <div class="input-prefix-badge">
+          <mat-icon>mail_outline</mat-icon>
+        </div>
         <input 
           type="email" 
           formControlName="email" 
           class="form-control custom-input" 
           placeholder="name@example.com">
       </div>
-      <div *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid" class="text-warning extra-small mt-1">
+      <div *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid" class="text-danger-custom extra-small mt-1">
         Valid email required
       </div>
     </div>
 
+    <!-- Mobile Number -->
     <div class="form-group">
-      <label class="form-label fw-bold text-white-90 extra-small mb-1">Mobile Number <span class="text-danger-custom">*</span></label>
+      <label class="form-label fw-bold extra-small mb-1">Mobile Number <span class="text-danger-custom">*</span></label>
       <div class="input-with-icon position-relative">
-        <mat-icon class="input-prefix-icon">phone</mat-icon>
+        <div class="input-prefix-badge">
+          <mat-icon>phone</mat-icon>
+        </div>
         <input 
           type="tel" 
           formControlName="mobileNumber" 
           class="form-control custom-input" 
-          placeholder="Mobile number">
+          placeholder="Enter mobile number">
       </div>
-      <div *ngIf="registerForm.get('mobileNumber')?.touched && registerForm.get('mobileNumber')?.invalid" class="text-warning extra-small mt-1">
+      <div *ngIf="registerForm.get('mobileNumber')?.touched && registerForm.get('mobileNumber')?.invalid" class="text-danger-custom extra-small mt-1">
         Mobile number required
       </div>
     </div>
 
+    <!-- Password -->
     <div class="form-group">
-      <label class="form-label fw-bold text-white-90 extra-small mb-1">Password <span class="text-danger-custom">*</span></label>
+      <label class="form-label fw-bold extra-small mb-1">Password <span class="text-danger-custom">*</span></label>
       <div class="input-with-icon position-relative">
-        <mat-icon class="input-prefix-icon">lock_outline</mat-icon>
+        <div class="input-prefix-badge">
+          <mat-icon>lock_outline</mat-icon>
+        </div>
         <input 
-          [type]="hidePassword ? 'password' : 'text'" 
+          [type]="hideRegisterPassword ? 'password' : 'text'" 
           formControlName="password" 
           class="form-control custom-input" 
-          placeholder="Min. 6 characters">
+          placeholder="Create password (min. 6 characters)">
         <button 
           type="button" 
           class="btn-eye-toggle position-absolute end-0 top-50 translate-middle-y border-0 bg-transparent me-2"
-          (click)="hidePassword = !hidePassword">
-          <mat-icon class="fs-6 w-auto h-auto">{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          (click)="hideRegisterPassword = !hideRegisterPassword"
+          aria-label="Toggle password visibility">
+          <mat-icon class="fs-6 w-auto h-auto">{{hideRegisterPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
         </button>
       </div>
-      <div *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.invalid" class="text-warning extra-small mt-1">
-        Minimum 6 characters
+      <div *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.invalid" class="text-danger-custom extra-small mt-1">
+        Minimum 6 characters required
       </div>
     </div>
 
+    <!-- Confirm Password -->
+    <div class="form-group">
+      <label class="form-label fw-bold extra-small mb-1">Confirm Password <span class="text-danger-custom">*</span></label>
+      <div class="input-with-icon position-relative">
+        <div class="input-prefix-badge">
+          <mat-icon>lock_outline</mat-icon>
+        </div>
+        <input 
+          [type]="hideConfirmPassword ? 'password' : 'text'" 
+          formControlName="confirmPassword" 
+          class="form-control custom-input" 
+          placeholder="Confirm your password">
+        <button 
+          type="button" 
+          class="btn-eye-toggle position-absolute end-0 top-50 translate-middle-y border-0 bg-transparent me-2"
+          (click)="hideConfirmPassword = !hideConfirmPassword"
+          aria-label="Toggle confirm password visibility">
+          <mat-icon class="fs-6 w-auto h-auto">{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
+      </div>
+      <div *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.invalid" class="text-danger-custom extra-small mt-1">
+        <span *ngIf="registerForm.get('confirmPassword')?.hasError('required')">Please confirm your password</span>
+        <span *ngIf="registerForm.get('confirmPassword')?.hasError('passwordMismatch')">Passwords do not match</span>
+      </div>
+    </div>
+
+    <!-- Create Account CTA Button -->
     <button 
       type="submit" 
-      class="btn btn-primary theme-login-btn w-100 py-2.5 rounded-3 mt-2 shadow-sm d-flex align-items-center justify-content-center gap-2 fw-bold"
+      class="btn btn-primary theme-login-btn w-100 rounded-3 mt-1 shadow-sm d-flex align-items-center justify-content-center gap-2 fw-bold"
       [disabled]="registerForm.invalid || isLoading">
       <span *ngIf="!isLoading" class="d-flex align-items-center justify-content-center gap-2">
-        <span>Create Account & Continue</span>
+        <span>Create Account</span>
         <mat-icon class="fs-5 w-auto h-auto">arrow_forward</mat-icon>
       </span>
       <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
     </button>
 
-    <div class="text-center pt-2 border-top border-white-10">
-      <span class="text-white-70 extra-small">Already have an account? </span>
+    <div class="text-center pt-3 border-top border-light-subtle">
+      <span class="text-muted extra-small">Already have an account? </span>
       <a href="javascript:void(0)" class="text-primary-blue text-decoration-none fw-bold extra-small" (click)="setMode('login')">Sign In</a>
     </div>
   </form>
 </div>
+
 

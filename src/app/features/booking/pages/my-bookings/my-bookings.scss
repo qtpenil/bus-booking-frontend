@@ -1,25 +1,379 @@
+.my-bookings-page-wrapper,
 .my-bookings-container {
-  min-height: 80vh;
+  background-color: var(--color-surface-muted, #f8fafc);
+  min-height: calc(100vh - 68px);
+  width: 100%;
 }
 
-.summary-ticket-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  border-left: 5px solid #2563eb !important;
+.bookings-page-header {
+  border-bottom: 1px solid var(--color-border-subtle, #e2e8f0);
+
+  .page-title {
+    color: var(--color-text-dark, #0f172a);
+    letter-spacing: -0.5px;
+  }
+
+  .page-subtitle {
+    color: var(--color-text-muted, #64748b);
+    font-size: 0.95rem;
+  }
+}
+
+.header-action-wrap {
+  flex-shrink: 0;
+  width: auto;
+
+  @media (max-width: 767.98px) {
+    width: 100%;
+  }
+
+  .btn-book-ticket {
+    width: auto;
+    white-space: nowrap;
+
+    @media (max-width: 767.98px) {
+      width: 100% !important;
+    }
+  }
+}
+
+.bookings-badge {
+  background: var(--color-accent-tint, #eff6ff);
+  border: 1px solid #dbeafe;
+  color: var(--color-primary-blue, #2563eb);
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 4px 12px;
+  display: inline-flex;
+  align-items: center;
+
+  .badge-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+  }
+}
+
+.highlight-blue {
+  color: var(--color-primary-blue, #2563eb);
+}
+
+.text-primary-blue {
+  color: var(--color-primary-blue, #2563eb) !important;
+}
+
+.home-btn-primary {
+  background: var(--color-primary-blue, #2563eb) !important;
+  color: #ffffff !important;
+  height: 44px;
+  min-height: 44px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.15) !important;
+    background: var(--color-primary-blue-hover, #1d4ed8) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35) !important;
+  }
+}
+
+/* Status Filter Tabs (Pill controls) */
+.filter-tabs-wrapper {
+  .pill-tab-btn {
+    background: #ffffff;
+    border: 1px solid var(--color-border-subtle, #e2e8f0);
+    color: var(--color-text-muted, #64748b);
+    padding: 7px 16px;
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    .tab-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    .tab-count {
+      background: var(--color-input-bg, #f1f5f9);
+      color: var(--color-text-muted, #64748b);
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    &:hover:not(.active) {
+      background: var(--color-input-bg, #f1f5f9);
+      color: var(--color-text-dark, #0f172a);
+      border-color: #cbd5e1;
+    }
+
+    &.active {
+      background: var(--color-primary-blue, #2563eb);
+      color: #ffffff;
+      border-color: var(--color-primary-blue, #2563eb);
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+
+      .tab-count {
+        background: rgba(255, 255, 255, 0.25);
+        color: #ffffff;
+      }
+    }
+  }
+}
+
+/* Booking Ticket Card */
+.booking-ticket-card {
+  border-radius: 12px !important;
+  background: var(--color-surface-light, #ffffff) !important;
+  border: 1px solid var(--color-border-subtle, #e2e8f0) !important;
+  border-left: 4px solid var(--color-primary-blue, #2563eb) !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08) !important;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12) !important;
+  }
+
+  &.card-status-confirmed {
+    border-left: 4px solid var(--color-status-available-text, #047857) !important;
+  }
+
+  &.card-status-cancelled {
+    border-left: 4px solid #ef4444 !important;
+  }
+
+  &.card-status-pending {
+    border-left: 4px solid #f59e0b !important;
+  }
+}
+
+/* Icon Badges (Circular Tinted) */
+.icon-badge-tint {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-accent-tint, #eff6ff);
+  border: 1px solid #dbeafe;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  mat-icon {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+    color: var(--color-primary-blue, #2563eb);
+    line-height: 15px;
   }
 }
 
 .ticket-header {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+  background: var(--color-surface-muted, #f8fafc);
+  border-bottom: 1px solid var(--color-border-subtle, #e2e8f0);
 
-  .text-muted-light {
-    color: #94a3b8;
+  .pnr-icon-box {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .bus-badge-icon {
+    color: #b45309;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .pnr-label {
+    letter-spacing: 0.5px;
+    font-size: 0.7rem;
+    color: var(--color-text-muted, #64748b);
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .pnr-code {
+    color: #b45309;
+    font-weight: 700;
   }
 }
 
-.empty-card {
-  border: 2px dashed #cbd5e1;
+.card-route-strip {
+  .route-city {
+    color: var(--color-text-dark, #0f172a);
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+
+  .route-arrow {
+    color: var(--color-primary-blue, #2563eb);
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.field-label {
+  color: var(--color-text-muted, #64748b);
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.meta-label {
+  color: var(--color-text-muted, #64748b);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.fare-amount {
+  color: var(--color-text-dark, #0f172a);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+}
+
+.value-text {
+  font-size: 0.92rem;
+  color: var(--color-text-dark, #0f172a);
+}
+
+.status-pill {
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.5px;
+}
+
+.status-confirmed {
+  background: var(--color-status-available-bg, #ecfdf5) !important;
+  border: 1px solid var(--color-status-available-border, #a7f3d0) !important;
+  color: var(--color-status-available-text, #047857) !important;
+}
+
+.status-cancelled {
+  background: #fef2f2 !important;
+  border: 1px solid #fecaca !important;
+  color: #dc2626 !important;
+}
+
+.status-pending {
+  background: #fffbeb !important;
+  border: 1px solid #fde68a !important;
+  color: #b45309 !important;
+}
+
+.border-card-bottom {
+  border-bottom: 1px solid var(--color-border-subtle, #e2e8f0);
+}
+
+.border-card-top {
+  border-top: 1px solid var(--color-border-subtle, #e2e8f0);
+}
+
+.seat-badge-pill {
+  background: var(--color-accent-tint, #eff6ff);
+  border: 1px solid #dbeafe;
+  color: var(--color-primary-blue, #2563eb);
+  font-weight: 700;
+  padding: 3px 12px;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  display: inline-block;
+}
+
+.journey-info-strip {
+  background: var(--color-surface-muted, #f8fafc);
+  border: 1px solid var(--color-border-subtle, #e2e8f0);
+  border-radius: 10px;
+}
+
+.btn-cancel-ticket {
+  background: #ffffff !important;
+  border: 1px solid #fca5a5 !important;
+  color: #dc2626 !important;
+  border-radius: 10px !important;
+  font-weight: 600;
+  padding: 0 16px;
+  height: 44px;
+  min-height: 44px;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: #fef2f2 !important;
+    border-color: #ef4444 !important;
+  }
+
+  &:disabled {
+    background: var(--color-input-bg, #f1f5f9) !important;
+    border-color: var(--color-border-subtle, #e2e8f0) !important;
+    color: var(--color-text-muted, #94a3b8) !important;
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+}
+
+/* Empty & Alert Cards (Light Theme) */
+.light-empty-card,
+.light-alert-card {
+  max-width: 500px;
+  border-radius: 16px;
+  background: var(--color-surface-light, #ffffff);
+  border: 1px solid var(--color-border-subtle, #e2e8f0);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+}
+
+.light-alert-card {
+  border-color: #fde68a;
+  background: #fffbeb;
+}
+
+.empty-icon-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--color-accent-tint, #eff6ff);
+  border: 1px solid #dbeafe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .empty-ticket-icon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    color: var(--color-primary-blue, #2563eb);
+  }
+}
+
+.bookings-spinner {
+  ::ng-deep circle {
+    stroke: var(--color-primary-blue, #2563eb) !important;
+  }
 }

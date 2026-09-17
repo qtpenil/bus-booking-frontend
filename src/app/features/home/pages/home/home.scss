@@ -3,13 +3,17 @@
   min-height: calc(100vh - 68px);
   height: calc(100vh - 68px);
   overflow-x: hidden;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.45) 0%, rgba(15, 23, 42, 0.15) 50%, rgba(15, 23, 42, 0.35) 100%), 
-              url('/images/login_bg.png') no-repeat center center / cover;
+  background: 
+    linear-gradient(90deg, rgba(15, 23, 42, 0.80) 0%, rgba(15, 23, 42, 0.65) 28%, rgba(15, 23, 42, 0.20) 55%, rgba(15, 23, 42, 0) 75%),
+    linear-gradient(0deg, rgba(15, 23, 42, 0.70) 0%, rgba(15, 23, 42, 0.25) 30%, transparent 55%),
+    url('/images/login_bg.png') no-repeat center right / cover;
   position: relative;
 
   @supports not (background-image: url('/images/login_bg.png')) {
-    background: linear-gradient(180deg, rgba(15, 23, 42, 0.45) 0%, rgba(15, 23, 42, 0.15) 50%, rgba(15, 23, 42, 0.35) 100%), 
-                url('/assets/images/login_bg.png') no-repeat center center / cover;
+    background: 
+      linear-gradient(90deg, rgba(15, 23, 42, 0.80) 0%, rgba(15, 23, 42, 0.65) 28%, rgba(15, 23, 42, 0.20) 55%, rgba(15, 23, 42, 0) 75%),
+      linear-gradient(0deg, rgba(15, 23, 42, 0.70) 0%, rgba(15, 23, 42, 0.25) 30%, transparent 55%),
+      url('/assets/images/login_bg.png') no-repeat center right / cover;
   }
 }
 
@@ -29,11 +33,11 @@
   color: #ffffff;
   letter-spacing: -0.5px;
   line-height: 1.15;
-  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.85), 0 2px 6px rgba(0, 0, 0, 0.9);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.75);
 
   .highlight-blue {
     color: #3b82f6;
-    text-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.6), 0 2px 8px rgba(0, 0, 0, 0.6);
   }
 }
 
@@ -41,111 +45,198 @@
   font-weight: 500;
   color: rgba(255, 255, 255, 0.95);
   max-width: 480px;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.65);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
-/* Larger Vertical Glass Search Card (Matching Login/Signup modal UI) */
+/* Light Surface Search Card with Enhanced Depth & Sizing */
 .search-card {
-  max-width: 390px;
+  max-width: 480px;
   width: 100%;
-  border-radius: 20px !important;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5) !important;
-  background: rgba(10, 32, 58, 0.72) !important;
-  backdrop-filter: blur(18px) !important;
-  -webkit-backdrop-filter: blur(18px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.20) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25) !important;
+  background: var(--color-surface-light, #ffffff) !important;
+  border: 1px solid var(--color-border-subtle, #e2e8f0) !important;
+
+  .card-top-accent {
+    height: 4px;
+    width: 100%;
+    background: linear-gradient(90deg, #2563EB, #60A5FA);
+  }
 
   .search-card-header {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-    padding-bottom: 0.85rem;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1.1rem 1.75rem;
     
+    .header-icon-badge {
+      width: 32px;
+      height: 32px;
+      background: #eff6ff;
+      border: 1px solid #dbeafe;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #2563eb;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        line-height: 18px;
+      }
+    }
+
     .search-title {
       font-size: 1.35rem;
       letter-spacing: -0.2px;
+      color: var(--color-text-dark, #0f172a);
     }
   }
 
-  .swap-item {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .search-card-body {
+    padding: 1.75rem !important;
   }
 
-  .swap-btn {
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    background-color: rgba(255, 255, 255, 0.12);
+  /* Route Group with Balanced Spacing */
+  .route-group {
+    .swap-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .swap-btn {
+      border: 1px solid #bfdbfe;
+      background-color: #eff6ff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      
+      .swap-icon {
+        color: var(--color-primary-blue, #2563eb);
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+        line-height: 22px;
+      }
+
+      &:hover {
+        transform: rotate(180deg);
+        background-color: #dbeafe;
+        border-color: var(--color-primary-blue, #2563eb);
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+      }
+    }
+  }
+
+  /* Input Icon Badges (Circular Tinted Background) */
+  .input-icon-badge {
+    width: 36px;
+    height: 36px;
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
     border-radius: 50%;
-    width: 42px;
-    height: 42px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.25s ease, background-color 0.2s ease, border-color 0.2s ease;
-    
-    &:hover {
-      transform: rotate(180deg);
-      background-color: rgba(255, 255, 255, 0.22);
-      border-color: rgba(255, 255, 255, 0.4);
+    flex-shrink: 0;
+
+    mat-icon {
+      color: var(--color-primary-blue, #2563eb) !important;
+      font-size: 19px !important;
+      width: 19px !important;
+      height: 19px !important;
+      line-height: 19px !important;
     }
   }
 
+  /* Date Chips with Explicit Selected / Active State */
   .date-chips-wrapper {
     display: flex;
-    gap: 8px;
-    margin-top: 8px;
-    margin-bottom: 2px;
+    gap: 10px;
   }
 
   .date-chip {
-    font-size: 0.82rem;
-    font-weight: 600;
-    padding: 4px 14px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0 18px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 8px;
-    border: 1px solid rgba(59, 130, 246, 0.4);
-    background: rgba(37, 99, 235, 0.2);
-    color: #60a5fa;
+    border: 1px solid #cbd5e1;
+    background: var(--color-surface-muted, #f8fafc);
+    color: #475569;
     cursor: pointer;
     transition: all 0.2s ease;
 
-    &:hover {
-      background-color: #2563eb;
-      color: #ffffff;
-      border-color: #2563eb;
+    &:hover:not(.active) {
+      background-color: #eff6ff;
+      color: var(--color-primary-blue, #2563eb);
+      border-color: #bfdbfe;
+    }
+
+    &.active {
+      background-color: var(--color-primary-blue, #2563eb) !important;
+      border-color: var(--color-primary-blue, #2563eb) !important;
+      color: #ffffff !important;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
     }
   }
 
   .main-search-btn {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    background-color: var(--color-primary-blue, #2563eb) !important;
     color: #ffffff !important;
     height: 52px;
-    font-size: 1rem;
+    font-size: 1.05rem;
     font-weight: 700;
     border-radius: 12px !important;
-    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.45) !important;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35) !important;
     transition: all 0.2s ease;
 
     &:hover {
+      background-color: var(--color-primary-blue-hover, #1d4ed8) !important;
       transform: translateY(-1px);
-      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.6) !important;
+      box-shadow: 0 6px 22px rgba(37, 99, 235, 0.5) !important;
     }
   }
 }
 
 .text-primary-blue {
-  color: #3b82f6 !important;
+  color: var(--color-primary-blue, #2563eb) !important;
 }
 
-/* Material Form Field Control Customizations for Dark Glass Theme */
+/* Material Form Field Control Customizations for Light Surface Card */
 ::ng-deep .search-card {
   .mat-mdc-form-field-subscript-wrapper {
-    height: 0 !important;
-    min-height: 0 !important;
-    padding: 0 !important;
+    padding: 0 4px !important;
+  }
+
+  .mat-mdc-form-field-error-wrapper {
+    padding-top: 4px !important;
+    padding-bottom: 2px !important;
+  }
+
+  mat-error {
+    font-size: 0.8rem !important;
+    color: #ef4444 !important;
+    font-weight: 500 !important;
+    display: block !important;
+    line-height: 1.25 !important;
   }
   
   .mat-mdc-text-field-wrapper {
-    background-color: rgba(255, 255, 255, 0.1) !important;
+    background-color: var(--color-input-bg, #f1f5f9) !important;
     border-radius: 12px !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
   }
 
   .mat-mdc-form-field-flex {
@@ -154,35 +245,53 @@
   }
 
   .mat-mdc-floating-label {
-    color: rgba(255, 255, 255, 0.9) !important;
-    font-weight: 600 !important;
-  }
-
-  .mat-mdc-select-value-text, .mat-mdc-input-element {
-    color: #ffffff !important;
+    color: var(--color-text-muted, #64748b) !important;
     font-weight: 500 !important;
   }
 
-  .mat-mdc-select-arrow {
-    color: rgba(255, 255, 255, 0.7) !important;
+  .mat-mdc-select-value-text, .mat-mdc-input-element {
+    color: var(--color-text-dark, #0f172a) !important;
+    font-weight: 600 !important;
   }
 
-  .mat-datepicker-toggle .mat-icon-button {
-    color: rgba(255, 255, 255, 0.7) !important;
+  .mat-mdc-select-placeholder,
+  input::placeholder {
+    color: var(--color-text-muted, #64748b) !important;
+    font-weight: 400 !important;
+    opacity: 1 !important;
+  }
+
+  .mat-mdc-select-arrow svg,
+  .mat-mdc-select-arrow {
+    color: var(--color-text-muted, #64748b) !important;
+    fill: var(--color-text-muted, #64748b) !important;
+  }
+
+  .mat-datepicker-toggle .mat-icon-button,
+  .mat-datepicker-toggle mat-icon {
+    color: var(--color-primary-blue, #2563eb) !important;
   }
 
   .mdc-notched-outline__leading,
   .mdc-notched-outline__notch,
   .mdc-notched-outline__trailing {
-    border-color: rgba(255, 255, 255, 0.2) !important;
+    border-color: var(--color-border-subtle, #e2e8f0) !important;
   }
 
   .mat-mdc-form-field-focused {
+    .mat-mdc-text-field-wrapper {
+      background-color: #ffffff !important;
+    }
+
     .mdc-notched-outline__leading,
     .mdc-notched-outline__notch,
     .mdc-notched-outline__trailing {
-      border-color: #3b82f6 !important;
+      border-color: var(--color-primary-blue, #2563eb) !important;
       border-width: 2px !important;
+    }
+
+    .mat-mdc-floating-label {
+      color: var(--color-primary-blue, #2563eb) !important;
     }
   }
 }
@@ -192,13 +301,38 @@
     height: auto;
     min-height: calc(100vh - 68px);
     padding: 2rem 0;
+    background: 
+      linear-gradient(180deg, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.70) 50%, rgba(15, 23, 42, 0.85) 100%),
+      url('/images/login_bg.png') no-repeat center center / cover;
   }
 
   .hero-title {
     font-size: 2.2rem;
   }
 
+  .search-card-col {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-top: 1.5rem;
+  }
+
   .search-card {
     max-width: 100%;
   }
 }
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 1.85rem;
+  }
+
+  .search-card {
+    .search-card-header {
+      padding: 1rem 1.25rem;
+    }
+    .search-card-body {
+      padding: 1.25rem !important;
+    }
+  }
+}
+
