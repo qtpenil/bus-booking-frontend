@@ -1,2 +1,65 @@
 /* You can add global styles to this file, and also import other style files */
 @import 'bootstrap/dist/css/bootstrap.min.css';
+
+:root {
+  --color-navy-dark: #0F172A;
+  --color-primary-blue: #2563EB;
+  --color-primary-blue-hover: #1D4ED8;
+  --color-surface-light: #FFFFFF;
+  --color-surface-muted: #F8FAFC;
+  --color-accent-tint: #EFF6FF;
+  --color-input-bg: #F1F5F9;
+  --color-text-dark: #0F172A;
+  --color-text-muted: #64748B;
+  --color-border-subtle: #E2E8F0;
+
+  /* Bus Type Tint Tokens */
+  --color-tint-ac-bg: #EFF6FF;
+  --color-tint-ac-border: #DBEAFE;
+  --color-tint-ac-text: #2563EB;
+
+  --color-tint-non-ac-bg: #F1F5F9;
+  --color-tint-non-ac-border: #E2E8F0;
+  --color-tint-non-ac-text: #64748B;
+
+  --color-tint-sleeper-bg: #F5F3FF;
+  --color-tint-sleeper-border: #DDD6FE;
+  --color-tint-sleeper-text: #7C3AED;
+
+  --color-tint-semi-sleeper-bg: #F0FDFA;
+  --color-tint-semi-sleeper-border: #99F6E4;
+  --color-tint-semi-sleeper-text: #0D9488;
+
+  --color-tint-seater-bg: #ECFEFF;
+  --color-tint-seater-border: #CFFAFE;
+  --color-tint-seater-text: #0891B2;
+
+  /* Availability Status Badge */
+  --color-status-available-bg: #ECFDF5;
+  --color-status-available-border: #A7F3D0;
+  --color-status-available-text: #047857;
+
+  /* Overnight Tag */
+  --color-overnight-bg: #FEF3C7;
+  --color-overnight-border: #FDE68A;
+  --color-overnight-text: #B45309;
+}
+
+/* Responsive Width Utilities (Fixing Bootstrap 5 absence of responsive width classes) */
+@media (min-width: 768px) {
+  .w-md-auto {
+    width: auto !important;
+  }
+}
+
+@media (min-width: 576px) {
+  .w-sm-auto {
+    width: auto !important;
+  }
+}
+
+@media (min-width: 992px) {
+  .w-lg-auto {
+    width: auto !important;
+  }
+}

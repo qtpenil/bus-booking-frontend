@@ -94,7 +94,7 @@ export class SeatSelectionComponent implements OnInit {
   }
 
   loadData() {
-    this.scheduleService.getScheduleById(this.scheduleId).pipe(
+    this.scheduleService.getScheduleById(this.scheduleId, this.sourceCityId, this.destinationCityId).pipe(
       switchMap(schedule => {
         this.schedule = schedule;
         this.totalFare = 0;

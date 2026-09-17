@@ -14,85 +14,117 @@
         </div>
       </div>
 
-      <!-- Right Column: Vertical Glass Search Card (Positioned in Sky Area on Right) -->
+      <!-- Right Column: Vertical Light Search Card -->
       <div class="col-12 col-lg-6 col-xl-6 d-flex justify-content-center justify-content-lg-end align-self-center pe-lg-4 pe-xl-5 search-card-col">
-        <mat-card class="search-card border-0 p-4">
+        <mat-card class="search-card border-0 overflow-hidden">
           
-          <div class="search-card-header mb-3">
-            <h3 class="search-title text-white fw-bold mb-0 d-flex align-items-center">
-              <mat-icon class="text-primary-blue me-2">search</mat-icon> Search Buses
+          <!-- 4px Gradient Top Accent Bar -->
+          <div class="card-top-accent"></div>
+
+          <!-- Soft Tinted Header Strip -->
+          <div class="search-card-header">
+            <h3 class="search-title fw-bold mb-0 d-flex align-items-center">
+              <span class="header-icon-badge me-2.5">
+                <mat-icon>search</mat-icon>
+              </span>
+              Search Buses
             </h3>
           </div>
 
-          <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
-            <div class="search-flex-col d-flex flex-column gap-3">
-              
-              <!-- Source City -->
-              <div class="search-item">
-                <mat-form-field appearance="outline" class="w-100 search-field">
-                  <mat-label>From</mat-label>
-                  <mat-icon matPrefix class="text-primary-blue me-2">directions_bus</mat-icon>
-                  <mat-select formControlName="fromCityId" placeholder="Leaving from">
-                    <mat-option *ngFor="let city of cities" [value]="city.id">
-                      {{ city.name }}, {{ city.state }}
-                    </mat-option>
-                  </mat-select>
-                  <mat-error *ngIf="searchForm.get('fromCityId')?.hasError('required')">
-                    Source city required
-                  </mat-error>
-                </mat-form-field>
-              </div>
+          <div class="search-card-body p-4">
+            <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+              <div class="search-flex-col d-flex flex-column">
+                
+                <!-- Route Fields Group: From -> Swap -> To -->
+                <div class="route-group d-flex flex-column">
+                  <!-- Source City -->
+                  <div class="search-item from-item">
+                    <mat-form-field appearance="outline" class="w-100 search-field" subscriptSizing="dynamic">
+                      <mat-label>From</mat-label>
+                      <div matPrefix class="input-icon-badge me-2">
+                        <mat-icon>directions_bus</mat-icon>
+                      </div>
+                      <mat-select formControlName="fromCityId" placeholder="Leaving from">
+                        <mat-option *ngFor="let city of cities" [value]="city.id">
+                          {{ city.name }}, {{ city.state }}
+                        </mat-option>
+                      </mat-select>
+                      <mat-error *ngIf="searchForm.get('fromCityId')?.hasError('required')">
+                        Source city required
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
 
-              <!-- Swap Button (Vertical) -->
-              <div class="swap-item text-center my-0">
-                <button type="button" mat-icon-button class="swap-btn shadow-sm" (click)="swapCities()" title="Swap Cities">
-                  <mat-icon class="text-primary-blue">swap_vert</mat-icon>
-                </button>
-              </div>
+                  <!-- Swap Button (Centered with visible light-blue circular background) -->
+                  <div class="swap-item text-center my-1">
+                    <button type="button" mat-icon-button class="swap-btn shadow-sm" (click)="swapCities()" title="Swap Cities">
+                      <mat-icon class="swap-icon">swap_vert</mat-icon>
+                    </button>
+                  </div>
 
-              <!-- Destination City -->
-              <div class="search-item">
-                <mat-form-field appearance="outline" class="w-100 search-field">
-                  <mat-label>To</mat-label>
-                  <mat-icon matPrefix class="text-primary-blue me-2">location_on</mat-icon>
-                  <mat-select formControlName="toCityId" placeholder="Going to">
-                    <mat-option *ngFor="let city of cities" [value]="city.id">
-                      {{ city.name }}, {{ city.state }}
-                    </mat-option>
-                  </mat-select>
-                  <mat-error *ngIf="searchForm.get('toCityId')?.hasError('required')">
-                    Destination city required
-                  </mat-error>
-                </mat-form-field>
-              </div>
-
-              <!-- Date Selection -->
-              <div class="search-item position-relative mb-2">
-                <mat-form-field appearance="outline" class="w-100 search-field">
-                  <mat-label>Date of Journey</mat-label>
-                  <input matInput [matDatepicker]="picker" formControlName="journeyDate" [min]="minDate" readonly (click)="picker.open()">
-                  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                  <mat-datepicker #picker></mat-datepicker>
-                  <mat-error *ngIf="searchForm.get('journeyDate')?.hasError('required')">
-                    Date required
-                  </mat-error>
-                </mat-form-field>
-
-                <div class="date-chips-wrapper">
-                  <button type="button" class="date-chip btn-today" (click)="selectToday()">Today</button>
-                  <button type="button" class="date-chip btn-tomorrow" (click)="selectTomorrow()">Tomorrow</button>
+                  <!-- Destination City -->
+                  <div class="search-item to-item">
+                    <mat-form-field appearance="outline" class="w-100 search-field" subscriptSizing="dynamic">
+                      <mat-label>To</mat-label>
+                      <div matPrefix class="input-icon-badge me-2">
+                        <mat-icon>location_on</mat-icon>
+                      </div>
+                      <mat-select formControlName="toCityId" placeholder="Going to">
+                        <mat-option *ngFor="let city of cities" [value]="city.id">
+                          {{ city.name }}, {{ city.state }}
+                        </mat-option>
+                      </mat-select>
+                      <mat-error *ngIf="searchForm.get('toCityId')?.hasError('required')">
+                        Destination city required
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
                 </div>
-              </div>
 
-              <!-- Search Button -->
-              <div class="search-btn-item mt-2">
-                <button mat-flat-button class="main-search-btn w-100" type="submit">
-                  <mat-icon class="me-1">search</mat-icon> Search Buses
-                </button>
-              </div>
+                <!-- Date Selection Group -->
+                <div class="search-item position-relative mt-3">
+                  <mat-form-field appearance="outline" class="w-100 search-field" subscriptSizing="dynamic">
+                    <mat-label>Date of Journey</mat-label>
+                    <div matPrefix class="input-icon-badge me-2">
+                      <mat-icon>calendar_today</mat-icon>
+                    </div>
+                    <input matInput [matDatepicker]="picker" formControlName="journeyDate" [min]="minDate" readonly (click)="picker.open()">
+                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                    <mat-error *ngIf="searchForm.get('journeyDate')?.hasError('required')">
+                      Date required
+                    </mat-error>
+                  </mat-form-field>
 
-            </div>
-          </form>
+                  <!-- Today / Tomorrow Toggle Row with Distinct Active States -->
+                  <div class="date-chips-wrapper mt-2 pt-1">
+                    <button 
+                      type="button" 
+                      class="date-chip" 
+                      [class.active]="isTodaySelected()" 
+                      (click)="selectToday()">
+                      Today
+                    </button>
+                    <button 
+                      type="button" 
+                      class="date-chip" 
+                      [class.active]="isTomorrowSelected()" 
+                      (click)="selectTomorrow()">
+                      Tomorrow
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Search Buses Button -->
+                <div class="search-btn-item mt-4 pt-1">
+                  <button mat-flat-button class="main-search-btn w-100" type="submit">
+                    <mat-icon class="me-1">search</mat-icon> Search Buses
+                  </button>
+                </div>
+
+              </div>
+            </form>
+          </div>
         </mat-card>
       </div>
 

@@ -78,7 +78,7 @@ export class PassengerDetailsComponent implements OnInit {
   }
 
   loadData() {
-    this.scheduleService.getScheduleById(this.scheduleId).pipe(
+    this.scheduleService.getScheduleById(this.scheduleId, this.sourceCityId, this.destinationCityId).pipe(
       switchMap(schedule => {
         this.schedule = schedule;
         
@@ -159,6 +159,8 @@ export class PassengerDetailsComponent implements OnInit {
           scheduleId: this.scheduleId,
           sourceCityId: this.sourceCityId,
           destinationCityId: this.destinationCityId,
+          sourceCityName: this.schedule?.sourceCityName || this.routeDetails?.sourceCityName,
+          destinationCityName: this.schedule?.destinationCityName || this.routeDetails?.destinationCityName,
           contactEmail: formValue.contactEmail,
           contactPhone: formValue.contactPhone,
           passengers: passengers

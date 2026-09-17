@@ -64,6 +64,27 @@ export class HomeComponent implements OnInit {
     this.searchForm.patchValue({ journeyDate: tomorrow });
   }
 
+  isTodaySelected(): boolean {
+    const selected = this.searchForm.get('journeyDate')?.value;
+    if (!selected) return false;
+    const d = new Date(selected);
+    const today = new Date();
+    return d.getDate() === today.getDate() &&
+           d.getMonth() === today.getMonth() &&
+           d.getFullYear() === today.getFullYear();
+  }
+
+  isTomorrowSelected(): boolean {
+    const selected = this.searchForm.get('journeyDate')?.value;
+    if (!selected) return false;
+    const d = new Date(selected);
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return d.getDate() === tomorrow.getDate() &&
+           d.getMonth() === tomorrow.getMonth() &&
+           d.getFullYear() === tomorrow.getFullYear();
+  }
+
   swapCities(): void {
     const from = this.searchForm.get('fromCityId')?.value;
     const to = this.searchForm.get('toCityId')?.value;

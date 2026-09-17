@@ -1,12 +1,32 @@
 <div class="search-results-wrapper">
-  <!-- Header Section -->
-  <div class="header-section text-white py-5 px-4 mb-4 text-center">
+  <!-- Header Route Banner -->
+  <div class="search-header-banner py-3 py-md-4 px-3 mb-3 mb-md-4">
     <div class="container">
-      <h2 class="display-6 fw-bold mb-2">Available Buses</h2>
-      <p class="lead mb-0" *ngIf="fromCityName && toCityName">
-        {{ fromCityName }} <mat-icon class="align-middle mx-2">arrow_forward</mat-icon> {{ toCityName }}
-      </p>
-      <p class="text-white-50 mt-2">{{ journeyDate | date:'longDate' }}</p>
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 header-inner-wrap">
+        <div class="w-100 w-md-auto">
+          <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+            <span class="route-badge">
+              <mat-icon class="badge-icon">directions_bus</mat-icon> Bus Route
+            </span>
+            <span class="date-chip" *ngIf="journeyDate">
+              <mat-icon class="badge-icon">calendar_today</mat-icon> {{ journeyDate | date:'fullDate' }}
+            </span>
+          </div>
+          <h1 class="route-title fw-bold mb-0 d-flex align-items-center flex-wrap" *ngIf="fromCityName && toCityName">
+            <span>{{ fromCityName }}</span>
+            <mat-icon class="mx-2 mx-md-3 route-arrow">trending_flat</mat-icon>
+            <span class="highlight-blue">{{ toCityName }}</span>
+          </h1>
+          <p class="search-subtitle mt-1 mb-0" *ngIf="!isLoading && schedules.length > 0">
+            Showing <strong class="text-dark-emphasis">{{ schedules.length }}</strong> available {{ schedules.length === 1 ? 'bus' : 'buses' }} (earliest first)
+          </p>
+        </div>
+        <div class="header-action-wrap mt-2 mt-md-0">
+          <button mat-button class="btn-modify-search" (click)="goBack()">
+            <mat-icon class="me-1">tune</mat-icon> Modify Search
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -14,91 +34,143 @@
     
     <!-- Loading State -->
     <div *ngIf="isLoading" class="d-flex flex-column justify-content-center align-items-center py-5">
-      <mat-spinner diameter="50"></mat-spinner>
-      <p class="mt-3 text-muted">Searching for the best buses...</p>
+      <mat-spinner diameter="48" class="search-spinner"></mat-spinner>
+      <p class="mt-3 text-muted fs-6">Searching for the best buses...</p>
     </div>
 
     <!-- Error State -->
-    <div *ngIf="!isLoading && errorMessage" class="alert alert-warning text-center mx-auto" style="max-width: 600px;">
-      <mat-icon class="display-4 d-block mx-auto mb-3 text-warning">error_outline</mat-icon>
-      <h4 class="alert-heading">Oops!</h4>
-      <p>{{ errorMessage }}</p>
-      <button mat-stroked-button color="primary" class="mt-3" (click)="goBack()">Modify Search</button>
+    <div *ngIf="!isLoading && errorMessage" class="light-alert-card text-center mx-auto p-4 mb-4">
+      <mat-icon class="display-5 text-warning mb-2">error_outline</mat-icon>
+      <h4 class="fw-bold mb-2">Notice</h4>
+      <p class="text-muted mb-3">{{ errorMessage }}</p>
+      <button mat-button class="btn-modify-search" (click)="goBack()">
+        <mat-icon class="me-1">arrow_back</mat-icon> Modify Search
+      </button>
     </div>
 
     <!-- Empty State -->
-    <div *ngIf="!isLoading && !errorMessage && schedules.length === 0" class="text-center py-5 mx-auto" style="max-width: 600px;">
-      <img src="assets/images/no-bus.svg" alt="No buses" class="img-fluid mb-4" style="max-height: 200px; opacity: 0.6;">
-      <h3 class="text-muted">No buses found</h3>
-      <p class="text-muted">We couldn't find any buses for this route on the selected date.</p>
-      <button mat-stroked-button color="primary" class="mt-3" (click)="goBack()">Change Date or Route</button>
+    <div *ngIf="!isLoading && !errorMessage && schedules.length === 0" class="light-empty-card text-center py-5 px-4 mx-auto">
+      <div class="empty-icon-circle mx-auto mb-3">
+        <mat-icon class="empty-bus-icon">directions_bus</mat-icon>
+      </div>
+      <h3 class="fw-bold text-dark mb-2">No Buses Found</h3>
+      <p class="text-muted mb-4 mx-auto" style="max-width: 480px;">
+        No buses found for this route on this date. Try searching for a different date or city.
+      </p>
+      <button mat-button class="btn-modify-search" (click)="goBack()">
+        <mat-icon class="me-1">search</mat-icon> Modify Search
+      </button>
     </div>
 
-    <!-- Results List -->
-    <div *ngIf="!isLoading && schedules.length > 0" class="row justify-content-center">
-      <div class="col-lg-10">
-        
-        <mat-card class="schedule-card mb-4" *ngFor="let schedule of schedules">
-          <mat-card-content class="p-0">
-            <div class="row g-0 align-items-center p-4">
-              
-              <!-- Bus Details -->
-              <div class="col-md-3 border-md-end text-center text-md-start mb-3 mb-md-0">
-                <h5 class="fw-bold text-primary mb-1">{{ schedule?.bus?.busTypeName || 'Standard Bus' }}</h5>
-                <p class="text-success fw-bold small mb-1 d-flex align-items-center justify-content-center justify-content-md-start">
-                  <mat-icon inline="true" class="me-1">event_seat</mat-icon>
-                  <span>{{ schedule?.availableSeats != null ? schedule.availableSeats : (schedule?.bus?.totalSeats || '0') }} Seats Available</span>
-                </p>
-                <p class="text-muted mb-0" style="font-size: 0.78rem;" *ngIf="schedule?.bus?.totalSeats">
-                  <span>Total Capacity: {{ schedule.bus.totalSeats }} Seats</span>
-                </p>
-                <span class="badge bg-light text-dark border mt-2">{{ schedule?.bus?.registrationNumber || 'Unknown' }}</span>
+    <!-- Results List (Single centered column, max-width ~920px) -->
+    <div *ngIf="!isLoading && schedules.length > 0" class="results-container mx-auto">
+      
+      <mat-card class="schedule-card mb-3 mb-md-4" *ngFor="let schedule of schedules">
+        <mat-card-content class="p-0">
+          <div class="row g-0 align-items-center p-3 p-md-4">
+            
+            <!-- 1. Bus Details (Col 1 on desktop, Section 1 on mobile) -->
+            <div class="col-12 col-md-3 border-subtle-end bus-info-col mb-3 mb-md-0 pe-md-3">
+              <div class="d-flex align-items-start justify-content-between justify-content-md-start mb-2">
+                <div class="d-flex align-items-center">
+                  <div class="bus-type-badge-icon me-2" [ngClass]="getBusTypeClass(schedule?.bus?.busTypeName)">
+                    <mat-icon>{{ getBusTypeIcon(schedule?.bus?.busTypeName) }}</mat-icon>
+                  </div>
+                  <div>
+                    <h5 class="fw-bold bus-type-title mb-0">{{ schedule?.bus?.busTypeName || 'Standard Bus' }}</h5>
+                    <div class="text-muted small bus-operator-name" *ngIf="schedule?.bus?.busName">
+                      {{ schedule.bus.busName }}
+                    </div>
+                  </div>
+                </div>
+                <!-- On mobile, show registration number badge top-right -->
+                <span class="reg-number-badge d-inline-block d-md-none">{{ schedule?.bus?.registrationNumber || 'BUS-EXP' }}</span>
               </div>
+
+              <div class="d-flex align-items-center gap-2 mt-1">
+                <div class="text-muted small" *ngIf="schedule?.bus?.totalSeats">
+                  <span>Capacity: {{ schedule.bus.totalSeats }} Seats</span>
+                </div>
+                <!-- On desktop, show registration number badge below capacity -->
+                <span class="reg-number-badge d-none d-md-inline-block">{{ schedule?.bus?.registrationNumber || 'BUS-EXP' }}</span>
+              </div>
+            </div>
+            
+            <!-- 2. Time, Duration & Route Details (Col 2 on desktop, Section 2 on mobile) -->
+            <div class="col-12 col-md-6 px-md-3 text-center timeline-col mb-3 mb-md-0">
+              <div class="d-flex justify-content-between align-items-center px-1 px-sm-3">
+                
+                <!-- Departure -->
+                <div class="text-start text-md-end time-block">
+                  <h3 class="fw-bold mb-0 time-val">{{ schedule.departureTime.substring(0,5) }}</h3>
+                  <span class="time-label">Departure</span>
+                </div>
+                
+                <!-- Visual Route Timeline with Duration -->
+                <div class="flex-grow-1 px-2 px-sm-3 position-relative d-flex flex-column align-items-center">
+                  
+                  <!-- Duration Label -->
+                  <div class="duration-label mb-1">
+                    <span>{{ getDuration(schedule.departureTime, schedule.arrivalTime) }}</span>
+                  </div>
+
+                  <div class="w-100 position-relative py-2">
+                    <div class="journey-line"></div>
+                    <div class="journey-icon-wrap">
+                      <mat-icon class="journey-icon">directions_bus</mat-icon>
+                    </div>
+                  </div>
+                  
+                  <!-- Route Stops Below the Line -->
+                  <div class="d-flex justify-content-between w-100 mt-1 px-1 flex-wrap route-stops-wrap" *ngIf="routeStops && routeStops.length > 0">
+                    <div class="stop-tag d-flex flex-column align-items-center" *ngFor="let stop of routeStops" title="{{stop.cityName}}">
+                      <span class="stop-dot">•</span>
+                      <span class="stop-name">{{ stop.cityName }}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Arrival (with optional +1 day overnight tag) -->
+                <div class="text-end text-md-start time-block">
+                  <div class="d-flex align-items-baseline justify-content-end justify-content-md-start gap-1">
+                    <h3 class="fw-bold mb-0 time-val">{{ schedule.arrivalTime.substring(0,5) }}</h3>
+                    <span class="overnight-badge" *ngIf="isOvernight(schedule.departureTime, schedule.arrivalTime)">+1 day</span>
+                  </div>
+                  <span class="time-label">Arrival</span>
+                </div>
+                
+              </div>
+            </div>
+            
+            <!-- 3. Availability, Price & Action (Col 3 on desktop, Section 3 on mobile) -->
+            <div class="col-12 col-md-3 text-center text-md-end border-subtle-start action-col ps-md-3 pt-2 pt-md-0">
               
-              <!-- Time & Route Details -->
-              <div class="col-md-6 px-md-4 text-center mb-3 mb-md-0">
-                <div class="d-flex justify-content-between align-items-center px-4">
-                  
-                  <div class="text-end">
-                    <h4 class="fw-bold mb-0">{{ schedule.departureTime.substring(0,5) }}</h4>
-                    <span class="text-muted small">Departure</span>
-                  </div>
-                  
-                  <div class="flex-grow-1 px-3 position-relative d-flex flex-column align-items-center">
-                    <div class="w-100 position-relative py-2">
-                      <div class="journey-line"></div>
-                      <mat-icon class="journey-icon text-muted bg-white px-1">directions_bus</mat-icon>
-                    </div>
-                    <!-- Route Stops Below the Line -->
-                    <div class="d-flex justify-content-between w-100 mt-1 px-1" *ngIf="routeStops && routeStops.length > 0">
-                      <div class="text-muted d-flex flex-column align-items-center" style="font-size: 0.65rem; line-height: 1;" *ngFor="let stop of routeStops" title="{{stop.cityName}}">
-                        <span style="font-size: 10px;">•</span>
-                        <span>{{ stop.cityName }}</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div class="text-start">
-                    <h4 class="fw-bold mb-0">{{ schedule.arrivalTime.substring(0,5) }}</h4>
-                    <span class="text-muted small">Arrival</span>
-                  </div>
-                  
+              <!-- Responsive Layout: On mobile sits side-by-side; on desktop stacks vertically -->
+              <div class="d-flex d-md-block justify-content-between align-items-center mb-3">
+                <div class="seat-badge-wrap mb-0 mb-md-2 d-flex align-items-center justify-content-start justify-content-md-end">
+                  <span class="seats-left-badge">
+                    <mat-icon class="me-1 seat-icon">event_seat</mat-icon>
+                    <span>{{ schedule?.availableSeats != null ? schedule.availableSeats : (schedule?.bus?.totalSeats || '0') }} Seats Left</span>
+                  </span>
+                </div>
+
+                <div class="price-wrap text-end">
+                  <span class="text-muted small d-block price-label">Starting from</span>
+                  <h3 class="fw-bold price-amount mb-0">₹{{ schedule.baseFare }}</h3>
                 </div>
               </div>
-              
-              <!-- Price & Action -->
-              <div class="col-md-3 text-center text-md-end border-md-start pl-md-4">
-                <h3 class="fw-bold text-success mb-3">₹{{ schedule.baseFare }}</h3>
-                <button mat-flat-button color="accent" class="w-100 rounded-pill px-4" (click)="viewSeats(schedule.id)">
-                  View Seats
-                </button>
-              </div>
-              
+
+              <!-- Full-width button on mobile (touch target 48px), 100% column on desktop -->
+              <button mat-flat-button class="view-seats-btn w-100" (click)="viewSeats(schedule.id)">
+                <span>View Seats</span>
+                <mat-icon class="ms-1">arrow_forward</mat-icon>
+              </button>
             </div>
-          </mat-card-content>
-        </mat-card>
-        
-      </div>
+            
+          </div>
+        </mat-card-content>
+      </mat-card>
+      
     </div>
     
   </div>

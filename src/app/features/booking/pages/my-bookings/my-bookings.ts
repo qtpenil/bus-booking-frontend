@@ -87,6 +87,25 @@ export class MyBookingsComponent implements OnInit {
     this.fetchBookings();
   }
 
+  isJourneyPassed(journeyDate?: string): boolean {
+    if (!journeyDate) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const jDate = new Date(journeyDate);
+    jDate.setHours(0, 0, 0, 0);
+    return jDate.getTime() < today.getTime();
+  }
+
+  getEmptyStateMessage(): string {
+    if (this.activeTab === 'CONFIRMED') {
+      return 'No confirmed tickets found.';
+    }
+    if (this.activeTab === 'CANCELLED') {
+      return 'No cancelled tickets yet.';
+    }
+    return 'You do not have any bus bookings yet.';
+  }
+
   openTicketDetails(ticket: any): void {
     const dialogRef = this.dialog.open(TicketDialogComponent, {
       width: '680px',
@@ -159,10 +178,51 @@ export class MyBookingsComponent implements OnInit {
     return 'Reserved Seat';
   }
 
+  getDepartureTimeDisplay(ticket: any): string {
+    if (ticket.boardingTime) {
+      const date = new Date(ticket.boardingTime);
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    }
+    if (ticket.departureTime) {
+      return ticket.departureTime.substring(0, 5);
+    }
+    return 'TBD';
+  }
+
   getPassengerNames(ticket: any): string {
     if (ticket.passengers && ticket.passengers.length > 0) {
       return ticket.passengers.map((p: any) => `${p.firstName} ${p.lastName}`.trim()).join(', ');
     }
     return 'Passenger';
+  }
+
+  getRouteSource(ticket: any): string {
+    if (ticket.sourceCityName) return ticket.sourceCityName;
+    if (ticket.sourceCity) return ticket.sourceCity;
+    if (ticket.fromCity) return ticket.fromCity;
+    if (ticket.routeName && ticket.routeName.includes(' to ')) {
+      return ticket.routeName.split(' to ')[0].trim();
+    }
+    if (ticket.routeName && ticket.routeName.includes(' - ')) {
+      return ticket.routeName.split(' - ')[0].trim();
+    }
+    return '';
+  }
+
+  getRouteDestination(ticket: any): string {
+    if (ticket.destinationCityName) return ticket.destinationCityName;
+    if (ticket.destinationCity) return ticket.destinationCity;
+    if (ticket.toCity) return ticket.toCity;
+    if (ticket.routeName && ticket.routeName.includes(' to ')) {
+      return ticket.routeName.split(' to ')[1].trim();
+    }
+    if (ticket.routeName && ticket.routeName.includes(' - ')) {
+      return ticket.routeName.split(' - ')[1].trim();
+    }
+    return '';
+  }
+
+  getRouteDisplay(ticket: any): boolean {
+    return !!(this.getRouteSource(ticket) && this.getRouteDestination(ticket));
   }
 }

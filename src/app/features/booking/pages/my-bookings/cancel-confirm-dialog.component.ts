@@ -26,43 +26,43 @@ export interface CancelConfirmData {
     <div class="cancel-dialog-container p-3">
       <!-- Icon Header -->
       <div class="text-center mb-3">
-        <div class="icon-wrapper bg-danger bg-opacity-10 text-danger rounded-circle mx-auto d-flex align-items-center justify-content-center mb-2" style="width: 56px; height: 56px;">
-          <mat-icon class="fs-2">warning_amber</mat-icon>
+        <div class="icon-wrapper mx-auto d-flex align-items-center justify-content-center mb-2">
+          <mat-icon class="fs-2 text-danger-icon">warning_amber</mat-icon>
         </div>
-        <h4 class="fw-bold text-dark mb-1">Cancel Booking?</h4>
+        <h4 class="fw-bold text-dark-emphasis mb-1">Cancel Booking?</h4>
         <p class="text-muted small mb-0">Please confirm if you want to cancel this ticket.</p>
       </div>
 
       <!-- Ticket Details Summary Card -->
-      <div class="bg-light p-3 rounded-3 mb-3 border">
+      <div class="summary-box p-3 mb-3">
         <div class="d-flex justify-content-between align-items-center mb-2">
           <span class="text-muted small">PNR / Reference:</span>
-          <strong class="font-monospace text-primary small">{{ data.bookingReference || ('BKG-' + data.bookingId) }}</strong>
+          <strong class="font-monospace pnr-amber small">{{ data.bookingReference || ('BKG-' + data.bookingId) }}</strong>
         </div>
         <div class="d-flex justify-content-between align-items-center mb-2" *ngIf="data.seatsDisplay">
           <span class="text-muted small">Seats:</span>
-          <span class="badge bg-primary px-2 py-1">{{ data.seatsDisplay }}</span>
+          <span class="seat-badge-pill">{{ data.seatsDisplay }}</span>
         </div>
         <div class="d-flex justify-content-between align-items-center" *ngIf="data.totalAmount">
           <span class="text-muted small">Total Fare:</span>
-          <strong class="text-success small">₹{{ data.totalAmount }}</strong>
+          <strong class="text-dark-emphasis small">₹{{ data.totalAmount }}</strong>
         </div>
       </div>
 
       <!-- Warning Info Note -->
-      <div class="alert alert-warning d-flex align-items-start p-2 mb-3 rounded-3 small">
-        <mat-icon class="text-warning me-2 fs-5 flex-shrink-0 mt-1">info</mat-icon>
-        <div>
+      <div class="light-warning-note d-flex align-items-start p-3 mb-3 small">
+        <mat-icon class="text-warning-icon me-2 fs-5 flex-shrink-0 mt-1">info</mat-icon>
+        <div class="text-warning-text">
           Cancelling this ticket will release your reserved seats immediately for other passengers.
         </div>
       </div>
 
       <!-- Dialog Action Buttons -->
       <div class="d-flex gap-2 justify-content-end">
-        <button mat-stroked-button class="rounded-pill px-3" (click)="dialogRef.close(false)">
+        <button mat-button class="btn-keep-ticket" (click)="dialogRef.close(false)">
           Keep Ticket
         </button>
-        <button mat-flat-button color="warn" class="rounded-pill px-3 bg-danger text-white" (click)="dialogRef.close(true)">
+        <button mat-flat-button class="danger-cancel-btn" (click)="dialogRef.close(true)">
           <mat-icon class="me-1 fs-6">cancel</mat-icon> Yes, Cancel Ticket
         </button>
       </div>
@@ -71,6 +71,85 @@ export interface CancelConfirmData {
   styles: [`
     .cancel-dialog-container {
       max-width: 440px;
+      background: var(--color-surface-light, #ffffff);
+      color: var(--color-text-dark, #0f172a);
+      border-radius: 16px;
+    }
+
+    .icon-wrapper {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+    }
+
+    .text-danger-icon {
+      color: #dc2626 !important;
+    }
+
+    .summary-box {
+      background: var(--color-surface-muted, #f8fafc);
+      border: 1px solid var(--color-border-subtle, #e2e8f0);
+      border-radius: 12px;
+    }
+
+    .pnr-amber {
+      color: #b45309;
+      font-weight: 700;
+    }
+
+    .seat-badge-pill {
+      background: var(--color-accent-tint, #eff6ff);
+      border: 1px solid #dbeafe;
+      color: var(--color-primary-blue, #2563eb);
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 6px;
+    }
+
+    .light-warning-note {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 12px;
+    }
+
+    .text-warning-icon {
+      color: #b45309 !important;
+    }
+
+    .text-warning-text {
+      color: #92400e !important;
+      font-weight: 500;
+    }
+
+    .btn-keep-ticket {
+      color: var(--color-text-dark, #0f172a) !important;
+      border: 1px solid var(--color-border-subtle, #e2e8f0) !important;
+      background: #ffffff !important;
+      border-radius: 10px !important;
+      font-weight: 600;
+      height: 42px;
+      padding: 0 16px;
+
+      &:hover {
+        background: var(--color-input-bg, #f1f5f9) !important;
+      }
+    }
+
+    .danger-cancel-btn {
+      background: #dc2626 !important;
+      color: #ffffff !important;
+      border-radius: 10px !important;
+      font-weight: 700;
+      height: 42px;
+      padding: 0 18px;
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25) !important;
+
+      &:hover {
+        background: #b91c1c !important;
+        box-shadow: 0 6px 16px rgba(220, 38, 38, 0.35) !important;
+      }
     }
   `]
 })
