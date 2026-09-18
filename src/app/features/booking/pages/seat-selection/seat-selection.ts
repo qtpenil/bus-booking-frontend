@@ -196,8 +196,8 @@ export class SeatSelectionComponent implements OnInit {
     this.aisleAfterCol = this.maxCol >= 2 ? Math.floor(this.maxCol / 2) : 0;
 
     const isSleeper = this.displayedSeats.some(s => s.seatType === 'SLEEPER');
-    const seatColWidth = isSleeper ? '36px' : '34px';
-    const aisleGapWidth = isSleeper ? '20px' : '22px';
+    const seatColWidth = isSleeper ? '50px' : '48px';
+    const aisleGapWidth = isSleeper ? '30px' : '32px';
 
     let columns = '';
     if (this.aisleAfterCol === 0) {

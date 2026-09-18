@@ -7,5 +7,6 @@ export const API_URLS = {
   PAYMENTS: `${environment.api.gatewayUrl}/api/v1/payments`,
   ROUTES: `${environment.api.gatewayUrl}/api/v1/routes`,
   CITIES: `${environment.api.gatewayUrl}/api/v1/cities`,
-  SCHEDULES: `${environment.api.gatewayUrl}/api/v1/schedules`
+  SCHEDULES: `${environment.api.gatewayUrl}/api/v1/schedules`,
+  NOTIFICATIONS: `${environment.api.gatewayUrl}/api/notifications`
 };
