@@ -1,7 +1,7 @@
 .home-wrapper {
   width: 100%;
-  min-height: calc(100vh - 68px);
-  height: calc(100vh - 68px);
+  min-height: calc(100vh - 64px);
+  height: calc(100vh - 64px);
   overflow-x: hidden;
   background: 
     linear-gradient(90deg, rgba(15, 23, 42, 0.80) 0%, rgba(15, 23, 42, 0.65) 28%, rgba(15, 23, 42, 0.20) 55%, rgba(15, 23, 42, 0) 75%),
@@ -189,23 +189,6 @@
       color: #ffffff !important;
       font-weight: 600;
       box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
-    }
-  }
-
-  .main-search-btn {
-    background-color: var(--color-primary-blue, #2563eb) !important;
-    color: #ffffff !important;
-    height: 52px;
-    font-size: 1.05rem;
-    font-weight: 700;
-    border-radius: 12px !important;
-    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35) !important;
-    transition: all 0.2s ease;
-
-    &:hover {
-      background-color: var(--color-primary-blue-hover, #1d4ed8) !important;
-      transform: translateY(-1px);
-      box-shadow: 0 6px 22px rgba(37, 99, 235, 0.5) !important;
     }
   }
 }

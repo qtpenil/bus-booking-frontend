@@ -167,7 +167,7 @@ import { CancelConfirmDialogComponent } from './cancel-confirm-dialog.component'
         </div>
         <div class="d-flex gap-2">
           <button mat-button class="ticket-close-btn" (click)="dialogRef.close()">Close</button>
-          <button mat-flat-button class="home-btn-primary" (click)="printTicket()">
+          <button mat-flat-button class="btn-primary btn-view-ticket" (click)="printTicket()">
             <mat-icon class="me-1">print</mat-icon> Print Pass
           </button>
         </div>
@@ -353,22 +353,6 @@ import { CancelConfirmDialogComponent } from './cancel-confirm-dialog.component'
       border-radius: 10px;
     }
 
-    .home-btn-primary {
-      background: var(--color-primary-blue, #2563eb) !important;
-      color: #ffffff !important;
-      border-radius: 10px !important;
-      font-weight: 700;
-      padding: 0 20px;
-      height: 44px;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
-      transition: all 0.2s;
-
-      &:hover {
-        background: var(--color-primary-blue-hover, #1d4ed8) !important;
-        transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35) !important;
-      }
-    }
 
     .ticket-cancel-btn {
       background: #ffffff !important;

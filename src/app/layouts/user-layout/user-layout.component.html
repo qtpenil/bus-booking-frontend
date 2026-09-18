@@ -1,55 +1,6 @@
 <div class="user-wrapper d-flex flex-column min-vh-100">
-  <mat-toolbar class="premium-header">
-    <div class="container-fluid px-3 px-md-5 d-flex justify-content-between align-items-center w-100">
-      <a routerLink="/home" class="navbar-brand d-flex align-items-center text-white text-decoration-none">
-        <div class="brand-icon-box d-flex align-items-center justify-content-center me-2">
-          <mat-icon class="brand-bus-icon">directions_bus</mat-icon>
-        </div>
-        <span class="fs-4 fw-bold logo-text">Bus<span class="highlight-brand">Booking</span></span>
-      </a>
-
-      <div class="nav-links d-none d-md-flex align-items-center">
-        <a mat-button routerLink="/home" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" class="nav-btn">Home</a>
-        <a mat-button routerLink="/search" routerLinkActive="active-link" class="nav-btn">Find Buses</a>
-        <a mat-button (click)="onMyBookingsClick()" routerLinkActive="active-link" class="nav-btn">My Bookings</a>
-      </div>
-
-      <div class="auth-buttons d-flex align-items-center">
-        <ng-container *ngIf="!isLoggedIn; else userProfileMenu">
-          <button mat-button (click)="openAuthModal('login')" class="me-2 login-btn">Login</button>
-          <button mat-flat-button (click)="openAuthModal('register')" class="signup-btn">Sign Up</button>
-        </ng-container>
-
-        <ng-template #userProfileMenu>
-          <button mat-button [matMenuTriggerFor]="userMenu" class="user-menu-btn d-flex align-items-center">
-            <mat-icon class="me-1 icon-user">account_circle</mat-icon>
-            <span class="username-text me-1">{{ getUserDisplayName() }}</span>
-            <mat-icon class="dropdown-icon">expand_more</mat-icon>
-          </button>
-          
-          <mat-menu #userMenu="matMenu" class="custom-user-menu">
-            <div class="px-3 py-2 border-bottom user-menu-header">
-              <p class="mb-0 fw-bold text-dark">{{ getUserDisplayName() }}</p>
-              <small class="text-muted">{{ currentUser?.sub || currentUser?.email }}</small>
-            </div>
-            <a mat-menu-item routerLink="/home">
-              <mat-icon>home</mat-icon>
-              <span>Home</span>
-            </a>
-            <a mat-menu-item routerLink="/booking/my-bookings">
-              <mat-icon>confirmation_number</mat-icon>
-              <span>My Bookings</span>
-            </a>
-            <mat-divider></mat-divider>
-            <button mat-menu-item (click)="logout()" class="text-danger">
-              <mat-icon class="text-danger">exit_to_app</mat-icon>
-              <span>Logout</span>
-            </button>
-          </mat-menu>
-        </ng-template>
-      </div>
-    </div>
-  </mat-toolbar>
+  <!-- Shared Navbar Component -->
+  <app-navbar></app-navbar>
   
   <main class="flex-grow-1">
     <router-outlet></router-outlet>
@@ -65,4 +16,3 @@
     </div>
   </footer>
 </div>
-

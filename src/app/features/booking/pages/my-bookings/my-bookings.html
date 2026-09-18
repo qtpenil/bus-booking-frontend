@@ -14,7 +14,7 @@
         <p class="page-subtitle mb-0">View your active travel passes, scheduled journeys, and boarding history</p>
       </div>
       <div class="header-action-wrap mt-2 mt-md-0">
-        <a mat-flat-button routerLink="/search" class="home-btn-primary btn-book-ticket">
+        <a mat-flat-button routerLink="/search" class="btn-primary btn-book-ticket">
           <mat-icon class="me-1">search</mat-icon> Book New Ticket
         </a>
       </div>
@@ -31,7 +31,7 @@
       <mat-icon class="display-5 text-warning mb-2">error_outline</mat-icon>
       <h4 class="fw-bold text-dark mb-1">Notice</h4>
       <p class="text-muted mb-3">{{ errorMessage }}</p>
-      <button mat-flat-button class="home-btn-primary" (click)="fetchBookings()">
+      <button mat-flat-button class="btn-primary btn-book-ticket" (click)="fetchBookings()">
         <mat-icon class="me-1">refresh</mat-icon> Retry
       </button>
     </div>
@@ -64,7 +64,7 @@
       <p class="text-muted mb-4 mx-auto" style="max-width: 440px;">
         {{ activeTab === 'ALL' ? 'You have not booked any bus tickets yet. Find your route and reserve seats now.' : 'You have no tickets currently under this tab.' }}
       </p>
-      <a mat-flat-button class="home-btn-primary px-4" routerLink="/search">
+      <a mat-flat-button class="btn-primary btn-book-ticket px-4" routerLink="/search">
         <mat-icon class="me-1">search</mat-icon> Find Buses & Book Now
       </a>
     </div>
@@ -196,7 +196,7 @@
 
             <!-- Card Action Buttons -->
             <div class="pt-3 border-card-top d-flex gap-2 align-items-center">
-              <button mat-flat-button class="home-btn-primary flex-grow-1" (click)="openTicketDetails(ticket)">
+              <button mat-flat-button class="btn-primary btn-view-ticket flex-grow-1" (click)="openTicketDetails(ticket)">
                 <mat-icon class="me-1">receipt_long</mat-icon> View Ticket
               </button>
               

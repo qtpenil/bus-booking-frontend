@@ -1,12 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, BehaviorSubject, of } from 'rxjs';
+import { tap, catchError, finalize } from 'rxjs/operators';
 import { API_URLS } from '../../../core/constants/api.constants';
 import { STORAGE_KEYS } from '../../../core/constants/storage.constants';
 import { LoginRequest, RegisterRequest, AuthResponse } from '../models/auth.models';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
+import { NotificationService } from '../../../services/notification.service';
 
 export interface UserPayload {
   sub?: string;
@@ -24,6 +25,7 @@ export interface UserPayload {
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
+  private notificationService = inject(NotificationService);
 
   private currentUserSubject = new BehaviorSubject<UserPayload | null>(this.getStoredUser());
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -57,6 +59,21 @@ export class AuthService {
   }
 
   logout(): void {
+    const installationId = localStorage.getItem(STORAGE_KEYS.FCM_INSTALLATION_ID);
+    if (installationId) {
+      this.notificationService.deactivateDevice({ installationId }).pipe(
+        catchError(err => {
+          console.warn('Failed to deactivate notification device during logout:', err);
+          return of(null);
+        }),
+        finalize(() => this.performLocalLogout())
+      ).subscribe();
+    } else {
+      this.performLocalLogout();
+    }
+  }
+
+  private performLocalLogout(): void {
     localStorage.removeItem(STORAGE_KEYS.JWT_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
     this.currentUserSubject.next(null);
