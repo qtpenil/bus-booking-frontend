@@ -5,9 +5,6 @@ import { RoleType } from '../enums/role-type.enum';
 
 export const adminGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
-  
-  // Real app would decode JWT using jwt-decode library
-  // For now, we assume user data is stored in CURRENT_USER
   const userJson = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
   
   if (userJson) {
@@ -17,10 +14,10 @@ export const adminGuard: CanActivateFn = (route, state) => {
         return true;
       }
     } catch (e) {
-      console.error('Error parsing user data', e);
+      console.error('Error parsing admin user data', e);
     }
   }
   
-  // Not an admin, redirect to home
-  return router.parseUrl('/home');
+  // Not an admin or not logged in, redirect to admin login
+  return router.parseUrl('/admin/login');
 };

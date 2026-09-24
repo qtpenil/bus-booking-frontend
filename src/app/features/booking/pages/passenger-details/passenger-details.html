@@ -1,142 +1,251 @@
-<div class="passenger-details-wrapper py-5 bg-light min-vh-100">
+<div class="passenger-details-wrapper py-4 min-vh-100">
   <div class="container">
-    
-    <div *ngIf="isLoading" class="d-flex justify-content-center py-5">
-      <mat-spinner diameter="50"></mat-spinner>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="d-flex flex-column justify-content-center align-items-center py-5">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p class="mt-3 text-muted fw-semibold">Loading booking details...</p>
     </div>
 
-    <div class="row" *ngIf="!isLoading && schedule">
-      
-      <!-- Left Column: Forms -->
-      <div class="col-lg-8 mb-4 mb-lg-0">
-        <form [formGroup]="bookingForm" (ngSubmit)="submitBooking()">
-          
-          <!-- Contact Details -->
-          <mat-card class="mb-4 shadow-sm border-0">
-            <mat-card-header class="border-bottom pb-3 mb-4">
-              <mat-icon mat-card-avatar class="text-primary mt-2">contact_mail</mat-icon>
-              <mat-card-title class="fw-bold">Contact Details</mat-card-title>
-              <mat-card-subtitle>Your ticket will be sent to these contact details</mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content class="px-4">
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <mat-form-field appearance="outline" class="w-100">
-                    <mat-label>Email Address</mat-label>
-                    <input matInput formControlName="contactEmail" type="email" placeholder="example@email.com">
-                    <mat-error *ngIf="bookingForm.get('contactEmail')?.hasError('required')">Email is required</mat-error>
-                    <mat-error *ngIf="bookingForm.get('contactEmail')?.hasError('email')">Invalid email address</mat-error>
-                  </mat-form-field>
+    <!-- Main Content -->
+    <div *ngIf="!isLoading && schedule">
+
+      <div class="row g-4">
+        <!-- Left Column: Forms -->
+        <div class="col-lg-8">
+          <form [formGroup]="bookingForm" (ngSubmit)="submitBooking()">
+
+            <!-- Contact Details Card -->
+            <div class="app-card mb-4">
+              <div class="card-header-row">
+                <div class="section-icon-badge">
+                  <mat-icon>contact_mail</mat-icon>
                 </div>
-                <div class="col-md-6 mb-3">
-                  <mat-form-field appearance="outline" class="w-100">
-                    <mat-label>Phone Number</mat-label>
-                    <input matInput formControlName="contactPhone" type="tel" placeholder="10-digit number">
-                    <mat-error *ngIf="bookingForm.get('contactPhone')?.hasError('required')">Phone is required</mat-error>
-                    <mat-error *ngIf="bookingForm.get('contactPhone')?.hasError('pattern')">Must be 10 digits</mat-error>
-                  </mat-form-field>
+                <div>
+                  <h4 class="section-title">Contact Details</h4>
+                  <p class="section-subtitle">Your ticket will be sent to these contact details</p>
                 </div>
               </div>
-            </mat-card-content>
-          </mat-card>
 
-          <!-- Passenger Details -->
-          <mat-card class="mb-4 shadow-sm border-0">
-            <mat-card-header class="border-bottom pb-3 mb-4">
-              <mat-icon mat-card-avatar class="text-primary mt-2">people</mat-icon>
-              <mat-card-title class="fw-bold">Passenger Details</mat-card-title>
-              <mat-card-subtitle>Please enter details for all {{ selectedSeats.length }} passengers</mat-card-subtitle>
-            </mat-card-header>
-            
-            <mat-card-content class="px-4" formArrayName="passengers">
-              <div *ngFor="let control of passengerForms; let i = index" [formGroupName]="i" class="mb-4 pb-3" [class.border-bottom]="i < passengerForms.length - 1">
-                <h6 class="fw-bold text-muted mb-3">Passenger {{ i + 1 }} - Seat {{ selectedSeats[i].seatNumber }}</h6>
-                
-                <div class="row">
-                  <div class="col-md-4 mb-3">
-                    <mat-form-field appearance="outline" class="w-100">
-                      <mat-label>First Name</mat-label>
-                      <input matInput formControlName="firstName">
-                      <mat-error>Required</mat-error>
-                    </mat-form-field>
+              <div class="card-body-content">
+                <div class="row g-3">
+                  <!-- Email Address -->
+                  <div class="col-md-6">
+                    <label class="field-label">Email Address <span class="text-danger">*</span></label>
+                    <div class="input-with-icon">
+                      <div class="input-prefix-badge">
+                        <mat-icon>mail_outline</mat-icon>
+                      </div>
+                      <input 
+                        type="email" 
+                        formControlName="contactEmail" 
+                        class="form-control custom-input" 
+                        placeholder="example@email.com">
+                    </div>
+                    <div *ngIf="bookingForm.get('contactEmail')?.touched && bookingForm.get('contactEmail')?.invalid" class="field-error-msg mt-1">
+                      <span *ngIf="bookingForm.get('contactEmail')?.hasError('required')">Email is required</span>
+                      <span *ngIf="bookingForm.get('contactEmail')?.hasError('email')">Please enter a valid email address</span>
+                    </div>
                   </div>
-                  <div class="col-md-4 mb-3">
-                    <mat-form-field appearance="outline" class="w-100">
-                      <mat-label>Last Name</mat-label>
-                      <input matInput formControlName="lastName">
-                      <mat-error>Required</mat-error>
-                    </mat-form-field>
-                  </div>
-                  <div class="col-md-2 mb-3">
-                    <mat-form-field appearance="outline" class="w-100">
-                      <mat-label>Age</mat-label>
-                      <input matInput type="number" formControlName="age">
-                      <mat-error>Invalid</mat-error>
-                    </mat-form-field>
-                  </div>
-                  <div class="col-md-2 mb-3">
-                    <mat-form-field appearance="outline" class="w-100">
-                      <mat-label>Gender</mat-label>
-                      <mat-select formControlName="gender">
-                        <mat-option value="MALE">Male</mat-option>
-                        <mat-option value="FEMALE">Female</mat-option>
-                        <mat-option value="OTHER">Other</mat-option>
-                      </mat-select>
-                      <mat-error>Required</mat-error>
-                    </mat-form-field>
+
+                  <!-- Phone Number -->
+                  <div class="col-md-6">
+                    <label class="field-label">Phone Number <span class="text-danger">*</span></label>
+                    <div class="input-with-icon">
+                      <div class="input-prefix-badge">
+                        <mat-icon>phone</mat-icon>
+                      </div>
+                      <input 
+                        type="tel" 
+                        formControlName="contactPhone" 
+                        class="form-control custom-input" 
+                        placeholder="10-digit mobile number">
+                    </div>
+                    <div *ngIf="bookingForm.get('contactPhone')?.touched && bookingForm.get('contactPhone')?.invalid" class="field-error-msg mt-1">
+                      <span *ngIf="bookingForm.get('contactPhone')?.hasError('required')">Phone is required</span>
+                      <span *ngIf="bookingForm.get('contactPhone')?.hasError('pattern')">Must be a valid 10-digit number</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </mat-card-content>
-          </mat-card>
-
-        </form>
-      </div>
-
-      <!-- Right Column: Summary Panel -->
-      <div class="col-lg-4">
-        <mat-card class="shadow-sm border-0 position-sticky" style="top: 20px;">
-          <mat-card-content class="p-4">
-            
-            <h5 class="fw-bold mb-3 text-primary border-bottom pb-2">Booking Summary</h5>
-            <div class="d-flex justify-content-between mb-2">
-              <span class="text-muted">Route</span>
-              <span class="fw-medium text-end">{{ schedule?.sourceCityName || routeDetails?.sourceCityName }} to {{ schedule?.destinationCityName || routeDetails?.destinationCityName }}</span>
-            </div>
-            <div class="d-flex justify-content-between mb-2">
-              <span class="text-muted">Date</span>
-              <span class="fw-medium">{{ schedule.journeyDate | date:'mediumDate' }}</span>
-            </div>
-            <div class="d-flex justify-content-between mb-2">
-              <span class="text-muted">Time</span>
-              <span class="fw-medium">{{ schedule.departureTime.substring(0,5) }}</span>
-            </div>
-            <div class="d-flex justify-content-between mb-4">
-              <span class="text-muted">Seats ({{ selectedSeats.length }})</span>
-              <span class="fw-medium text-end">
-                 <span *ngFor="let s of selectedSeats; let last = last">{{ s.seatNumber }}{{ !last ? ', ' : '' }}</span>
-              </span>
             </div>
 
-            <h5 class="fw-bold mb-3 text-primary border-bottom pb-2">Fare Details</h5>
-            <div class="d-flex justify-content-between mb-2">
-              <span class="text-muted">Base Fare (x{{ selectedSeats.length }})</span>
-              <span class="fw-medium">₹{{ totalFare }}</span>
+            <!-- Passenger Details Card -->
+            <div class="app-card mb-4">
+              <div class="card-header-row">
+                <div class="section-icon-badge">
+                  <mat-icon>people</mat-icon>
+                </div>
+                <div>
+                  <h4 class="section-title">Passenger Details</h4>
+                  <p class="section-subtitle">Please enter details for all {{ selectedSeats.length }} passenger(s)</p>
+                </div>
+              </div>
+
+              <div class="card-body-content" formArrayName="passengers">
+                <div *ngFor="let control of passengerForms; let i = index" [formGroupName]="i" class="passenger-sub-card mb-3">
+                  
+                  <!-- Sub-card header with seat badge chip -->
+                  <div class="passenger-header-row mb-3">
+                    <span class="passenger-num">Passenger {{ i + 1 }}</span>
+                    <span class="seat-badge-chip">
+                      <mat-icon class="seat-chip-icon">airline_seat_recline_normal</mat-icon>
+                      Seat {{ selectedSeats[i]?.seatNumber }}
+                    </span>
+                  </div>
+
+                  <div class="row g-3">
+                    <!-- Single Name Field (Full Width) -->
+                    <div class="col-12">
+                      <label class="field-label">Name <span class="text-danger">*</span></label>
+                      <div class="input-with-icon">
+                        <div class="input-prefix-badge">
+                          <mat-icon>person_outline</mat-icon>
+                        </div>
+                        <input 
+                          type="text" 
+                          formControlName="name" 
+                          class="form-control custom-input" 
+                          placeholder="Enter passenger name">
+                      </div>
+                      <div *ngIf="control.get('name')?.touched && control.get('name')?.invalid" class="field-error-msg mt-1">
+                        Name is required
+                      </div>
+                    </div>
+
+                    <!-- Age -->
+                    <div class="col-md-6">
+                      <label class="field-label">Age <span class="text-danger">*</span></label>
+                      <div class="input-with-icon">
+                        <div class="input-prefix-badge">
+                          <mat-icon>cake</mat-icon>
+                        </div>
+                        <input 
+                          type="number" 
+                          formControlName="age" 
+                          class="form-control custom-input" 
+                          placeholder="Age in years" 
+                          min="1" 
+                          max="120">
+                      </div>
+                      <div *ngIf="control.get('age')?.touched && control.get('age')?.invalid" class="field-error-msg mt-1">
+                        Valid age (1-120) is required
+                      </div>
+                    </div>
+
+                    <!-- Gender -->
+                    <div class="col-md-6">
+                      <label class="field-label">Gender <span class="text-danger">*</span></label>
+                      <div class="input-with-icon">
+                        <div class="input-prefix-badge">
+                          <mat-icon>wc</mat-icon>
+                        </div>
+                        <select formControlName="gender" class="form-select custom-input">
+                          <option value="" disabled selected>Select Gender</option>
+                          <option value="MALE">Male</option>
+                          <option value="FEMALE">Female</option>
+                          <option value="OTHER">Other</option>
+                        </select>
+                      </div>
+                      <div *ngIf="control.get('gender')?.touched && control.get('gender')?.invalid" class="field-error-msg mt-1">
+                        Gender is required
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
             </div>
-            <div class="d-flex justify-content-between mb-4 mt-3 pt-3 border-top">
-              <span class="fw-bold fs-5">Total Amount</span>
-              <span class="fw-bold fs-4 text-success">₹{{ totalFare }}</span>
+
+          </form>
+        </div>
+
+        <!-- Right Column: Booking Summary Panel (Commit Panel) -->
+        <div class="col-lg-4">
+          <div class="summary-sticky-wrap">
+            <div class="app-card summary-card">
+              <div class="summary-header">
+                <h5 class="summary-title">Booking Summary</h5>
+              </div>
+
+              <div class="summary-body">
+                <!-- Meta Rows with Icon Badges -->
+                <div class="summary-row">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="meta-icon-badge">
+                      <mat-icon>directions_bus</mat-icon>
+                    </div>
+                    <span class="meta-label">Route</span>
+                  </div>
+                  <span class="meta-value">{{ schedule?.sourceCityName || routeDetails?.sourceCityName }} to {{ schedule?.destinationCityName || routeDetails?.destinationCityName }}</span>
+                </div>
+
+                <div class="summary-row">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="meta-icon-badge">
+                      <mat-icon>calendar_today</mat-icon>
+                    </div>
+                    <span class="meta-label">Date</span>
+                  </div>
+                  <span class="meta-value">{{ schedule.journeyDate | date:'mediumDate' }}</span>
+                </div>
+
+                <div class="summary-row">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="meta-icon-badge">
+                      <mat-icon>schedule</mat-icon>
+                    </div>
+                    <span class="meta-label">Time</span>
+                  </div>
+                  <span class="meta-value">{{ schedule.departureTime.substring(0,5) }}</span>
+                </div>
+
+                <div class="summary-row">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="meta-icon-badge">
+                      <mat-icon>airline_seat_recline_normal</mat-icon>
+                    </div>
+                    <span class="meta-label">Seats ({{ selectedSeats.length }})</span>
+                  </div>
+                  <div class="seats-chip-container">
+                    <span class="seat-badge-chip" *ngFor="let s of selectedSeats">{{ s.seatNumber }}</span>
+                  </div>
+                </div>
+
+                <!-- Fare Details Section -->
+                <div class="fare-section mt-4 pt-3 border-top">
+                  <h6 class="fare-section-title mb-3">Fare Details</h6>
+                  
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="fare-sub-label">Base Fare (x{{ selectedSeats.length }})</span>
+                    <span class="fare-sub-value">₹{{ totalFare }}</span>
+                  </div>
+
+                  <div class="d-flex justify-content-between align-items-baseline mt-3 pt-3 border-top">
+                    <span class="total-label">Total Amount</span>
+                    <span class="total-amount-value">₹{{ totalFare }}</span>
+                  </div>
+                </div>
+
+                <!-- CTA Button using .btn-primary -->
+                <button 
+                  type="button" 
+                  class="btn-primary w-100 mt-4" 
+                  style="height: 50px;" 
+                  [disabled]="bookingForm.invalid || isSubmitting" 
+                  (click)="submitBooking()">
+                  <mat-spinner *ngIf="isSubmitting" diameter="22" class="me-2 text-white"></mat-spinner>
+                  <span>{{ isSubmitting ? 'Processing...' : 'Proceed to Payment' }}</span>
+                </button>
+
+                <p class="terms-text text-center mt-3 mb-0">
+                  By clicking Proceed, you agree to our terms and conditions.
+                </p>
+              </div>
             </div>
-            
-            <button mat-flat-button color="accent" class="w-100 py-4 rounded" style="font-size: 1.1rem;" 
-                    [disabled]="bookingForm.invalid || isSubmitting" 
-                    (click)="submitBooking()">
-              <mat-spinner *ngIf="isSubmitting" diameter="24" class="me-2 d-inline-block align-middle"></mat-spinner>
-              {{ isSubmitting ? 'Processing...' : 'Proceed to Payment' }}
-            </button>
-            <p class="text-muted small text-center mt-3 mb-0">By clicking Proceed, you agree to our terms and conditions.</p>
-          </mat-card-content>
-        </mat-card>
+          </div>
+        </div>
+
       </div>
 
     </div>

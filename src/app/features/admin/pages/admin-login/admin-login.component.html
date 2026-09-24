@@ -1,0 +1,95 @@
+<div class="admin-login-wrapper d-flex align-items-center justify-content-center min-vh-100 p-3">
+  
+  <div class="bg-glow"></div>
+
+  <div class="admin-login-card">
+    
+    <!-- Top Security Icon Badge -->
+    <div class="text-center mb-4">
+      <div class="admin-badge-circle mx-auto mb-3">
+        <mat-icon class="admin-badge-icon">admin_panel_settings</mat-icon>
+      </div>
+      <h3 class="admin-title">Admin Portal</h3>
+      <p class="admin-subtitle">Sign in to access the fleet & booking management console</p>
+    </div>
+
+    <!-- Error Alert Banner -->
+    <div *ngIf="errorMessage" class="error-banner mb-3 p-3 rounded-3 d-flex align-items-center gap-2">
+      <mat-icon class="text-danger fs-5">error_outline</mat-icon>
+      <span class="small fw-medium">{{ errorMessage }}</span>
+    </div>
+
+    <!-- Login Form -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="d-flex flex-column gap-3">
+      
+      <!-- Email Field -->
+      <div class="form-group">
+        <label class="admin-label">Admin Email <span class="text-danger">*</span></label>
+        <div class="input-with-icon">
+          <div class="input-prefix-badge">
+            <mat-icon>mail_outline</mat-icon>
+          </div>
+          <input 
+            type="email" 
+            formControlName="email" 
+            class="form-control admin-input" 
+            placeholder="admin@busbooking.com">
+        </div>
+        <div *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid" class="field-error-msg mt-1">
+          <span *ngIf="loginForm.get('email')?.hasError('required')">Email is required</span>
+          <span *ngIf="loginForm.get('email')?.hasError('email')">Please enter a valid email</span>
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group">
+        <label class="admin-label">Password <span class="text-danger">*</span></label>
+        <div class="input-with-icon">
+          <div class="input-prefix-badge">
+            <mat-icon>lock_outline</mat-icon>
+          </div>
+          <input 
+            [type]="hidePassword ? 'password' : 'text'" 
+            formControlName="password" 
+            class="form-control admin-input" 
+            placeholder="Enter password">
+          <button 
+            type="button" 
+            class="btn-eye-toggle" 
+            (click)="hidePassword = !hidePassword"
+            aria-label="Toggle password visibility">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </div>
+        <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" class="field-error-msg mt-1">
+          Password is required
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button 
+        type="submit" 
+        class="btn-admin-submit mt-2 w-100" 
+        [disabled]="loginForm.invalid || isLoading">
+        <mat-spinner *ngIf="isLoading" diameter="22" class="me-2 text-white"></mat-spinner>
+        <mat-icon *ngIf="!isLoading" class="me-2">login</mat-icon>
+        <span>{{ isLoading ? 'Authenticating...' : 'Sign In to Portal' }}</span>
+      </button>
+
+    </form>
+
+    <!-- Card Footer -->
+    <div class="admin-card-footer mt-4 pt-3 text-center border-top">
+      <div class="d-flex align-items-center justify-content-center gap-1 text-muted small mb-2">
+        <mat-icon class="lock-icon">lock</mat-icon>
+        <span>Restricted Access • Authorized Personnel Only</span>
+      </div>
+      <a routerLink="/home" class="return-home-link small">
+        <mat-icon class="arrow-back">arrow_back</mat-icon>
+        <span>Return to Passenger Website</span>
+      </a>
+    </div>
+
+  </div>
+
+</div>
