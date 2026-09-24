@@ -115,10 +115,9 @@ export class PassengerDetailsComponent implements OnInit {
 
     const passengersArray = this.bookingForm.get('passengers') as FormArray;
     
-    this.selectedSeats.forEach(seat => {
+        this.selectedSeats.forEach(seat => {
       passengersArray.push(this.fb.group({
-        firstName: ['', Validators.required],
-        lastName: ['', Validators.required],
+        name: ['', Validators.required],
         age: ['', [Validators.required, Validators.min(1), Validators.max(120)]],
         gender: ['', Validators.required],
         seatId: [seat.seatId]
@@ -147,13 +146,23 @@ export class PassengerDetailsComponent implements OnInit {
       next: (holdResponse) => {
         // Step 2: Create Booking
         const formValue = this.bookingForm.value;
-        const passengers = formValue.passengers.map((p: any) => ({
-          seatId: p.seatId,
-          firstName: p.firstName,
-          lastName: p.lastName,
-          age: Number(p.age),
-          gender: p.gender
-        }));
+                const passengers = formValue.passengers.map((p: any) => {
+          const rawName = (p.name || '').trim();
+          const spaceIdx = rawName.indexOf(' ');
+          let fName = rawName;
+          let lName = '.';
+          if (spaceIdx > 0) {
+            fName = rawName.substring(0, spaceIdx).trim();
+            lName = rawName.substring(spaceIdx + 1).trim() || '.';
+          }
+          return {
+            seatId: p.seatId,
+            firstName: fName,
+            lastName: lName,
+            age: Number(p.age),
+            gender: p.gender
+          };
+        });
 
         this.bookingService.createBooking({
           scheduleId: this.scheduleId,
@@ -178,12 +187,19 @@ export class PassengerDetailsComponent implements OnInit {
         });
       },
       error: (err) => {
-        const errorMsg = err.error?.message || 'One or more selected seats are no longer available. Please select another seat.';
-        this.snackBar.open(errorMsg, 'Close', { duration: 4000 });
+        const errorMsg = err.error?.message || 'One or more selected seats were just reserved by another user. Please choose another seat.';
         this.isSubmitting = false;
         this.cdr.detectChanges();
-        // Redirect back to seat selection so user can choose available seats
-        this.router.navigate(['/booking/seats'], { queryParams: { scheduleId: this.scheduleId } });
+        // Redirect back to seat selection with conflict parameters
+        this.router.navigate(['/booking/seats'], { 
+          queryParams: { 
+            scheduleId: this.scheduleId,
+            sourceCityId: this.sourceCityId,
+            destinationCityId: this.destinationCityId,
+            conflict: 'true',
+            conflictMsg: errorMsg
+          } 
+        });
       }
     });
   }

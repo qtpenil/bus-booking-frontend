@@ -169,3 +169,30 @@
     </div>
   </div>
 </div>
+
+
+<!-- Seat Conflict Modal Popup -->
+<div class="conflict-modal-backdrop" *ngIf="showConflictPopup" (click)="closeConflictPopup()">
+  <div class="conflict-modal-card" (click)="$event.stopPropagation()">
+    <!-- Top-Right Close Button (X) -->
+    <button class="btn-close-modal" (click)="closeConflictPopup()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+    
+    <!-- Warning Icon -->
+    <div class="conflict-modal-icon-wrapper">
+      <mat-icon class="conflict-icon">warning_amber</mat-icon>
+    </div>
+    
+    <!-- Title & Message -->
+    <h3 class="conflict-modal-title">Seat Already Reserved!</h3>
+    <p class="conflict-modal-desc">
+      {{ conflictPopupMessage }}
+    </p>
+
+    <!-- Action Button -->
+    <button mat-flat-button color="primary" class="w-100 py-2 rounded-pill mt-3 fw-bold" (click)="closeConflictPopup()">
+      Choose Another Seat
+    </button>
+  </div>
+</div>

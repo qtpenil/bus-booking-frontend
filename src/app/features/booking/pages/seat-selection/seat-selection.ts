@@ -50,6 +50,10 @@ export class SeatSelectionComponent implements OnInit {
   maxSeats = 6;
   totalFare = 0;
 
+  // --- Seat Conflict Popup State ---
+  showConflictPopup = false;
+  conflictPopupMessage = '';
+
   // --- Seat layout UI properties ---
   activeDeck: string = 'LOWER';
   displayedSeats: ScheduleSeatResponse[] = [];
@@ -84,6 +88,15 @@ export class SeatSelectionComponent implements OnInit {
       this.scheduleId = Number(params['scheduleId']);
       this.sourceCityId = params['sourceCityId'] ? Number(params['sourceCityId']) : undefined;
       this.destinationCityId = params['destinationCityId'] ? Number(params['destinationCityId']) : undefined;
+
+      // Check if redirected due to a seat conflict
+      if (params['conflict'] === 'true') {
+        this.showConflictPopup = true;
+        this.conflictPopupMessage = params['conflictMsg'] || 'The seat you selected is no longer available. Someone else just reserved it.';
+        this.selectedSeats = [];
+        this.totalFare = 0;
+        this.cdr.detectChanges();
+      }
       if (!this.scheduleId) {
         this.errorMessage = 'Invalid Schedule ID.';
         this.isLoading = false;
@@ -98,6 +111,8 @@ export class SeatSelectionComponent implements OnInit {
       switchMap(schedule => {
         this.schedule = schedule;
         this.totalFare = 0;
+
+
         
         // Fetch seats, route, and bus in parallel with segment bounds
         return Promise.all([
@@ -312,5 +327,15 @@ export class SeatSelectionComponent implements OnInit {
   
   goBack() {
     this.router.navigate(['/home']);
+  }
+
+  closeConflictPopup() {
+    this.showConflictPopup = false;
+    // Clean up query params from URL so refreshing won't reopen the popup
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { conflict: null, conflictMsg: null },
+      queryParamsHandling: 'merge'
+    });
   }
 }
