@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FleetService } from '../../services/fleet.service';
 import { SeatLayoutTemplateResponse, BusTypeResponse } from '../../models/fleet.models';
 import { ToastService } from '../../../../shared/services/toast.service';
@@ -22,13 +23,14 @@ import { SeatLayoutBuilderDialog } from '../../components/seat-layout-builder-di
     CommonModule, 
     ReactiveFormsModule, 
     MatCardModule, 
-    MatFormFieldModule,
+    MatFormFieldModule, 
     MatInputModule, 
     MatButtonModule, 
     MatIconModule,
     MatSelectModule,
     MatSlideToggleModule,
     MatDialogModule,
+    MatProgressSpinnerModule,
     DataTableComponent
   ],
   templateUrl: './seat-templates.html',
@@ -43,23 +45,25 @@ export class SeatTemplates implements OnInit {
 
   templates: SeatLayoutTemplateResponse[] = [];
   busTypes: BusTypeResponse[] = [];
+  isLoading = false;
+  isSubmitting = false;
   
   templateForm: FormGroup = this.fb.group({
     templateName: ['', [Validators.required, Validators.maxLength(100)]],
     templateCode: ['', [Validators.required, Validators.maxLength(50)]],
-    totalSeats: [0, [Validators.required, Validators.min(1)]],
+    totalSeats: [null, [Validators.required, Validators.min(1)]],
     busTypeId: ['', [Validators.required]],
     isActive: [true],
     description: ['', [Validators.maxLength(255)]]
   });
 
   columns: TableColumn[] = [
-    { def: 'id', header: 'ID', cell: (element: SeatLayoutTemplateResponse) => `${element.id}` },
-    { def: 'templateName', header: 'Name', cell: (element: SeatLayoutTemplateResponse) => `${element.templateName}` },
+    { def: 'id', header: 'ID', cell: (element: SeatLayoutTemplateResponse) => `#${element.id}` },
+    { def: 'templateName', header: 'Template Name', cell: (element: SeatLayoutTemplateResponse) => `${element.templateName}` },
     { def: 'templateCode', header: 'Code', cell: (element: SeatLayoutTemplateResponse) => `${element.templateCode}` },
-    { def: 'totalSeats', header: 'Seats', cell: (element: SeatLayoutTemplateResponse) => `${element.totalSeats}` },
-    { def: 'busTypeId', header: 'Bus Type ID', cell: (element: SeatLayoutTemplateResponse) => `${element.busTypeId}` },
-    { def: 'isActive', header: 'Active', cell: (element: SeatLayoutTemplateResponse) => element.isActive ? 'Yes' : 'No' }
+    { def: 'totalSeats', header: 'Capacity', cell: (element: SeatLayoutTemplateResponse) => `${element.totalSeats} seats` },
+    { def: 'busType', header: 'Bus Type', cell: (element: SeatLayoutTemplateResponse) => this.getBusTypeName(element.busTypeId) },
+    { def: 'isActive', header: 'Status', cell: (element: SeatLayoutTemplateResponse) => element.isActive ? 'Active' : 'Inactive' }
   ];
 
   ngOnInit(): void {
@@ -67,15 +71,22 @@ export class SeatTemplates implements OnInit {
     this.loadBusTypes();
   }
 
+  getBusTypeName(busTypeId: number): string {
+    const found = this.busTypes.find(bt => bt.id === busTypeId);
+    return found ? found.name : `Type #${busTypeId}`;
+  }
+
   loadTemplates(): void {
+    this.isLoading = true;
     this.fleetService.getAllSeatTemplates().subscribe({
       next: (data) => {
         this.templates = [...data];
-        this.cdr.markForCheck();
+        this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: () => {
         this.toast.error('Failed to load seat templates');
+        this.isLoading = false;
         this.cdr.detectChanges();
       }
     });
@@ -85,27 +96,28 @@ export class SeatTemplates implements OnInit {
     this.fleetService.getAllBusTypes().subscribe({
       next: (data) => {
         this.busTypes = [...data];
-        this.cdr.markForCheck();
         this.cdr.detectChanges();
       },
       error: () => {
-        this.toast.error('Failed to load bus types for dropdown');
-        this.cdr.detectChanges();
+        this.toast.error('Failed to load bus types');
       }
     });
   }
 
   onSubmit(): void {
     if (this.templateForm.valid) {
+      this.isSubmitting = true;
       this.fleetService.createSeatTemplate(this.templateForm.value).subscribe({
         next: (newTemplate) => {
-          this.toast.success('Seat template added successfully!');
-          this.templateForm.reset({ isActive: true, totalSeats: 0 });
+          this.toast.success(`Template "${newTemplate.templateName}" created successfully!`);
+          this.templateForm.reset({ isActive: true });
           this.templates = [newTemplate, ...this.templates];
+          this.isSubmitting = false;
           this.cdr.detectChanges();
         },
         error: (err) => {
-          this.toast.error(err?.error?.message || 'Failed to add seat template');
+          this.toast.error(err?.error?.message || 'Failed to create seat template');
+          this.isSubmitting = false;
           this.cdr.detectChanges();
         }
       });
@@ -114,16 +126,16 @@ export class SeatTemplates implements OnInit {
 
   onView(template: SeatLayoutTemplateResponse): void {
     this.dialog.open(SeatLayoutBuilderDialog, {
-      width: '90vw',
-      maxWidth: '1200px',
-      height: '90vh',
+      width: '94vw',
+      maxWidth: '1300px',
+      height: '92vh',
       disableClose: true,
       data: { template }
     });
   }
 
   onEdit(template: SeatLayoutTemplateResponse): void {
-    this.toast.info(`Edit mode not fully implemented. Selected: ${template.templateName}`);
+    this.toast.info(`Edit template "${template.templateName}" will be available in next release.`);
   }
 
   onDelete(template: SeatLayoutTemplateResponse): void {

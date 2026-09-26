@@ -5,6 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouteService } from '../../services/route.service';
 import { CityResponse } from '../../models/route.models';
 import { ToastService } from '../../../../shared/services/toast.service';
@@ -20,6 +21,7 @@ import { DataTableComponent, TableColumn } from '../../../../shared/components/d
     MatInputModule, 
     MatButtonModule, 
     MatIconModule,
+    MatProgressSpinnerModule,
     DataTableComponent
   ],
   templateUrl: './cities.component.html',
@@ -33,6 +35,7 @@ export class CitiesComponent implements OnInit {
 
   cities: CityResponse[] = [];
   isLoading = false;
+  isSubmitting = false;
 
   cityForm: FormGroup = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(100)]],
@@ -40,9 +43,9 @@ export class CitiesComponent implements OnInit {
   });
 
   columns: TableColumn[] = [
-    { def: 'id', header: 'ID', cell: (element: CityResponse) => `${element.id}` },
+    { def: 'id', header: 'ID', cell: (element: CityResponse) => `#${element.id}` },
     { def: 'name', header: 'City Name', cell: (element: CityResponse) => `${element.name}` },
-    { def: 'state', header: 'State', cell: (element: CityResponse) => `${element.state}` }
+    { def: 'state', header: 'State / Region', cell: (element: CityResponse) => `${element.state}` }
   ];
 
   ngOnInit(): void {
@@ -71,22 +74,18 @@ export class CitiesComponent implements OnInit {
 
   onSubmit(): void {
     if (this.cityForm.valid) {
-      this.isLoading = true;
+      this.isSubmitting = true;
       this.routeService.createCity(this.cityForm.value).subscribe({
         next: (newCity) => {
-          this.toast.success('City added successfully!');
+          this.toast.success(`City "${newCity.name}" added successfully!`);
           this.cityForm.reset();
-          // Prepend new city to array for instant feedback or reload from server
           this.cities = [newCity, ...this.cities];
+          this.isSubmitting = false;
           this.cdr.detectChanges();
         },
         error: (err) => {
           this.toast.error(err?.error?.message || 'Failed to add city');
-          this.isLoading = false;
-          this.cdr.detectChanges();
-        },
-        complete: () => {
-          this.isLoading = false;
+          this.isSubmitting = false;
           this.cdr.detectChanges();
         }
       });
@@ -94,10 +93,10 @@ export class CitiesComponent implements OnInit {
   }
 
   onEdit(city: CityResponse): void {
-    this.toast.info(`Edit mode not fully implemented. Selected: ${city.name}`);
+    this.toast.info(`Edit mode for ${city.name} will be available in next release.`);
   }
 
   onDelete(city: CityResponse): void {
-    this.toast.info(`Delete not supported by backend yet. Selected: ${city.name}`);
+    this.toast.info(`City ${city.name} cannot be deleted while assigned to routes.`);
   }
 }

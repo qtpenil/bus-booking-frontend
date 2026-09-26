@@ -6,6 +6,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouteService } from '../../services/route.service';
 import { CityResponse, RouteResponse } from '../../models/route.models';
 import { ToastService } from '../../../../shared/services/toast.service';
@@ -25,6 +27,8 @@ import { RouteDetailsDialogComponent } from '../../components/route-details-dial
     MatSelectModule,
     MatButtonModule, 
     MatIconModule,
+    MatProgressSpinnerModule,
+    MatTooltipModule,
     DataTableComponent
   ],
   templateUrl: './routes.component.html',
@@ -39,9 +43,11 @@ export class RoutesComponent implements OnInit {
 
   routes: RouteResponse[] = [];
   cities: CityResponse[] = [];
+  isLoading = false;
+  isSubmitting = false;
 
   routeForm: FormGroup = this.fb.group({
-    routeName: ['', [Validators.required]],
+    routeName: ['', [Validators.required, Validators.maxLength(150)]],
     sourceCityId: ['', [Validators.required]],
     destinationCityId: ['', [Validators.required]],
     distanceKm: ['', [Validators.required, Validators.min(1)]],
@@ -50,12 +56,12 @@ export class RoutesComponent implements OnInit {
   });
 
   columns: TableColumn[] = [
-    { def: 'id', header: 'ID', cell: (element: RouteResponse) => `${element.id}` },
+    { def: 'id', header: 'ID', cell: (element: RouteResponse) => `#${element.id}` },
     { def: 'routeName', header: 'Route Name', cell: (element: RouteResponse) => `${element.routeName}` },
-    { def: 'source', header: 'From', cell: (element: RouteResponse) => `${element.sourceCityName}` },
-    { def: 'destination', header: 'To', cell: (element: RouteResponse) => `${element.destinationCityName}` },
-    { def: 'distance', header: 'Distance (km)', cell: (element: RouteResponse) => `${element.distanceKm}` },
-    { def: 'duration', header: 'Duration (min)', cell: (element: RouteResponse) => `${element.estimatedDurationMinutes}` }
+    { def: 'source', header: 'Origin', cell: (element: RouteResponse) => `${element.sourceCityName}` },
+    { def: 'destination', header: 'Destination', cell: (element: RouteResponse) => `${element.destinationCityName}` },
+    { def: 'distance', header: 'Distance', cell: (element: RouteResponse) => `${element.distanceKm} km` },
+    { def: 'duration', header: 'Est. Duration', cell: (element: RouteResponse) => this.formatMinutes(element.estimatedDurationMinutes) }
   ];
 
   ngOnInit(): void {
@@ -77,13 +83,13 @@ export class RoutesComponent implements OnInit {
 
   removeStop(index: number) {
     this.stops.removeAt(index);
-    // update stop orders
     this.stops.controls.forEach((control, i) => {
       control.get('stopOrder')?.setValue(i + 1);
     });
   }
 
   loadData(): void {
+    this.isLoading = true;
     forkJoin({
       routes: this.routeService.getAllRoutes(),
       cities: this.routeService.getAllCities()
@@ -91,11 +97,12 @@ export class RoutesComponent implements OnInit {
       next: (data) => {
         this.routes = [...data.routes];
         this.cities = [...data.cities];
-        this.cdr.markForCheck();
+        this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: () => {
         this.toast.error('Failed to load routes and cities');
+        this.isLoading = false;
         this.cdr.detectChanges();
       }
     });
@@ -108,25 +115,27 @@ export class RoutesComponent implements OnInit {
         return;
       }
 
+      this.isSubmitting = true;
       const { stops, ...routeDetails } = this.routeForm.value;
 
       this.routeService.createRoute(routeDetails).subscribe({
         next: (newRoute) => {
           if (stops && stops.length > 0) {
-            // Add stops sequentially
             from(stops).pipe(
               concatMap(stop => this.routeService.addStopToRoute(newRoute.id, stop))
             ).subscribe({
               complete: () => {
-                this.toast.success('Route and stops created successfully!');
+                this.toast.success('Route and stops configured successfully!');
                 this.resetForm();
                 this.routes = [newRoute, ...this.routes];
+                this.isSubmitting = false;
                 this.cdr.detectChanges();
               },
               error: () => {
-                this.toast.error('Route created but failed to add some stops');
+                this.toast.error('Route created but failed to save some stops');
                 this.resetForm();
                 this.routes = [newRoute, ...this.routes];
+                this.isSubmitting = false;
                 this.cdr.detectChanges();
               }
             });
@@ -134,11 +143,13 @@ export class RoutesComponent implements OnInit {
             this.toast.success('Route created successfully!');
             this.resetForm();
             this.routes = [newRoute, ...this.routes];
+            this.isSubmitting = false;
             this.cdr.detectChanges();
           }
         },
         error: (err) => {
           this.toast.error(err?.error?.message || 'Failed to create route');
+          this.isSubmitting = false;
           this.cdr.detectChanges();
         }
       });
@@ -152,16 +163,23 @@ export class RoutesComponent implements OnInit {
 
   onView(route: RouteResponse): void {
     this.dialog.open(RouteDetailsDialogComponent, {
-      width: '600px',
+      width: '640px',
       data: { route }
     });
   }
 
   onEdit(route: RouteResponse): void {
-    this.toast.info(`Edit mode not fully implemented. Selected: ${route.routeName}`);
+    this.toast.info(`Edit mode for ${route.routeName} will be available in next release.`);
   }
 
   onDelete(route: RouteResponse): void {
-    this.toast.info(`Delete not supported by backend yet. Selected: ${route.routeName}`);
+    this.toast.info(`Route ${route.routeName} cannot be deleted while referenced by active schedules.`);
+  }
+
+  formatMinutes(minutes: number): string {
+    if (!minutes) return '-';
+    const hrs = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
   }
 }

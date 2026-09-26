@@ -20,11 +20,30 @@ export interface CreateBookingRequest {
 }
 
 export interface PassengerResponse {
+  scheduleSeatId?: number;
+  bookingSeatId?: number;
   seatNumber: string;
   firstName: string;
   lastName: string;
   age: number;
   gender: string;
+  fare?: number;
+  status?: string;
+}
+
+export interface CancelBookingRequest {
+  seatIds?: number[];
+  reason?: string;
+}
+
+export interface CancelBookingResponse {
+  bookingId: number;
+  bookingReference: string;
+  bookingStatus: string;
+  cancelledSeatIds: number[];
+  remainingActiveSeatIds: number[];
+  refundAmount: number;
+  message: string;
 }
 
 export interface BookingResponse {

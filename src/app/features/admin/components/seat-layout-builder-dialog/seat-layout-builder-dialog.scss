@@ -1,83 +1,323 @@
-.transition-all {
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+/* ============================================================
+   Seat Layout Builder Dialog — Admin Studio
+   Visual style mirrors customer-facing seat-selection UI
+   ============================================================ */
+
+.seat-builder-modal {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #f8fafc;
+  overflow: hidden;
 }
 
-.seat-placeholder {
-  width: 60px;
-  height: 60px;
-  opacity: 0;
-  pointer-events: none;
-}
+/* ── Header ── */
+.modal-builder-header {
+  padding: 1rem 1.5rem;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
 
-.seat-card {
-  border-radius: 12px;
-  cursor: pointer;
-  
-  .delete-btn {
-    top: -8px;
-    right: -8px;
-    opacity: 0;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    transform: scale(0.8);
-  }
+  .builder-icon-box {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #b71c1c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-  &:hover {
-    transform: translateY(-2px);
-    .delete-btn {
-      opacity: 1;
-      transform: scale(1);
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
     }
   }
 
-  .seat-bg {
-    transition: filter 0.2s ease;
-  }
-  
-  &:hover .seat-bg {
-    filter: brightness(1.1);
-  }
-}
-
-/* SEATER Styling */
-.seat-seater {
-  width: 60px;
-  height: 60px;
-  
-  .seat-bg {
-    background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
-  }
-
-  .seat-icon {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
+  .capacity-meter-box {
+    background: #f1f5f9;
+    padding: 0.35rem 0.85rem;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
   }
 }
 
-/* SLEEPER Styling (Vertical Orientation for top-down bus view) */
-.seat-sleeper {
-  width: 60px;
-  height: 120px; /* Taller to represent a bed along the bus length */
-  
-  .seat-bg {
-    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-  }
+/* ── Body ── */
+.builder-body {
+  flex: 1;
+  padding: 1.25rem 1.5rem;
+  overflow-y: auto;
+}
 
-  .seat-icon {
-    font-size: 24px;
-    width: 24px;
-    height: 24px;
-    margin-top: 8px !important;
+/* ── Left Config Panel ── */
+.config-panel-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+
+  .config-panel-header {
+    padding: 0.85rem 1.25rem;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
   }
 }
 
-/* Bus Chassis Utilities */
-.rounded-top-5 { border-top-left-radius: 40px !important; border-top-right-radius: 40px !important; }
-.rounded-top-4 { border-top-left-radius: 36px !important; border-top-right-radius: 36px !important; }
-.rounded-bottom-4 { border-bottom-left-radius: 20px !important; border-bottom-right-radius: 20px !important; }
-.bus-chassis { min-width: 320px; max-width: max-content; }
+/* Legend */
+.legend-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 
-/* Z-Index utilities */
-.z-0 { z-index: 0; }
-.z-1 { z-index: 1; }
-.z-2 { z-index: 2; }
+.admin-legend {
+  display: flex;
+  gap: 1.25rem;
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #475569;
+  }
+}
+
+/* ── Right Canvas Card ── */
+.visual-canvas-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  min-height: 520px;
+
+  .canvas-header {
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .canvas-hint {
+    font-size: 0.8rem;
+  }
+
+  .canvas-viewport {
+    flex: 1;
+    padding: 2rem 1.5rem;
+    background: #f1f5f9;
+    display: flex;
+    justify-content: center;
+    overflow: auto;
+  }
+}
+
+/* ── Deck Tabs (matches customer UI) ── */
+.deck-tabs-group {
+  display: inline-flex;
+  gap: 8px;
+
+  .deck-tab-btn {
+    padding: 8px 22px;
+    border: 2px solid #e0e0e0;
+    border-radius: 24px;
+    background: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #757575;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+
+    .tab-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: #e2e8f0;
+      color: #475569;
+      padding: 0.1rem 0.45rem;
+      border-radius: 10px;
+    }
+
+    &.active {
+      border-color: #2e7d32;
+      color: #2e7d32;
+      background: #e8f5e9;
+
+      .tab-badge {
+        background: #c8e6c9;
+        color: #1b5e20;
+      }
+    }
+
+    &:hover:not(.active) {
+      border-color: #a5d6a7;
+      color: #388e3c;
+    }
+  }
+}
+
+/* ============================================================
+   Bus Body — identical shape to customer seat-selection UI
+   ============================================================ */
+.bus-body-admin {
+  border: 2px solid #e2e8f0;
+  border-radius: 36px 36px 20px 20px;
+  background: #ffffff;
+  padding: 56px 32px 32px;
+  position: relative;
+  width: fit-content;
+  min-width: 260px;
+  max-width: 520px;
+  margin: 0 auto;
+  min-height: 220px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Steering wheel — top-right, same as customer UI */
+.steering-wheel-admin {
+  position: absolute;
+  top: 18px;
+  right: 28px;
+  opacity: 0.6;
+}
+
+/* Empty state */
+.empty-canvas-state {
+  padding: 3rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Seat Grid — CSS grid with aisle, mirrors customer UI ── */
+.admin-seat-grid {
+  display: grid;
+  gap: 14px 8px;
+  justify-content: center;
+  align-items: start;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+/* ── Individual Admin Seat Item ── */
+.admin-seat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: default;
+  padding: 2px 0;
+  transition: transform 0.15s ease;
+  user-select: none;
+
+  &:hover {
+    transform: scale(1.05);
+
+    .admin-seat-remove {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Tint the seat fill on hover to show it's removable */
+    .admin-seat-svg rect {
+      fill: #f0fdf4;
+    }
+  }
+}
+
+/* SVG seat — matches customer-side sizes exactly */
+.admin-seat-svg {
+  display: block;
+  transition: all 0.15s ease;
+  width: 46px;
+  height: 52px;
+
+  &.sleeper-admin-svg {
+    height: 74px;
+  }
+}
+
+/* Seat number label */
+.admin-seat-num {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #15803d;
+  margin-top: 3px;
+  line-height: 1.1;
+  white-space: nowrap;
+  text-align: center;
+}
+
+/* Remove button — appears on hover (top-right corner) */
+.admin-seat-remove {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ef4444;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, background 0.15s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+
+  mat-icon {
+    font-size: 12px;
+    width: 12px;
+    height: 12px;
+    line-height: 12px;
+  }
+
+  &:hover {
+    background: #dc2626;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .bus-body-admin {
+    max-width: 360px;
+    padding: 48px 16px 20px;
+  }
+
+  .admin-seat-svg {
+    width: 38px !important;
+    height: 44px !important;
+
+    &.sleeper-admin-svg {
+      height: 64px !important;
+    }
+  }
+
+  .admin-seat-num {
+    font-size: 0.7rem;
+  }
+}

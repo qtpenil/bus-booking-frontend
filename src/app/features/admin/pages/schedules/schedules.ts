@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ScheduleService } from '../../services/schedule.service';
 import { FleetService } from '../../services/fleet.service';
 import { RouteService } from '../../services/route.service';
@@ -28,6 +29,7 @@ import { DataTableComponent, TableColumn } from '../../../../shared/components/d
     MatButtonModule,
     MatIconModule,
     MatSelectModule,
+    MatProgressSpinnerModule,
     DataTableComponent
   ],
   templateUrl: './schedules.html',
@@ -47,16 +49,16 @@ export class SchedulesComponent implements OnInit {
   
   scheduleForm: FormGroup;
   isLoading = false;
+  isSubmitting = false;
 
   columns: TableColumn[] = [
-    { def: 'id', header: 'ID', cell: (element: ScheduleResponse) => `${element.id}` },
-    { def: 'routeId', header: 'Route ID', cell: (element: ScheduleResponse) => `${element.routeId}` },
-    { def: 'busId', header: 'Bus ID', cell: (element: ScheduleResponse) => `${element.busId}` },
-    { def: 'journeyDate', header: 'Journey Date', cell: (element: ScheduleResponse) => `${element.journeyDate}` },
-    { def: 'departureTime', header: 'Departure', cell: (element: ScheduleResponse) => `${element.departureTime}` },
-    { def: 'arrivalTime', header: 'Arrival', cell: (element: ScheduleResponse) => `${element.arrivalTime}` },
-    { def: 'baseFare', header: 'Base Fare', cell: (element: ScheduleResponse) => `₹${element.baseFare}` },
-    { def: 'availableSeats', header: 'Avail. Seats', cell: (element: ScheduleResponse) => `${element.availableSeats}` },
+    { def: 'id', header: 'Trip ID', cell: (element: ScheduleResponse) => `#${element.id}` },
+    { def: 'route', header: 'Route Corridor', cell: (element: ScheduleResponse) => this.getRouteLabel(element) },
+    { def: 'bus', header: 'Assigned Bus', cell: (element: ScheduleResponse) => this.getBusLabel(element) },
+    { def: 'journeyDate', header: 'Date', cell: (element: ScheduleResponse) => `${element.journeyDate}` },
+    { def: 'timing', header: 'Departure → Arrival', cell: (element: ScheduleResponse) => `${element.departureTime} → ${element.arrivalTime}` },
+    { def: 'baseFare', header: 'Fare', cell: (element: ScheduleResponse) => `₹${element.baseFare}` },
+    { def: 'availableSeats', header: 'Seats Avail', cell: (element: ScheduleResponse) => `${element.availableSeats}` },
     { def: 'status', header: 'Status', cell: (element: ScheduleResponse) => `${element.status}` }
   ];
 
@@ -67,12 +69,22 @@ export class SchedulesComponent implements OnInit {
       journeyDate: ['', Validators.required],
       departureTime: ['', Validators.required],
       arrivalTime: ['', Validators.required],
-      baseFare: ['', [Validators.required, Validators.min(0)]]
+      baseFare: [null, [Validators.required, Validators.min(0)]]
     });
   }
 
   ngOnInit(): void {
     this.loadData();
+  }
+
+  getRouteLabel(element: ScheduleResponse): string {
+    const found = this.routes.find(r => r.id === element.routeId);
+    return found ? `${found.sourceCityName} → ${found.destinationCityName}` : `Route #${element.routeId}`;
+  }
+
+  getBusLabel(element: ScheduleResponse): string {
+    const found = this.buses.find(b => b.id === element.busId);
+    return found ? `${found.busName} (${found.busNumber})` : `Bus #${element.busId}`;
   }
 
   loadData(): void {
@@ -81,24 +93,20 @@ export class SchedulesComponent implements OnInit {
     this.routeService.getAllRoutes().subscribe({
       next: (routes) => {
         this.routes = [...routes];
-        this.cdr.markForCheck();
         this.cdr.detectChanges();
       },
       error: () => {
         this.toast.error('Failed to load routes');
-        this.cdr.detectChanges();
       }
     });
 
     this.fleetService.getAllBuses().subscribe({
       next: (buses) => {
         this.buses = [...buses];
-        this.cdr.markForCheck();
         this.cdr.detectChanges();
       },
       error: () => {
         this.toast.error('Failed to load buses');
-        this.cdr.detectChanges();
       }
     });
 
@@ -106,11 +114,11 @@ export class SchedulesComponent implements OnInit {
   }
 
   loadSchedules(): void {
+    this.isLoading = true;
     this.scheduleService.getAllSchedules().subscribe({
       next: (schedules) => {
         this.schedules = [...schedules];
         this.isLoading = false;
-        this.cdr.markForCheck();
         this.cdr.detectChanges();
       },
       error: () => {
@@ -123,34 +131,36 @@ export class SchedulesComponent implements OnInit {
 
   onSubmit(): void {
     if (this.scheduleForm.valid) {
+      this.isSubmitting = true;
       const request: CreateScheduleRequest = this.scheduleForm.value;
       
       this.scheduleService.createSchedule(request).subscribe({
-        next: (response) => {
-          this.toast.success('Schedule created successfully');
+        next: () => {
+          this.toast.success('Schedule planned and published successfully!');
           this.scheduleForm.reset();
+          this.isSubmitting = false;
           this.loadSchedules();
         },
         error: (err) => {
           this.toast.error(err.error?.message || 'Failed to create schedule');
+          this.isSubmitting = false;
           this.cdr.detectChanges();
         }
       });
     }
   }
 
-  cancelSchedule(id: number): void {
-    if (confirm('Are you sure you want to cancel this schedule?')) {
-      this.scheduleService.cancelSchedule(id).subscribe({
-        next: () => {
-          this.toast.success('Schedule cancelled successfully');
-          this.loadSchedules();
-        },
-        error: (err) => {
-          this.toast.error(err.error?.message || 'Failed to cancel schedule');
-          this.cdr.detectChanges();
-        }
-      });
-    }
+  cancelSchedule(schedule: ScheduleResponse): void {
+    const id = schedule.id;
+    this.scheduleService.cancelSchedule(id).subscribe({
+      next: () => {
+        this.toast.success(`Schedule #${id} has been cancelled`);
+        this.loadSchedules();
+      },
+      error: (err) => {
+        this.toast.error(err.error?.message || 'Failed to cancel schedule');
+        this.cdr.detectChanges();
+      }
+    });
   }
 }
