@@ -154,3 +154,172 @@
   border-radius: 10px !important;
 }
 
+/* ==========================================================================
+   Admin Portal Design System (GSRTC Enterprise Theme)
+   ========================================================================== */
+:root {
+  --admin-primary: #b71c1c;
+  --admin-primary-dark: #8e1515;
+  --admin-primary-subtle: #fef2f2;
+  --admin-primary-border: #fecaca;
+  --admin-accent: #2563eb;
+  --admin-navy-dark: #0f172a;
+  --admin-navy-card: #1e293b;
+  --admin-sidebar-bg: #0f172a;
+  --admin-sidebar-hover: #1e293b;
+  --admin-sidebar-text: #94a3b8;
+  --admin-sidebar-active-bg: rgba(183, 28, 28, 0.12);
+  --admin-surface: #ffffff;
+  --admin-canvas: #f8fafc;
+  --admin-border: #e2e8f0;
+  --admin-text-main: #0f172a;
+  --admin-text-muted: #64748b;
+  --admin-shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.05), 0 1px 2px -1px rgba(15, 23, 42, 0.05);
+  --admin-shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+  --admin-radius: 10px;
+}
+
+.admin-page-container {
+  padding: 1.5rem;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.admin-header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 20px;
+  background-color: var(--admin-primary-subtle);
+  color: var(--admin-primary);
+  border: 1px solid var(--admin-primary-border);
+}
+
+.admin-card {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  box-shadow: var(--admin-shadow-sm);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  overflow: hidden;
+}
+
+.admin-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: var(--admin-shadow-md);
+}
+
+.admin-card-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--admin-border);
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--admin-navy-dark);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-card-body {
+  padding: 1.25rem;
+}
+
+/* Admin Primary Action Button */
+.btn-admin-primary {
+  background: linear-gradient(135deg, #b71c1c 0%, #991b1b 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 0.55rem 1.25rem !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  letter-spacing: 0.2px;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.4rem !important;
+  /* Bright shadow when enabled — visually clear call-to-action */
+  box-shadow: 0 3px 10px rgba(183, 28, 28, 0.35), 0 1px 3px rgba(183, 28, 28, 0.2) !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer;
+  /* Override Bootstrap's opacity: 0.65 on :disabled — we control disabled visuals manually */
+  opacity: 1 !important;
+}
+
+/* Explicit enabled state - counteract any Bootstrap opacity interference */
+.btn-admin-primary:not(:disabled) {
+  opacity: 1 !important;
+  background: linear-gradient(135deg, #b71c1c 0%, #991b1b 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 3px 10px rgba(183, 28, 28, 0.35), 0 1px 3px rgba(183, 28, 28, 0.2) !important;
+}
+
+.btn-admin-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%) !important;
+  box-shadow: 0 5px 16px rgba(183, 28, 28, 0.45), 0 2px 5px rgba(183, 28, 28, 0.25) !important;
+  transform: translateY(-1px);
+  opacity: 1 !important;
+}
+
+.btn-admin-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(183, 28, 28, 0.3) !important;
+}
+
+/* Disabled state — clearly flat and muted, no shadow */
+.btn-admin-primary:disabled,
+.btn-admin-primary[disabled] {
+  background: #e2e8f0 !important;
+  color: #94a3b8 !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  opacity: 1 !important; /* keep opacity: 1 so our colors show, not washed-out by Bootstrap's 0.65 */
+  pointer-events: none;
+}
+
+/* Secondary/Stroked Button */
+.btn-admin-secondary {
+  background: #ffffff !important;
+  color: #334155 !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  padding: 0.55rem 1rem !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.4rem !important;
+  transition: all 0.15s ease !important;
+}
+
+/* ==========================================================================
+   Ticket & Booking Modal Dialog Styling
+   ========================================================================== */
+.ticket-modal-panel .mat-mdc-dialog-surface {
+  border-radius: 16px !important;
+  max-height: 90vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  background: #ffffff !important;
+}
+
+.ticket-modal-panel mat-dialog-container {
+  max-height: 90vh !important;
+  overflow: hidden !important;
+}
+
+

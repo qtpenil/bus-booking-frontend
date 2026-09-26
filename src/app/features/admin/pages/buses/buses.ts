@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FleetService } from '../../services/fleet.service';
 import { BusResponse, BusTypeResponse, SeatLayoutTemplateResponse, BusStatus } from '../../models/fleet.models';
 import { ToastService } from '../../../../shared/services/toast.service';
@@ -19,11 +20,12 @@ import { DataTableComponent, TableColumn } from '../../../../shared/components/d
     CommonModule, 
     ReactiveFormsModule, 
     MatCardModule, 
-    MatFormFieldModule,
+    MatFormFieldModule, 
     MatInputModule, 
     MatButtonModule, 
-    MatIconModule,
+    MatIconModule, 
     MatSelectModule,
+    MatProgressSpinnerModule,
     DataTableComponent
   ],
   templateUrl: './buses.html',
@@ -38,6 +40,8 @@ export class Buses implements OnInit {
   buses: BusResponse[] = [];
   busTypes: BusTypeResponse[] = [];
   seatTemplates: SeatLayoutTemplateResponse[] = [];
+  isLoading = false;
+  isSubmitting = false;
   
   busStatuses = Object.values(BusStatus);
 
@@ -46,20 +50,21 @@ export class Buses implements OnInit {
     busName: ['', [Validators.required, Validators.maxLength(100)]],
     operatorName: ['', [Validators.required, Validators.maxLength(100)]],
     registrationNumber: ['', [Validators.required, Validators.maxLength(50)]],
-    totalSeats: [0, [Validators.required, Validators.min(1)]],
+    totalSeats: [null, [Validators.required, Validators.min(1)]],
     status: [BusStatus.ACTIVE, [Validators.required]],
     busTypeId: ['', [Validators.required]],
     seatLayoutTemplateId: ['', [Validators.required]]
   });
 
   columns: TableColumn[] = [
-    { def: 'id', header: 'ID', cell: (element: BusResponse) => `${element.id}` },
-    { def: 'busNumber', header: 'Bus Number', cell: (element: BusResponse) => `${element.busNumber}` },
-    { def: 'busName', header: 'Name', cell: (element: BusResponse) => `${element.busName}` },
-    { def: 'operatorName', header: 'Operator', cell: (element: BusResponse) => `${element.operatorName}` },
-    { def: 'status', header: 'Status', cell: (element: BusResponse) => `${element.status}` },
-    { def: 'busTypeName', header: 'Type', cell: (element: BusResponse) => `${element.busTypeName || element.busTypeId}` },
-    { def: 'totalSeats', header: 'Seats', cell: (element: BusResponse) => `${element.totalSeats}` }
+    { def: 'id', header: 'ID', cell: (element: BusResponse) => `#${element.id}` },
+    { def: 'busNumber', header: 'Bus Code', cell: (element: BusResponse) => `${element.busNumber}` },
+    { def: 'busName', header: 'Fleet / Vehicle Name', cell: (element: BusResponse) => `${element.busName}` },
+    { def: 'registrationNumber', header: 'Registration No', cell: (element: BusResponse) => `${element.registrationNumber || '-'}` },
+    { def: 'operatorName', header: 'Depot / Operator', cell: (element: BusResponse) => `${element.operatorName}` },
+    { def: 'busTypeName', header: 'Type', cell: (element: BusResponse) => `${element.busTypeName || this.getBusTypeName(element.busTypeId)}` },
+    { def: 'totalSeats', header: 'Seats', cell: (element: BusResponse) => `${element.totalSeats} seats` },
+    { def: 'status', header: 'Status', cell: (element: BusResponse) => `${element.status}` }
   ];
 
   ngOnInit(): void {
@@ -68,15 +73,29 @@ export class Buses implements OnInit {
     this.loadSeatTemplates();
   }
 
+  getBusTypeName(busTypeId: number): string {
+    const found = this.busTypes.find(bt => bt.id === busTypeId);
+    return found ? found.name : `Type #${busTypeId}`;
+  }
+
+  onTemplateSelect(templateId: number): void {
+    const found = this.seatTemplates.find(t => t.id === templateId);
+    if (found && found.totalSeats) {
+      this.busForm.get('totalSeats')?.setValue(found.totalSeats);
+    }
+  }
+
   loadBuses(): void {
+    this.isLoading = true;
     this.fleetService.getAllBuses().subscribe({
       next: (data) => {
         this.buses = [...data];
-        this.cdr.markForCheck();
+        this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: () => {
         this.toast.error('Failed to load buses');
+        this.isLoading = false;
         this.cdr.detectChanges();
       }
     });
@@ -86,12 +105,10 @@ export class Buses implements OnInit {
     this.fleetService.getAllBusTypes().subscribe({
       next: (data) => {
         this.busTypes = [...data];
-        this.cdr.markForCheck();
         this.cdr.detectChanges();
       },
       error: () => {
         this.toast.error('Failed to load bus types');
-        this.cdr.detectChanges();
       }
     });
   }
@@ -100,27 +117,28 @@ export class Buses implements OnInit {
     this.fleetService.getAllSeatTemplates().subscribe({
       next: (data) => {
         this.seatTemplates = [...data];
-        this.cdr.markForCheck();
         this.cdr.detectChanges();
       },
       error: () => {
         this.toast.error('Failed to load seat templates');
-        this.cdr.detectChanges();
       }
     });
   }
 
   onSubmit(): void {
     if (this.busForm.valid) {
+      this.isSubmitting = true;
       this.fleetService.createBus(this.busForm.value).subscribe({
         next: (newBus) => {
-          this.toast.success('Bus added successfully!');
-          this.busForm.reset({ status: BusStatus.ACTIVE, totalSeats: 0 });
+          this.toast.success(`Bus ${newBus.busNumber} added to active fleet!`);
+          this.busForm.reset({ status: BusStatus.ACTIVE });
           this.buses = [newBus, ...this.buses];
+          this.isSubmitting = false;
           this.cdr.detectChanges();
         },
         error: (err) => {
           this.toast.error(err?.error?.message || 'Failed to add bus');
+          this.isSubmitting = false;
           this.cdr.detectChanges();
         }
       });
@@ -128,13 +146,13 @@ export class Buses implements OnInit {
   }
 
   onEdit(bus: BusResponse): void {
-    this.toast.info(`Edit mode not fully implemented. Selected: ${bus.busNumber}`);
+    this.toast.info(`Edit mode for ${bus.busNumber} will be available in next release.`);
   }
 
   onDelete(bus: BusResponse): void {
     this.fleetService.deleteBus(bus.id).subscribe({
       next: () => {
-        this.toast.success('Bus deleted successfully');
+        this.toast.success('Bus removed from fleet registry');
         this.buses = this.buses.filter(b => b.id !== bus.id);
         this.cdr.detectChanges();
       },

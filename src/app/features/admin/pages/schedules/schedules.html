@@ -1,47 +1,80 @@
-<div class="container-fluid py-4">
-  <div class="row mb-4">
-    <div class="col-12 d-flex justify-content-between align-items-center">
-      <h1 class="h3 mb-0 text-gray-800 fw-bold">Manage Schedules</h1>
+<div class="admin-page-container">
+  <!-- Page Header -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="admin-header-badge">
+          <mat-icon style="font-size: 14px; width: 14px; height: 14px;">calendar_month</mat-icon>
+          OPERATIONS DISPATCH
+        </span>
+        <span class="text-muted small">Daily Timetable & Fare Management</span>
+      </div>
+      <h1 class="h3 fw-bold text-dark mb-0">Manage Schedules</h1>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge bg-light text-dark border px-3 py-2">
+        <strong class="text-danger">{{ schedules.length }}</strong> Trips Scheduled
+      </span>
+      <button class="btn btn-admin-secondary btn-sm" (click)="loadSchedules()" [disabled]="isLoading" title="Refresh">
+        <mat-icon style="font-size: 16px; width: 16px; height: 16px;">refresh</mat-icon>
+      </button>
     </div>
   </div>
 
-  <div class="row">
-    <!-- Create Form -->
-    <div class="col-xl-4 col-lg-5">
-      <mat-card class="shadow-sm border-0 mb-4 h-100">
-        <mat-card-header class="bg-primary text-white p-3 rounded-top">
-          <mat-card-title class="h6 mb-0 text-white">Create New Schedule</mat-card-title>
-        </mat-card-header>
-        <mat-card-content class="p-4">
-          <form [formGroup]="scheduleForm" (ngSubmit)="onSubmit()" class="d-flex flex-column gap-3 mt-2">
+  <div class="row g-4">
+    <!-- Form Section -->
+    <div class="col-lg-4">
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <span class="admin-card-title">
+            <mat-icon style="font-size: 18px; width: 18px; height: 18px; color: var(--admin-primary);">more_time</mat-icon>
+            Plan New Schedule
+          </span>
+          <span class="badge bg-danger-subtle text-danger small">Dispatch Setup</span>
+        </div>
+        <div class="admin-card-body">
+          <form [formGroup]="scheduleForm" (ngSubmit)="onSubmit()" class="d-flex flex-column gap-3">
             
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Route</mat-label>
-              <mat-select formControlName="routeId">
-                <mat-option *ngFor="let route of routes" [value]="route.id">
-                  #{{route.id}} - {{route.sourceCityName}} to {{route.destinationCityName}}
-                </mat-option>
-              </mat-select>
-              <mat-error *ngIf="scheduleForm.get('routeId')?.hasError('required')">Route is required</mat-error>
-            </mat-form-field>
+            <!-- Route Selection -->
+            <div>
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Select Route Corridor</mat-label>
+                <mat-select formControlName="routeId">
+                  <mat-option *ngFor="let route of routes" [value]="route.id">
+                    #{{ route.id }} - {{ route.sourceCityName }} → {{ route.destinationCityName }}
+                  </mat-option>
+                </mat-select>
+                <mat-icon matPrefix class="text-muted me-1">alt_route</mat-icon>
+                <mat-error *ngIf="scheduleForm.get('routeId')?.hasError('required')">Route is required</mat-error>
+              </mat-form-field>
+            </div>
 
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Bus</mat-label>
-              <mat-select formControlName="busId">
-                <mat-option *ngFor="let bus of buses" [value]="bus.id">
-                  #{{bus.id}} - {{bus.busName}} ({{bus.registrationNumber}})
-                </mat-option>
-              </mat-select>
-              <mat-error *ngIf="scheduleForm.get('busId')?.hasError('required')">Bus is required</mat-error>
-            </mat-form-field>
+            <!-- Bus Selection -->
+            <div>
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Assign Vehicle (Bus)</mat-label>
+                <mat-select formControlName="busId">
+                  <mat-option *ngFor="let bus of buses" [value]="bus.id">
+                    {{ bus.busName }} ({{ bus.registrationNumber || bus.busNumber }})
+                  </mat-option>
+                </mat-select>
+                <mat-icon matPrefix class="text-muted me-1">directions_bus</mat-icon>
+                <mat-error *ngIf="scheduleForm.get('busId')?.hasError('required')">Bus assignment is required</mat-error>
+              </mat-form-field>
+            </div>
 
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Journey Date</mat-label>
-              <input matInput type="date" formControlName="journeyDate">
-              <mat-error *ngIf="scheduleForm.get('journeyDate')?.hasError('required')">Date is required</mat-error>
-            </mat-form-field>
+            <!-- Journey Date -->
+            <div>
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Journey Date</mat-label>
+                <input matInput type="date" formControlName="journeyDate">
+                <mat-error *ngIf="scheduleForm.get('journeyDate')?.hasError('required')">Date is required</mat-error>
+              </mat-form-field>
+            </div>
 
-            <div class="row">
+            <!-- Departure & Arrival Times -->
+            <div class="row g-2">
               <div class="col-6">
                 <mat-form-field appearance="outline" class="w-100">
                   <mat-label>Departure Time</mat-label>
@@ -49,6 +82,7 @@
                   <mat-error *ngIf="scheduleForm.get('departureTime')?.hasError('required')">Required</mat-error>
                 </mat-form-field>
               </div>
+
               <div class="col-6">
                 <mat-form-field appearance="outline" class="w-100">
                   <mat-label>Arrival Time</mat-label>
@@ -58,37 +92,57 @@
               </div>
             </div>
 
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Base Fare (₹)</mat-label>
-              <input matInput type="number" formControlName="baseFare">
-              <mat-error *ngIf="scheduleForm.get('baseFare')?.hasError('required')">Fare is required</mat-error>
-            </mat-form-field>
+            <!-- Base Fare -->
+            <div>
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Base Seat Fare (₹)</mat-label>
+                <input matInput type="number" formControlName="baseFare" placeholder="e.g. 450">
+                <span matPrefix class="text-muted fw-bold me-1">₹</span>
+                <mat-error *ngIf="scheduleForm.get('baseFare')?.hasError('required')">Fare is required</mat-error>
+                <mat-error *ngIf="scheduleForm.get('baseFare')?.hasError('min')">Must be a positive amount</mat-error>
+              </mat-form-field>
+            </div>
 
-            <button mat-flat-button color="primary" type="submit" [disabled]="scheduleForm.invalid" class="w-100 py-3 mt-2 fw-bold">
-              <mat-icon>event_available</mat-icon> Create Schedule
-            </button>
+            <div class="pt-2">
+              <button 
+                type="submit" 
+                class="btn btn-admin-primary w-100 py-2" 
+                [disabled]="scheduleForm.invalid || isSubmitting">
+                <mat-spinner *ngIf="isSubmitting" diameter="18" class="me-2"></mat-spinner>
+                <mat-icon *ngIf="!isSubmitting">schedule_send</mat-icon>
+                <span>{{ isSubmitting ? 'Publishing Schedule...' : 'Publish Trip Schedule' }}</span>
+              </button>
+            </div>
           </form>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
     </div>
 
-    <!-- Data Table -->
-    <div class="col-xl-8 col-lg-7">
-      <mat-card class="shadow-sm border-0 h-100">
-        <mat-card-header class="bg-white border-bottom p-3">
-          <mat-card-title class="h6 mb-0 text-dark">Existing Schedules</mat-card-title>
-        </mat-card-header>
-        <mat-card-content class="p-0">
+    <!-- Data Table Section -->
+    <div class="col-lg-8">
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <span class="admin-card-title">
+            <mat-icon style="font-size: 18px; width: 18px; height: 18px; color: var(--admin-primary);">departure_board</mat-icon>
+            Scheduled Dispatches
+          </span>
+          <span class="text-muted small">Live Timetable Records</span>
+        </div>
+        <div class="admin-card-body p-0">
           <app-data-table 
             [data]="schedules" 
             [columns]="columns" 
             [showView]="false"
             [showEdit]="false"
             [showDelete]="true"
-            (onDelete)="cancelSchedule($event.id)">
+            searchPlaceholder="Search trips by date, fare, or route..."
+            emptyMessage="No schedules dispatched. Plan your first departure."
+            deleteConfirmTitle="Cancel Trip Schedule"
+            deleteConfirmMessage="Are you sure you want to cancel this scheduled journey? Passenger bookings may be affected."
+            (onDelete)="cancelSchedule($event)">
           </app-data-table>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
     </div>
   </div>
 </div>

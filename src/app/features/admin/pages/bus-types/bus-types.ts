@@ -6,6 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FleetService } from '../../services/fleet.service';
 import { BusTypeResponse } from '../../models/fleet.models';
 import { ToastService } from '../../../../shared/services/toast.service';
@@ -22,6 +23,7 @@ import { DataTableComponent, TableColumn } from '../../../../shared/components/d
     MatInputModule, 
     MatButtonModule, 
     MatIconModule,
+    MatProgressSpinnerModule,
     DataTableComponent
   ],
   templateUrl: './bus-types.html',
@@ -34,6 +36,8 @@ export class BusTypes implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   busTypes: BusTypeResponse[] = [];
+  isLoading = false;
+  isSubmitting = false;
   
   busTypeForm: FormGroup = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(100)]],
@@ -41,9 +45,9 @@ export class BusTypes implements OnInit {
   });
 
   columns: TableColumn[] = [
-    { def: 'id', header: 'ID', cell: (element: BusTypeResponse) => `${element.id}` },
-    { def: 'name', header: 'Type Name', cell: (element: BusTypeResponse) => `${element.name}` },
-    { def: 'description', header: 'Description', cell: (element: BusTypeResponse) => `${element.description || 'N/A'}` }
+    { def: 'id', header: 'ID', cell: (element: BusTypeResponse) => `#${element.id}` },
+    { def: 'name', header: 'Category / Type', cell: (element: BusTypeResponse) => `${element.name}` },
+    { def: 'description', header: 'Amenities & Details', cell: (element: BusTypeResponse) => `${element.description || 'Standard Configuration'}` }
   ];
 
   ngOnInit(): void {
@@ -51,14 +55,16 @@ export class BusTypes implements OnInit {
   }
 
   loadBusTypes(): void {
+    this.isLoading = true;
     this.fleetService.getAllBusTypes().subscribe({
       next: (data) => {
         this.busTypes = [...data];
-        this.cdr.markForCheck();
+        this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: () => {
         this.toast.error('Failed to load bus types');
+        this.isLoading = false;
         this.cdr.detectChanges();
       }
     });
@@ -66,15 +72,18 @@ export class BusTypes implements OnInit {
 
   onSubmit(): void {
     if (this.busTypeForm.valid) {
+      this.isSubmitting = true;
       this.fleetService.createBusType(this.busTypeForm.value).subscribe({
         next: (newBusType) => {
-          this.toast.success('Bus type added successfully!');
+          this.toast.success(`Bus type "${newBusType.name}" added successfully!`);
           this.busTypeForm.reset();
           this.busTypes = [newBusType, ...this.busTypes];
+          this.isSubmitting = false;
           this.cdr.detectChanges();
         },
         error: (err) => {
           this.toast.error(err?.error?.message || 'Failed to add bus type');
+          this.isSubmitting = false;
           this.cdr.detectChanges();
         }
       });
@@ -82,7 +91,7 @@ export class BusTypes implements OnInit {
   }
 
   onEdit(type: BusTypeResponse): void {
-    this.toast.info(`Edit mode not fully implemented. Selected: ${type.name}`);
+    this.toast.info(`Edit mode for ${type.name} will be available in next release.`);
   }
 
   onDelete(type: BusTypeResponse): void {

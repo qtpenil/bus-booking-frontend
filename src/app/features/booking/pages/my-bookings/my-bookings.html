@@ -75,6 +75,7 @@
         <div class="booking-ticket-card overflow-hidden h-100 d-flex flex-column"
              [ngClass]="{
                'card-status-confirmed': ticket.status === 'CONFIRMED',
+               'card-status-partially-cancelled': ticket.status === 'PARTIALLY_CANCELLED',
                'card-status-cancelled': ticket.status === 'CANCELLED',
                'card-status-pending': ticket.status === 'PENDING_PAYMENT' || ticket.status === 'PENDING'
              }">
@@ -91,8 +92,8 @@
               </div>
             </div>
             <span class="badge px-3 py-2 text-uppercase fs-6 status-pill" 
-                  [ngClass]="ticket.status === 'CONFIRMED' ? 'status-confirmed' : (ticket.status === 'CANCELLED' ? 'status-cancelled' : 'status-pending')">
-              {{ ticket.status }}
+                  [ngClass]="ticket.status === 'CONFIRMED' ? 'status-confirmed' : (ticket.status === 'PARTIALLY_CANCELLED' ? 'status-partially-cancelled' : (ticket.status === 'CANCELLED' ? 'status-cancelled' : 'status-pending'))">
+              {{ ticket.status === 'PARTIALLY_CANCELLED' ? 'Partially Cancelled' : ticket.status }}
             </span>
           </div>
 
@@ -200,14 +201,14 @@
                 <mat-icon class="me-1">receipt_long</mat-icon> View Ticket
               </button>
               
-              <!-- Conditional Cancel Button: disabled if journey has already passed -->
-              <button *ngIf="ticket.status === 'CONFIRMED' || ticket.status === 'PENDING_PAYMENT'" 
+              <!-- Conditional Cancel Button: disabled if journey has already passed or no seats left -->
+              <button *ngIf="(ticket.status === 'CONFIRMED' || ticket.status === 'PARTIALLY_CANCELLED' || ticket.status === 'PENDING_PAYMENT') && hasActiveSeats(ticket)" 
                       mat-button 
                       class="btn-cancel-ticket"
                       [disabled]="isJourneyPassed(ticket.journeyDate)"
                       [title]="isJourneyPassed(ticket.journeyDate) ? 'Journey already completed' : 'Cancel Ticket'"
                       (click)="!isJourneyPassed(ticket.journeyDate) && cancelTicket(ticket, $event)">
-                <mat-icon class="me-1">cancel</mat-icon> Cancel
+                <mat-icon class="me-1">cancel</mat-icon> Cancel Seats
               </button>
             </div>
 

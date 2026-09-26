@@ -1,58 +1,125 @@
-<div class="admin-wrapper d-flex min-vh-100">
-  <aside class="sidebar bg-dark text-white p-3">
-    <h4>Admin Portal</h4>
-    <hr>
-    <ul class="nav nav-pills flex-column mb-auto">
-      <li class="nav-item">
-        <a routerLink="/admin/cities" routerLinkActive="active" class="nav-link text-white">
-          <i class="bi bi-geo-alt me-2"></i>
-          Manage Cities
-        </a>
-      </li>
-      <li>
-        <a routerLink="/admin/routes" routerLinkActive="active" class="nav-link text-white">
-          <i class="bi bi-signpost-split me-2"></i>
-          Manage Routes
-        </a>
-      </li>
-      <li>
-        <a routerLink="/admin/bus-types" routerLinkActive="active" class="nav-link text-white">
-          <i class="bi bi-bookmark-star me-2"></i>
-          Bus Types
-        </a>
-      </li>
-      <li>
-        <a routerLink="/admin/seat-templates" routerLinkActive="active" class="nav-link text-white">
-          <i class="bi bi-grid-3x3 me-2"></i>
-          Seat Templates
-        </a>
-      </li>
-      <li>
-        <a routerLink="/admin/buses" routerLinkActive="active" class="nav-link text-white">
-          <i class="bi bi-bus-front me-2"></i>
-          Manage Buses
-        </a>
-      </li>
-      <li>
-        <a routerLink="/admin/schedules" routerLinkActive="active" class="nav-link text-white">
-          <i class="bi bi-calendar-week me-2"></i>
-          Manage Schedules
-        </a>
-      </li>
-    </ul>
+<div class="admin-shell" [class.sidebar-collapsed]="isCollapsed">
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <!-- Brand Logo / Header -->
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <mat-icon>directions_bus</mat-icon>
+      </div>
+      <div class="brand-text" *ngIf="!isCollapsed">
+        <span class="brand-title">GSRTC <span class="brand-sub">OPS</span></span>
+        <span class="brand-caption">Fleet Control Center</span>
+      </div>
+    </div>
+
+    <!-- Navigation List -->
+    <nav class="sidebar-nav">
+      <div *ngFor="let group of navGroups" class="nav-group">
+        <div class="nav-group-header" *ngIf="!isCollapsed">
+          {{ group.title }}
+        </div>
+        <div class="nav-group-divider" *ngIf="isCollapsed"></div>
+
+        <ul class="nav-list">
+          <li *ngFor="let item of group.items" class="nav-item">
+            <a 
+              [routerLink]="item.route" 
+              routerLinkActive="active" 
+              class="nav-link"
+              [matTooltip]="isCollapsed ? item.label : ''"
+              matTooltipPosition="right">
+              <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+              <span class="nav-label" *ngIf="!isCollapsed">{{ item.label }}</span>
+              <span *ngIf="item.badge && !isCollapsed" class="nav-badge" [ngClass]="item.badgeClass">
+                {{ item.badge }}
+              </span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Sidebar Footer / Collapse Toggle -->
+    <div class="sidebar-footer">
+      <button class="collapse-toggle-btn" (click)="toggleSidebar()" [matTooltip]="isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'" matTooltipPosition="right">
+        <mat-icon>{{ isCollapsed ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+        <span *ngIf="!isCollapsed" class="ms-2">Collapse Menu</span>
+      </button>
+    </div>
   </aside>
-  
-  <div class="main-content flex-grow-1 bg-light">
-    <header class="bg-white shadow-sm p-3 mb-4 d-flex justify-content-between align-items-center">
-      <h5 class="mb-0">Dashboard</h5>
-      <div>
-        <span class="me-3">Admin User</span>
-        <button class="btn btn-outline-danger btn-sm" (click)="logout()">Logout</button>
+
+  <!-- Main Content Area -->
+  <div class="admin-main">
+    <!-- Top Navigation Bar -->
+    <header class="admin-topbar">
+      <div class="topbar-left">
+        <button class="topbar-icon-btn d-lg-none" (click)="toggleSidebar()" title="Toggle Menu">
+          <mat-icon>menu</mat-icon>
+        </button>
+
+        <div class="breadcrumb-trail">
+          <mat-icon class="breadcrumb-home-icon">home</mat-icon>
+          <span class="breadcrumb-separator">/</span>
+          <span class="breadcrumb-text">{{ currentBreadcrumb }}</span>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <!-- Global Search Input -->
+        <div class="topbar-search">
+          <mat-icon class="search-icon">search</mat-icon>
+          <input 
+            type="text" 
+            placeholder="Quick search buses, routes, cities..." 
+            [(ngModel)]="searchQuery"
+            class="search-input">
+          <span class="search-badge">⌘K</span>
+        </div>
+
+        <!-- Quick Status Indicator -->
+        <div class="system-status-indicator d-none d-md-flex" title="Fleet API Connection Live">
+          <span class="status-dot"></span>
+          <span class="status-text">Fleet Live</span>
+        </div>
+
+        <!-- User Profile Dropdown -->
+        <button class="user-profile-btn" [matMenuTriggerFor]="userMenu">
+          <div class="user-avatar">{{ getUserInitials() }}</div>
+          <div class="user-info d-none d-sm-flex">
+            <span class="user-name">{{ getUserDisplayName() }}</span>
+            <span class="user-role">{{ getUserRole() }}</span>
+          </div>
+          <mat-icon class="dropdown-arrow">expand_more</mat-icon>
+        </button>
+
+        <!-- Mat Menu for User Profile -->
+        <mat-menu #userMenu="matMenu" xPosition="before" class="admin-user-menu">
+          <div class="menu-user-header px-3 py-2">
+            <div class="fw-bold text-dark">{{ getUserDisplayName() }}</div>
+            <div class="small text-muted">{{ currentUser?.email || 'admin@gsrtc.internal' }}</div>
+            <span class="badge bg-danger-subtle text-danger mt-1">{{ getUserRole() }}</span>
+          </div>
+          <mat-divider></mat-divider>
+          <a mat-menu-item routerLink="/admin/dashboard">
+            <mat-icon>dashboard</mat-icon>
+            <span>Ops Dashboard</span>
+          </a>
+          <a mat-menu-item routerLink="/admin/schedules">
+            <mat-icon>calendar_today</mat-icon>
+            <span>Live Schedules</span>
+          </a>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="logout()" class="text-danger">
+            <mat-icon color="warn">logout</mat-icon>
+            <span>Sign Out</span>
+          </button>
+        </mat-menu>
       </div>
     </header>
-    
-    <div class="container-fluid">
+
+    <!-- Page Content Viewport -->
+    <main class="admin-content-viewport">
       <router-outlet></router-outlet>
-    </div>
+    </main>
   </div>
 </div>

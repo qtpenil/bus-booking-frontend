@@ -10,7 +10,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BookingService } from '../../services/booking.service';
 import { TicketDialogComponent } from './ticket-dialog.component';
-import { CancelConfirmDialogComponent } from './cancel-confirm-dialog.component';
+import { CancelConfirmDialogComponent, CancelConfirmResult } from './cancel-confirm-dialog.component';
+import { CancelBookingRequest } from '../../models/booking.models';
 
 @Component({
   selector: 'app-my-bookings',
@@ -67,16 +68,16 @@ export class MyBookingsComponent implements OnInit {
 
   get filteredTickets(): any[] {
     if (this.activeTab === 'CONFIRMED') {
-      return this.allBookings.filter(b => b && b.status && b.status.toString().toUpperCase() === 'CONFIRMED');
+      return this.allBookings.filter(b => b && b.status && (b.status.toString().toUpperCase() === 'CONFIRMED' || b.status.toString().toUpperCase() === 'PARTIALLY_CANCELLED'));
     }
     if (this.activeTab === 'CANCELLED') {
-      return this.allBookings.filter(b => b && b.status && b.status.toString().toUpperCase() === 'CANCELLED');
+      return this.allBookings.filter(b => b && b.status && (b.status.toString().toUpperCase() === 'CANCELLED' || b.status.toString().toUpperCase() === 'PARTIALLY_CANCELLED'));
     }
     return this.allBookings;
   }
 
   get confirmedCount(): number {
-    return this.allBookings.filter(b => b && b.status && b.status.toString().toUpperCase() === 'CONFIRMED').length;
+    return this.allBookings.filter(b => b && b.status && (b.status.toString().toUpperCase() === 'CONFIRMED' || b.status.toString().toUpperCase() === 'PARTIALLY_CANCELLED')).length;
   }
 
   get cancelledCount(): number {
@@ -109,6 +110,9 @@ export class MyBookingsComponent implements OnInit {
   openTicketDetails(ticket: any): void {
     const dialogRef = this.dialog.open(TicketDialogComponent, {
       width: '680px',
+      maxWidth: '95vw',
+      maxHeight: '92vh',
+      autoFocus: false,
       data: ticket,
       panelClass: 'ticket-modal-panel'
     });
@@ -120,6 +124,11 @@ export class MyBookingsComponent implements OnInit {
     });
   }
 
+  hasActiveSeats(ticket: any): boolean {
+    if (!ticket.passengers || ticket.passengers.length === 0) return true;
+    return ticket.passengers.some((p: any) => p.status !== 'CANCELLED');
+  }
+
   cancelTicket(ticket: any, event?: Event): void {
     if (event) {
       event.stopPropagation();
@@ -129,24 +138,36 @@ export class MyBookingsComponent implements OnInit {
     const seatsDisplay = this.getSeatsDisplay(ticket);
 
     const dialogRef = this.dialog.open(CancelConfirmDialogComponent, {
-      width: '440px',
+      width: '520px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
       data: {
         bookingId: ticket.bookingId,
         bookingReference: pnr,
+        passengers: ticket.passengers,
         seatsDisplay: seatsDisplay,
-        totalAmount: ticket.totalAmount
+        totalAmount: ticket.totalAmount,
+        sourceCityName: ticket.sourceCityName,
+        destinationCityName: ticket.destinationCityName
       }
     });
 
-    dialogRef.afterClosed().subscribe(confirmed => {
-      if (confirmed) {
+    dialogRef.afterClosed().subscribe((res: CancelConfirmResult | null) => {
+      if (res && res.confirmed) {
         this.isLoading = true;
         this.cdr.detectChanges();
 
-        this.bookingService.cancelBooking(ticket.bookingId).subscribe({
-          next: () => {
-            this.snackBar.open(`Ticket ${pnr} cancelled successfully. Seats released!`, 'Dismiss', {
-              duration: 4000,
+        const req: CancelBookingRequest = {
+          seatIds: res.isAllSelected ? undefined : res.selectedSeatIds
+        };
+
+        this.bookingService.cancelBooking(ticket.bookingId, req).subscribe({
+          next: (resp) => {
+            const msg = resp.bookingStatus === 'PARTIALLY_CANCELLED'
+              ? `Selected seat(s) cancelled successfully! Refund of ₹${resp.refundAmount || res.refundAmount} initiated.`
+              : `Ticket ${pnr} cancelled successfully. Full refund initiated!`;
+            this.snackBar.open(msg, 'Dismiss', {
+              duration: 5000,
               horizontalPosition: 'end',
               verticalPosition: 'bottom'
             });

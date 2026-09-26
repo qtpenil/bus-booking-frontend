@@ -5,9 +5,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { BookingResponse } from '../../models/booking.models';
+import { BookingResponse, CancelBookingRequest } from '../../models/booking.models';
 import { BookingService } from '../../services/booking.service';
-import { CancelConfirmDialogComponent } from './cancel-confirm-dialog.component';
+import { CancelConfirmDialogComponent, CancelConfirmResult } from './cancel-confirm-dialog.component';
 
 @Component({
   selector: 'app-ticket-dialog',
@@ -35,12 +35,16 @@ import { CancelConfirmDialogComponent } from './cancel-confirm-dialog.component'
               <small class="text-muted">Official Electronic Travel Pass</small>
             </div>
           </div>
-          <div class="text-end">
+          <div class="d-flex align-items-center gap-2">
             <span class="badge px-3 py-2 text-uppercase fs-6 status-pill" [ngClass]="{
               'status-confirmed': data.status === 'CONFIRMED',
+              'status-partially-cancelled': data.status === 'PARTIALLY_CANCELLED',
               'status-pending': data.status === 'PENDING_PAYMENT' || data.status === 'PENDING',
               'status-cancelled': data.status === 'CANCELLED'
-            }">{{ data.status }}</span>
+            }">{{ data.status === 'PARTIALLY_CANCELLED' ? 'Partially Cancelled' : data.status }}</span>
+            <button mat-icon-button class="ticket-top-close-btn no-print" (click)="dialogRef.close()" title="Close dialog">
+              <mat-icon>close</mat-icon>
+            </button>
           </div>
         </div>
 
@@ -124,20 +128,35 @@ import { CancelConfirmDialogComponent } from './cancel-confirm-dialog.component'
                   <th>#</th>
                   <th>Seat No</th>
                   <th>Passenger Name</th>
-                  <th>Age</th>
-                  <th>Gender</th>
+                  <th>Age & Gender</th>
+                  <th>Fare</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let p of data.passengers; let i = index">
+                <tr *ngFor="let p of data.passengers; let i = index" [class.table-light]="p.status === 'CANCELLED'">
                   <td class="text-center text-muted fw-semibold">{{ i + 1 }}</td>
-                  <td><span class="seat-badge-pill">{{ p.seatNumber || (data.seats ? data.seats[i] : 'N/A') }}</span></td>
-                  <td class="fw-bold text-dark-emphasis">{{ p.firstName }} {{ p.lastName }}</td>
-                  <td>{{ p.age }} yrs</td>
-                  <td class="text-capitalize">{{ p.gender }}</td>
+                  <td>
+                    <span class="seat-badge-pill" [class.text-decoration-line-through]="p.status === 'CANCELLED'">
+                      {{ p.seatNumber || (data.seats ? data.seats[i] : 'N/A') }}
+                    </span>
+                  </td>
+                  <td class="fw-bold text-dark-emphasis" [class.text-muted]="p.status === 'CANCELLED'" [class.text-decoration-line-through]="p.status === 'CANCELLED'">
+                    {{ p.firstName }} {{ p.lastName }}
+                  </td>
+                  <td>{{ p.age }} yrs<span *ngIf="p.gender">, {{ p.gender }}</span></td>
+                  <td class="fw-semibold">
+                    <span *ngIf="p.fare">₹{{ p.fare }}</span>
+                    <span *ngIf="!p.fare && data.totalAmount && data.passengers">₹{{ (data.totalAmount / data.passengers.length | number:'1.0-0') }}</span>
+                  </td>
+                  <td>
+                    <span class="badge px-2 py-1" [ngClass]="p.status === 'CANCELLED' ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success'">
+                      {{ p.status === 'CANCELLED' ? 'Cancelled' : 'Confirmed' }}
+                    </span>
+                  </td>
                 </tr>
                 <tr *ngIf="!data.passengers || data.passengers.length === 0">
-                  <td colspan="5" class="text-center text-muted py-3">
+                  <td colspan="6" class="text-center text-muted py-3">
                     Seats: <span class="fw-bold text-dark-emphasis">{{ data.seats ? data.seats.join(', ') : 'N/A' }}</span>
                   </td>
                 </tr>
@@ -153,16 +172,16 @@ import { CancelConfirmDialogComponent } from './cancel-confirm-dialog.component'
         </div>
       </div>
 
-      <!-- Dialog Actions -->
-      <div class="d-flex justify-content-between align-items-center mt-3 no-print">
+      <!-- Dialog Actions (Sticky Footer) -->
+      <div class="ticket-dialog-actions d-flex justify-content-between align-items-center pt-3 px-1 no-print flex-shrink-0">
         <div>
-          <button *ngIf="data.status === 'CONFIRMED' || data.status === 'PENDING_PAYMENT'"
+          <button *ngIf="(data.status === 'CONFIRMED' || data.status === 'PARTIALLY_CANCELLED' || data.status === 'PENDING_PAYMENT') && hasActiveSeats()"
                   mat-button 
                   (click)="!isJourneyPassed(data.journeyDate) && cancelTicket()" 
                   class="ticket-cancel-btn"
                   [disabled]="isJourneyPassed(data.journeyDate)"
                   [title]="isJourneyPassed(data.journeyDate) ? 'Journey already completed' : 'Cancel Ticket'">
-            <mat-icon class="me-1">cancel</mat-icon> Cancel Ticket
+            <mat-icon class="me-1">cancel</mat-icon> Cancel Seats / Ticket
           </button>
         </div>
         <div class="d-flex gap-2">
@@ -175,10 +194,24 @@ import { CancelConfirmDialogComponent } from './cancel-confirm-dialog.component'
     </div>
   `,
   styles: [`
+    :host {
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh;
+      overflow: hidden;
+      height: 100%;
+    }
+
     .ticket-dialog-container {
       background: var(--color-surface-light, #ffffff);
       color: var(--color-text-dark, #0f172a);
       border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh;
+      height: 100%;
+      box-sizing: border-box;
+      overflow: hidden;
     }
 
     .ticket-card {
@@ -186,6 +219,25 @@ import { CancelConfirmDialogComponent } from './cancel-confirm-dialog.component'
       border: 2px dashed #93c5fd !important;
       border-radius: 16px;
       box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+      overflow-y: auto;
+      flex: 1 1 auto;
+      min-height: 0;
+      scrollbar-width: thin;
+      scrollbar-color: #cbd5e1 transparent;
+
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      &::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
     }
 
     .ticket-brand-title {
@@ -299,6 +351,12 @@ import { CancelConfirmDialogComponent } from './cancel-confirm-dialog.component'
       color: var(--color-status-available-text, #047857) !important;
     }
 
+    .status-partially-cancelled {
+      background: #fffbeb !important;
+      border: 1px solid #fde68a !important;
+      color: #b45309 !important;
+    }
+
     .status-cancelled {
       background: #fef2f2 !important;
       border: 1px solid #fecaca !important;
@@ -393,6 +451,27 @@ import { CancelConfirmDialogComponent } from './cancel-confirm-dialog.component'
       }
     }
 
+    .ticket-top-close-btn {
+      color: var(--color-text-muted, #64748b) !important;
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.15s ease;
+
+      &:hover {
+        background-color: var(--color-surface-muted, #f1f5f9) !important;
+        color: var(--color-text-dark, #0f172a) !important;
+      }
+    }
+
+    .ticket-dialog-actions {
+      border-top: 1px solid var(--color-border-subtle, #e2e8f0);
+      background: var(--color-surface-light, #ffffff);
+    }
+
     /* Print-Specific Styles */
     @media print {
       .no-print,
@@ -406,11 +485,16 @@ import { CancelConfirmDialogComponent } from './cancel-confirm-dialog.component'
         color: #000000 !important;
       }
 
-      .ticket-dialog-container {
+      :host,
+      .ticket-dialog-container,
+      .ticket-card {
         padding: 0 !important;
         margin: 0 !important;
         background: #ffffff !important;
         color: #000000 !important;
+        max-height: none !important;
+        height: auto !important;
+        overflow: visible !important;
       }
 
       .ticket-card {
@@ -520,26 +604,43 @@ export class TicketDialogComponent {
     return jDate.getTime() < today.getTime();
   }
 
+  hasActiveSeats(): boolean {
+    if (!this.data.passengers || this.data.passengers.length === 0) return true;
+    return this.data.passengers.some((p: any) => p.status !== 'CANCELLED');
+  }
+
   cancelTicket(): void {
     const pnr = this.data.bookingReference || ('BKG-' + this.data.bookingId);
     const seatsStr = this.data.seats ? this.data.seats.join(', ') : 'Reserved Seat';
 
     const confirmRef = this.confirmDialog.open(CancelConfirmDialogComponent, {
-      width: '440px',
+      width: '520px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
       data: {
         bookingId: this.data.bookingId,
         bookingReference: pnr,
+        passengers: this.data.passengers,
         seatsDisplay: seatsStr,
-        totalAmount: this.data.totalAmount
+        totalAmount: this.data.totalAmount,
+        sourceCityName: this.data.sourceCityName,
+        destinationCityName: this.data.destinationCityName
       }
     });
 
-    confirmRef.afterClosed().subscribe(confirmed => {
-      if (confirmed) {
-        this.bookingService.cancelBooking(this.data.bookingId).subscribe({
-          next: () => {
-            this.snackBar.open(`Ticket ${pnr} cancelled successfully. Seats released!`, 'Dismiss', {
-              duration: 4000,
+    confirmRef.afterClosed().subscribe((res: CancelConfirmResult | null) => {
+      if (res && res.confirmed) {
+        const req: CancelBookingRequest = {
+          seatIds: res.isAllSelected ? undefined : res.selectedSeatIds
+        };
+
+        this.bookingService.cancelBooking(this.data.bookingId, req).subscribe({
+          next: (resp) => {
+            const msg = resp.bookingStatus === 'PARTIALLY_CANCELLED'
+              ? `Selected seat(s) cancelled successfully! Refund of ₹${resp.refundAmount || res.refundAmount} initiated.`
+              : `Ticket ${pnr} cancelled successfully. Full refund initiated!`;
+            this.snackBar.open(msg, 'Dismiss', {
+              duration: 5000,
               horizontalPosition: 'end',
               verticalPosition: 'bottom'
             });

@@ -1,0 +1,301 @@
+<div class="admin-page-container">
+  <!-- Top Banner / Header -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="admin-header-badge">
+          <mat-icon style="font-size: 14px; width: 14px; height: 14px;">verified</mat-icon>
+          SYSTEM ONLINE
+        </span>
+        <span class="text-muted small">Real-time Fleet Operations</span>
+      </div>
+      <h1 class="h3 fw-bold text-dark mb-0">Transport Operations Dashboard</h1>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+      <button class="btn btn-admin-secondary btn-sm" (click)="loadDashboardData()" [disabled]="isLoading" title="Refresh Live Data">
+        <mat-icon style="font-size: 16px; width: 16px; height: 16px;">refresh</mat-icon>
+        <span>Refresh</span>
+      </button>
+      <a routerLink="/admin/schedules" class="btn btn-admin-primary btn-sm">
+        <mat-icon style="font-size: 16px; width: 16px; height: 16px;">add</mat-icon>
+        <span>New Schedule</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="d-flex justify-content-center align-items-center py-5">
+    <div class="text-center">
+      <mat-spinner diameter="40" class="mx-auto mb-3"></mat-spinner>
+      <div class="text-muted small">Aggregating live fleet telemetry...</div>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading">
+    <!-- Stat Cards Row -->
+    <div class="row g-3 mb-4">
+      <!-- Active Fleet -->
+      <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+          <div class="stat-icon-wrapper bg-crimson-subtle text-crimson">
+            <mat-icon>directions_bus</mat-icon>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Active Fleet</span>
+            <div class="stat-value-group">
+              <span class="stat-value">{{ stats.activeBuses }}</span>
+              <span class="stat-subtext">/ {{ stats.totalBuses }} total</span>
+            </div>
+            <div class="stat-trend text-success">
+              <mat-icon>arrow_upward</mat-icon>
+              <span>{{ stats.totalBuses > 0 ? ((stats.activeBuses / stats.totalBuses) * 100 | number:'1.0-0') : 0 }}% Fleet Ready</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scheduled Journeys -->
+      <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+          <div class="stat-icon-wrapper bg-blue-subtle text-blue">
+            <mat-icon>calendar_month</mat-icon>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Scheduled Trips</span>
+            <div class="stat-value-group">
+              <span class="stat-value">{{ stats.totalSchedules }}</span>
+              <span class="stat-subtext">trips</span>
+            </div>
+            <div class="stat-trend text-primary">
+              <mat-icon>check_circle</mat-icon>
+              <span>Active on network</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Network Routes -->
+      <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+          <div class="stat-icon-wrapper bg-emerald-subtle text-emerald">
+            <mat-icon>alt_route</mat-icon>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Network Routes</span>
+            <div class="stat-value-group">
+              <span class="stat-value">{{ stats.totalRoutes }}</span>
+              <span class="stat-subtext">lines</span>
+            </div>
+            <div class="stat-trend text-muted">
+              <mat-icon>timeline</mat-icon>
+              <span>Inter-city connections</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Connected Cities -->
+      <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+          <div class="stat-icon-wrapper bg-amber-subtle text-amber">
+            <mat-icon>location_city</mat-icon>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Connected Cities</span>
+            <div class="stat-value-group">
+              <span class="stat-value">{{ stats.totalCities }}</span>
+              <span class="stat-subtext">terminals</span>
+            </div>
+            <div class="stat-trend text-muted">
+              <mat-icon>hub</mat-icon>
+              <span>Statewide network</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Operations Bar -->
+    <div class="admin-card mb-4">
+      <div class="admin-card-header py-2 px-3">
+        <span class="admin-card-title">
+          <mat-icon style="font-size: 18px; width: 18px; height: 18px; color: var(--admin-primary);">bolt</mat-icon>
+          Quick Operations & Shortcuts
+        </span>
+        <span class="badge bg-secondary-subtle text-secondary small">Instant Actions</span>
+      </div>
+      <div class="p-3 bg-white">
+        <div class="row g-2">
+          <div class="col-6 col-md-3">
+            <a routerLink="/admin/schedules" class="shortcut-box">
+              <mat-icon class="shortcut-icon text-primary">add_alarm</mat-icon>
+              <div class="shortcut-text">
+                <span class="shortcut-title">Add Schedule</span>
+                <span class="shortcut-desc">Plan bus departures</span>
+              </div>
+            </a>
+          </div>
+          <div class="col-6 col-md-3">
+            <a routerLink="/admin/buses" class="shortcut-box">
+              <mat-icon class="shortcut-icon text-danger">directions_bus</mat-icon>
+              <div class="shortcut-text">
+                <span class="shortcut-title">Register Bus</span>
+                <span class="shortcut-desc">Add vehicle to fleet</span>
+              </div>
+            </a>
+          </div>
+          <div class="col-6 col-md-3">
+            <a routerLink="/admin/routes" class="shortcut-box">
+              <mat-icon class="shortcut-icon text-success">route</mat-icon>
+              <div class="shortcut-text">
+                <span class="shortcut-title">Create Route</span>
+                <span class="shortcut-desc">Define stops & distance</span>
+              </div>
+            </a>
+          </div>
+          <div class="col-6 col-md-3">
+            <a routerLink="/admin/cities" class="shortcut-box">
+              <mat-icon class="shortcut-icon text-warning">add_location_alt</mat-icon>
+              <div class="shortcut-text">
+                <span class="shortcut-title">Add City</span>
+                <span class="shortcut-desc">Expand network coverage</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Split (Recent Schedules + Route Highlights) -->
+    <div class="row g-4">
+      <!-- Recent Schedules -->
+      <div class="col-lg-8">
+        <div class="admin-card h-100">
+          <div class="admin-card-header">
+            <span class="admin-card-title">
+              <mat-icon style="font-size: 18px; width: 18px; height: 18px; color: var(--admin-primary);">schedule</mat-icon>
+              Recent Schedules
+            </span>
+            <a routerLink="/admin/schedules" class="text-decoration-none small fw-semibold text-danger">
+              View All ({{ stats.totalSchedules }}) →
+            </a>
+          </div>
+          <div class="admin-card-body p-0">
+            <div *ngIf="recentSchedules.length === 0" class="text-center py-5 text-muted">
+              <mat-icon style="font-size: 36px; width: 36px; height: 36px; opacity: 0.4;">event_busy</mat-icon>
+              <p class="mt-2 mb-0 small">No schedules created yet.</p>
+            </div>
+
+            <div *ngIf="recentSchedules.length > 0" class="table-responsive">
+              <table class="table align-middle mb-0 custom-admin-table">
+                <thead>
+                  <tr>
+                    <th>Schedule ID</th>
+                    <th>Route</th>
+                    <th>Bus Info</th>
+                    <th>Timing</th>
+                    <th>Fare</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let s of recentSchedules">
+                    <td>
+                      <span class="badge bg-light text-dark border">#{{ s.id }}</span>
+                    </td>
+                    <td>
+                      <div class="fw-bold text-dark">
+                        {{ getRouteLabel(s.routeId) }}
+                      </div>
+                      <div class="small text-muted">Corridor #{{ s.routeId }}</div>
+                    </td>
+                    <td>
+                      <div class="fw-semibold text-dark">{{ getBusLabel(s.busId) }}</div>
+                      <div class="small text-muted">Fleet Unit #{{ s.busId }}</div>
+                    </td>
+                    <td>
+                      <div class="small fw-semibold text-dark">{{ s.departureTime }} → {{ s.arrivalTime }}</div>
+                      <div class="small text-muted">{{ s.journeyDate }}</div>
+                    </td>
+                    <td>
+                      <span class="fw-bold text-dark">₹{{ s.baseFare }}</span>
+                    </td>
+                    <td>
+                      <span class="badge" [ngClass]="s.status === 'SCHEDULED' ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'">
+                        {{ s.status || 'SCHEDULED' }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Network Summary / Popular Routes -->
+      <div class="col-lg-4">
+        <div class="admin-card mb-4">
+          <div class="admin-card-header">
+            <span class="admin-card-title">
+              <mat-icon style="font-size: 18px; width: 18px; height: 18px; color: var(--admin-primary);">pie_chart</mat-icon>
+              Fleet Capacity Overview
+            </span>
+          </div>
+          <div class="admin-card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+              <span class="text-muted small">Total Fleet Seats</span>
+              <span class="h5 mb-0 fw-bold text-dark">{{ stats.estimatedTotalSeats }}</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+              <span class="text-muted small">Bus Type Configurations</span>
+              <span class="h5 mb-0 fw-bold text-dark">{{ stats.totalBusTypes }}</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+              <span class="text-muted small">Active Fleet Ratio</span>
+              <span class="h5 mb-0 fw-bold text-success">
+                {{ stats.totalBuses > 0 ? ((stats.activeBuses / stats.totalBuses) * 100 | number:'1.0-0') : 0 }}%
+              </span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted small">Dispatch Readiness</span>
+              <span class="badge bg-success-subtle text-success fw-bold">Ready</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <span class="admin-card-title">
+              <mat-icon style="font-size: 18px; width: 18px; height: 18px; color: var(--admin-primary);">map</mat-icon>
+              Key Network Routes
+            </span>
+            <a routerLink="/admin/routes" class="text-decoration-none small fw-semibold text-danger">
+              Manage →
+            </a>
+          </div>
+          <div class="admin-card-body p-0">
+            <div *ngIf="popularRoutes.length === 0" class="text-center py-4 text-muted small">
+              No routes configured yet.
+            </div>
+
+            <div *ngIf="popularRoutes.length > 0" class="list-group list-group-flush">
+              <div *ngFor="let r of popularRoutes" class="list-group-item p-3 d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="fw-semibold text-dark" style="font-size: 0.9rem;">
+                    {{ r.routeName || (r.sourceCityName + ' to ' + r.destinationCityName) }}
+                  </div>
+                  <div class="text-muted small">
+                    {{ r.distanceKm }} km • Est. {{ formatDuration(r.estimatedDurationMinutes) }}
+                  </div>
+                </div>
+                <span class="badge bg-light text-dark border">#{{ r.id }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
