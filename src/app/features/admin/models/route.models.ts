@@ -31,6 +31,7 @@ export interface RouteResponse {
 export interface RouteStopRequest {
   cityId: number;
   stopOrder: number;
+  distanceFromOriginKm: number;
   arrivalOffsetMinutes: number;
   departureOffsetMinutes: number;
 }
@@ -41,6 +42,7 @@ export interface RouteStopResponse {
   cityId: number;
   cityName: string;
   stopOrder: number;
+  distanceFromOriginKm: number;
   arrivalOffsetMinutes: number;
   departureOffsetMinutes: number;
 }

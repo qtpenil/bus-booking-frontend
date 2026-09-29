@@ -1,0 +1,533 @@
+<div class="admin-page-container">
+  <!-- Page Header -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="admin-header-badge">
+          <mat-icon style="font-size: 14px; width: 14px; height: 14px;">payments</mat-icon>
+          DYNAMIC PRICING ENGINE
+        </span>
+        <span class="text-muted small">Per-KM Distance Rate & Intermediate Stop Fares</span>
+      </div>
+      <h1 class="h3 fw-bold text-dark mb-0">Fare Configurations</h1>
+    </div>
+
+    <!-- Stats & Refresh -->
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <span class="badge bg-light text-dark border px-3 py-2">
+        <strong class="text-danger">{{ configurations.length }}</strong> Rules Total
+      </span>
+      <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
+        <strong>{{ activeRulesCount }}</strong> Active
+      </span>
+      <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2" *ngIf="configurations.length > 0">
+        Avg: <strong>₹{{ averageRatePerKm }}/km</strong>
+      </span>
+      <button class="btn btn-admin-secondary btn-sm" (click)="loadAllData()" [disabled]="isLoading" title="Refresh">
+        <mat-icon style="font-size: 16px; width: 16px; height: 16px;">refresh</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Navigation Tab Bar -->
+  <div class="fare-tabs-bar mb-4">
+    <button 
+      type="button" 
+      class="tab-btn" 
+      [class.active]="activeTab === 'matrix'" 
+      (click)="activeTab = 'matrix'">
+      <mat-icon>table_chart</mat-icon>
+      <span>Rate Rules Matrix</span>
+      <span class="tab-pill">{{ filteredConfigurations.length }}</span>
+    </button>
+    <button 
+      type="button" 
+      class="tab-btn" 
+      [class.active]="activeTab === 'form'" 
+      (click)="activeTab = 'form'">
+      <mat-icon>{{ editingId ? 'edit_note' : 'add_circle' }}</mat-icon>
+      <span>{{ editingId ? 'Edit Fare Rule #' + editingId : 'Create New Fare Rule' }}</span>
+    </button>
+    <button 
+      type="button" 
+      class="tab-btn" 
+      [class.active]="activeTab === 'calculator'" 
+      (click)="activeTab = 'calculator'">
+      <mat-icon>calculate</mat-icon>
+      <span>Live Fare Simulator</span>
+    </button>
+  </div>
+
+  <!-- TAB 1: Rate Rules Matrix Table -->
+  <div *ngIf="activeTab === 'matrix'" class="fade-in">
+    <!-- Filter Toolbar Card -->
+    <div class="admin-card mb-4">
+      <div class="admin-card-body py-3">
+        <div class="row g-3 align-items-center">
+          <div class="col-md-4">
+            <mat-form-field appearance="outline" class="w-100 mb-0" subscriptSizing="dynamic">
+              <mat-label>Scope / Corridor</mat-label>
+              <mat-select [(ngModel)]="filterRouteId" (selectionChange)="applyFilters()">
+                <mat-option [value]="null">All Scopes (Global & Routes)</mat-option>
+                <mat-option [value]="0">🌐 Global Bus Category Defaults Only</mat-option>
+                <mat-option *ngFor="let route of routes" [value]="route.id">
+                  {{ route.routeName }} ({{ route.distanceKm }} km)
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix class="text-muted me-1">alt_route</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="col-md-3">
+            <mat-form-field appearance="outline" class="w-100 mb-0" subscriptSizing="dynamic">
+              <mat-label>Bus Category</mat-label>
+              <mat-select [(ngModel)]="filterBusTypeId" (selectionChange)="applyFilters()">
+                <mat-option [value]="null">All Bus Categories</mat-option>
+                <mat-option *ngFor="let bt of busTypes" [value]="bt.id">
+                  {{ bt.name }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix class="text-muted me-1">category</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="col-md-2">
+            <mat-form-field appearance="outline" class="w-100 mb-0" subscriptSizing="dynamic">
+              <mat-label>Status</mat-label>
+              <mat-select [(ngModel)]="filterStatus" (selectionChange)="applyFilters()">
+                <mat-option value="ALL">All Status</mat-option>
+                <mat-option value="ACTIVE">Active</mat-option>
+                <mat-option value="INACTIVE">Inactive</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="col-md-3 d-flex gap-2 justify-content-md-end">
+            <button 
+              type="button" 
+              class="btn btn-admin-secondary btn-sm" 
+              (click)="resetFilters()"
+              title="Reset Filters">
+              <mat-icon style="font-size: 16px; width: 16px; height: 16px;">clear_all</mat-icon>
+              <span>Reset</span>
+            </button>
+            <button 
+              type="button" 
+              class="btn btn-admin-primary btn-sm" 
+              (click)="resetForm(); activeTab = 'form'">
+              <mat-icon style="font-size: 16px; width: 16px; height: 16px;">add</mat-icon>
+              <span>New Rule</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Table Container -->
+    <div class="admin-card">
+      <div class="admin-card-header d-flex justify-content-between align-items-center">
+        <span class="admin-card-title">
+          <mat-icon style="font-size: 18px; width: 18px; height: 18px; color: var(--admin-primary);">request_quote</mat-icon>
+          Active Fare Rules Matrix
+        </span>
+        <span class="text-muted small">Showing {{ filteredConfigurations.length }} configured rules</span>
+      </div>
+      <div class="admin-card-body p-0">
+        <app-data-table 
+          [data]="filteredConfigurations" 
+          [columns]="columns" 
+          [showView]="true"
+          [showEdit]="true"
+          [showDelete]="true"
+          searchPlaceholder="Search by route, bus type, or fare..."
+          emptyMessage="No fare rules match current filters. Click 'New Rule' to configure pricing."
+          deleteConfirmTitle="Deactivate Fare Rule"
+          deleteConfirmMessage="Are you sure you want to deactivate this fare rule? Schedules will fall back to default proportional pricing."
+          (onView)="openCalculatorForRule($event)"
+          (onEdit)="onEdit($event)"
+          (onDelete)="onDelete($event)">
+        </app-data-table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: Create / Edit Rule Form -->
+  <div *ngIf="activeTab === 'form'" class="fade-in">
+    <div class="row g-4">
+      <!-- Left: Form Card -->
+      <div class="col-lg-6">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <span class="admin-card-title">
+              <mat-icon style="font-size: 18px; width: 18px; height: 18px; color: var(--admin-primary);">
+                {{ editingId ? 'edit_calendar' : 'add_card' }}
+              </mat-icon>
+              {{ editingId ? 'Edit Dynamic Fare Rule #' + editingId : 'Define New Per-KM Fare Rule' }}
+            </span>
+            <span class="badge bg-danger-subtle text-danger small">Per-KM Distance Model</span>
+          </div>
+          <div class="admin-card-body">
+            <form [formGroup]="fareForm" (ngSubmit)="onSubmit()" class="d-flex flex-column gap-3">
+
+              <!-- Bus Category (Primary) -->
+              <div>
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Bus Category (e.g. AC Sleeper, AC Seater, Non-AC Sleeper, Non-AC Seater)</mat-label>
+                  <mat-select formControlName="busTypeId">
+                    <mat-option *ngFor="let bt of busTypes" [value]="bt.id">
+                      <span class="fw-bold">{{ bt.name }}</span>
+                      <span *ngIf="bt.description" class="text-muted small ms-2">({{ bt.description }})</span>
+                    </mat-option>
+                  </mat-select>
+                  <mat-icon matPrefix class="text-muted me-1">directions_bus</mat-icon>
+                  <mat-error *ngIf="fareForm.get('busTypeId')?.hasError('required')">Bus category is required</mat-error>
+                </mat-form-field>
+              </div>
+
+              <!-- Corridor Scope (Optional: All routes vs specific route) -->
+              <div>
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Corridor Scope</mat-label>
+                  <mat-select formControlName="routeId">
+                    <mat-option [value]="''">
+                      <span class="fw-bold text-success">🌐 All Routes (Global Default Rate for this Bus Category)</span>
+                    </mat-option>
+                    <mat-option *ngFor="let route of routes" [value]="route.id">
+                      #{{ route.id }} - {{ route.routeName }} ({{ route.distanceKm }} km override)
+                    </mat-option>
+                  </mat-select>
+                  <mat-icon matPrefix class="text-muted me-1">alt_route</mat-icon>
+                  <mat-hint class="small">
+                    Leave as <strong>"All Routes"</strong> to automatically apply this per-KM rate to all buses of this category. Select a route only to override pricing for that corridor.
+                  </mat-hint>
+                </mat-form-field>
+              </div>
+
+              <!-- Rate Per KM & Minimum Base Fare -->
+              <div class="row g-3">
+                <div class="col-sm-6">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Rate Per KM (₹ / km)</mat-label>
+                    <input matInput type="number" step="0.05" min="0.01" formControlName="ratePerKm" placeholder="e.g. 1.50">
+                    <span matPrefix class="text-muted fw-bold me-1">₹</span>
+                    <span matSuffix class="text-muted small me-2">/km</span>
+                    <mat-error *ngIf="fareForm.get('ratePerKm')?.hasError('required')">Rate is required</mat-error>
+                    <mat-error *ngIf="fareForm.get('ratePerKm')?.hasError('min')">Must be greater than 0</mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="col-sm-6">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Minimum Base Fare (₹)</mat-label>
+                    <input matInput type="number" step="1" min="0" formControlName="minimumFare" placeholder="e.g. 50">
+                    <span matPrefix class="text-muted fw-bold me-1">₹</span>
+                    <mat-error *ngIf="fareForm.get('minimumFare')?.hasError('min')">Cannot be negative</mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <!-- Effective Validity Dates -->
+              <div class="row g-3">
+                <div class="col-sm-6">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Effective From (Start Date)</mat-label>
+                    <input matInput type="date" formControlName="effectiveFrom">
+                    <mat-error *ngIf="fareForm.get('effectiveFrom')?.hasError('required')">Start date is required</mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="col-sm-6">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Effective To (Optional / Ongoing)</mat-label>
+                    <input matInput type="date" formControlName="effectiveTo">
+                    <mat-hint class="small">Leave blank for indefinite validity</mat-hint>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <!-- Rule Status -->
+              <div>
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Rule Status</mat-label>
+                  <mat-select formControlName="status">
+                    <mat-option value="ACTIVE">ACTIVE (Operational)</mat-option>
+                    <mat-option value="INACTIVE">INACTIVE (Disabled)</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <!-- Submit & Cancel Buttons -->
+              <div class="d-flex gap-2 pt-2">
+                <button 
+                  type="submit" 
+                  class="btn btn-admin-primary flex-grow-1 py-2" 
+                  [disabled]="fareForm.invalid || isSubmitting">
+                  <mat-spinner *ngIf="isSubmitting" diameter="18" class="me-2"></mat-spinner>
+                  <mat-icon *ngIf="!isSubmitting">check_circle</mat-icon>
+                  <span>{{ isSubmitting ? 'Saving Fare Rule...' : (editingId ? 'Update Fare Rule' : 'Save Fare Rule') }}</span>
+                </button>
+
+                <button 
+                  type="button" 
+                  class="btn btn-admin-secondary py-2" 
+                  (click)="resetForm(); activeTab = 'matrix'">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Real-time Segment Pricing Preview -->
+      <div class="col-lg-6">
+        <div class="admin-card h-100">
+          <div class="admin-card-header d-flex justify-content-between align-items-center">
+            <span class="admin-card-title">
+              <mat-icon style="font-size: 18px; width: 18px; height: 18px; color: var(--admin-primary);">preview</mat-icon>
+              {{ fareForm.get('routeId')?.value ? 'Corridor Sub-Journey Breakdown' : 'Global Category Benchmark Pricing' }}
+            </span>
+            <span class="badge bg-success-subtle text-success small" *ngIf="samplePreviews.length > 0">
+              {{ samplePreviews.length }} Calculations
+            </span>
+          </div>
+
+          <div class="admin-card-body">
+            <!-- Hint if no route or rate entered -->
+            <div *ngIf="samplePreviews.length === 0" class="text-center py-5 text-muted">
+              <mat-icon style="font-size: 40px; width: 40px; height: 40px; opacity: 0.4;">auto_graph</mat-icon>
+              <div class="fw-semibold mt-2">Select Bus Category and enter Rate / KM</div>
+              <div class="small">The live preview will automatically calculate standard travel benchmarks and sub-journey fares!</div>
+            </div>
+
+            <!-- Segment Table when data is available -->
+            <div *ngIf="samplePreviews.length > 0" class="fade-in">
+              <div class="alert alert-info py-2 px-3 mb-3 small d-flex align-items-center gap-2">
+                <mat-icon style="font-size: 18px; width: 18px; height: 18px;">info</mat-icon>
+                <span>Formula: <strong>Fare = max(Distance × Rate/KM, Min Fare)</strong></span>
+              </div>
+
+              <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="table table-hover table-sm align-middle">
+                  <thead class="table-light sticky-top">
+                    <tr>
+                      <th>Segment Journey</th>
+                      <th class="text-center">Distance</th>
+                      <th class="text-end">Computed Fare</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let seg of samplePreviews">
+                      <td>
+                        <span class="fw-semibold text-dark">{{ seg.fromCity }}</span>
+                        <mat-icon style="font-size: 12px; width: 12px; height: 12px; vertical-align: middle;" class="mx-1 text-muted">trending_flat</mat-icon>
+                        <span class="fw-semibold text-dark">{{ seg.toCity }}</span>
+                      </td>
+                      <td class="text-center">
+                        <span class="badge bg-light text-dark border">{{ seg.distanceKm }} km</span>
+                      </td>
+                      <td class="text-end fw-bold text-danger">
+                        ₹{{ seg.calculatedFare }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: Live Fare Simulator & Test Calculator -->
+  <div *ngIf="activeTab === 'calculator'" class="fade-in">
+    <div class="row g-4">
+      <!-- Left: Simulator Input Form -->
+      <div class="col-lg-5">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <span class="admin-card-title">
+              <mat-icon style="font-size: 18px; width: 18px; height: 18px; color: var(--admin-primary);">query_stats</mat-icon>
+              Corridor Fare Simulator
+            </span>
+            <span class="badge bg-primary-subtle text-primary small">Live Test API</span>
+          </div>
+
+          <div class="admin-card-body">
+            <form [formGroup]="calcForm" (ngSubmit)="runSimulation()" class="d-flex flex-column gap-3">
+              <!-- Route Corridor -->
+              <div>
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Corridor Route</mat-label>
+                  <mat-select formControlName="routeId">
+                    <mat-option *ngFor="let route of routes" [value]="route.id">
+                      {{ route.routeName }} ({{ route.distanceKm }} km)
+                    </mat-option>
+                  </mat-select>
+                  <mat-icon matPrefix class="text-muted me-1">alt_route</mat-icon>
+                </mat-form-field>
+              </div>
+
+              <!-- Bus Type -->
+              <div>
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Bus Fleet Category</mat-label>
+                  <mat-select formControlName="busTypeId">
+                    <mat-option *ngFor="let bt of busTypes" [value]="bt.id">
+                      {{ bt.name }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-icon matPrefix class="text-muted me-1">category</mat-icon>
+                </mat-form-field>
+              </div>
+
+              <!-- Boarding Stop -->
+              <div>
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Boarding Stop (Origin or Waypoint)</mat-label>
+                  <mat-select formControlName="sourceCityId">
+                    <mat-option *ngFor="let stop of calculatorStops" [value]="stop.cityId">
+                      {{ stop.cityName }} ({{ stop.distanceFromOriginKm }} km)
+                    </mat-option>
+                  </mat-select>
+                  <mat-icon matPrefix class="text-muted me-1">trip_origin</mat-icon>
+                </mat-form-field>
+              </div>
+
+              <!-- Dropping Stop -->
+              <div>
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Dropping Stop (Waypoint or Terminus)</mat-label>
+                  <mat-select formControlName="destinationCityId">
+                    <mat-option *ngFor="let stop of calculatorStops" [value]="stop.cityId">
+                      {{ stop.cityName }} ({{ stop.distanceFromOriginKm }} km)
+                    </mat-option>
+                  </mat-select>
+                  <mat-icon matPrefix class="text-muted me-1">pin_drop</mat-icon>
+                </mat-form-field>
+              </div>
+
+              <!-- Travel Date -->
+              <div>
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Travel Date (For Seasonality / Validity)</mat-label>
+                  <input matInput type="date" formControlName="travelDate">
+                  <mat-icon matPrefix class="text-muted me-1">calendar_today</mat-icon>
+                </mat-form-field>
+              </div>
+
+              <!-- Calculate Button -->
+              <div>
+                <button 
+                  type="submit" 
+                  class="btn btn-admin-primary w-100 py-2" 
+                  [disabled]="calcForm.invalid || isCalculating">
+                  <mat-spinner *ngIf="isCalculating" diameter="18" class="me-2"></mat-spinner>
+                  <mat-icon *ngIf="!isCalculating">calculate</mat-icon>
+                  <span>{{ isCalculating ? 'Calculating Segment Fare...' : 'Calculate Segment Fare' }}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Live Result Card -->
+      <div class="col-lg-7">
+        <div class="admin-card h-100">
+          <div class="admin-card-header">
+            <span class="admin-card-title">
+              <mat-icon style="font-size: 18px; width: 18px; height: 18px; color: var(--admin-primary);">receipt_long</mat-icon>
+              Dynamic Fare Calculation Result
+            </span>
+            <span class="badge bg-danger-subtle text-danger small">Verified by Route Service</span>
+          </div>
+
+          <div class="admin-card-body d-flex flex-column justify-content-center">
+            <!-- Empty State -->
+            <div *ngIf="!calculationResult && !isCalculating" class="text-center py-5 text-muted">
+              <mat-icon style="font-size: 48px; width: 48px; height: 48px; opacity: 0.4;">toll</mat-icon>
+              <div class="fw-semibold mt-2">No Calculation Performed Yet</div>
+              <div class="small">Select the route corridor, vehicle type, and boarding/dropping stations, then click Calculate.</div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div *ngIf="isCalculating" class="text-center py-5">
+              <mat-spinner diameter="36" class="mx-auto mb-2"></mat-spinner>
+              <div class="text-muted small">Querying dynamic fare configuration engine...</div>
+            </div>
+
+            <!-- Calculation Output -->
+            <div *ngIf="calculationResult && !isCalculating" class="fade-in">
+              <!-- Big Fare Banner -->
+              <div class="fare-result-banner p-4 rounded-3 text-center mb-4">
+                <div class="small text-uppercase fw-bold text-muted mb-1">Calculated Segment Passenger Fare</div>
+                <div class="display-4 fw-bold text-danger">₹{{ calculationResult.calculatedFare }}</div>
+                <div class="text-muted mt-1">
+                  for <strong>{{ calculationResult.distanceKm }} km</strong> journey
+                </div>
+              </div>
+
+              <!-- Journey Breakdown Details -->
+              <div class="row g-3">
+                <div class="col-sm-6">
+                  <div class="p-3 bg-light rounded border">
+                    <span class="text-muted small d-block">Boarding Stop (Source)</span>
+                    <span class="fw-bold text-dark fs-6">{{ calculationResult.sourceCityName }}</span>
+                  </div>
+                </div>
+
+                <div class="col-sm-6">
+                  <div class="p-3 bg-light rounded border">
+                    <span class="text-muted small d-block">Dropping Stop (Destination)</span>
+                    <span class="fw-bold text-dark fs-6">{{ calculationResult.destinationCityName }}</span>
+                  </div>
+                </div>
+
+                <div class="col-sm-4">
+                  <div class="p-3 bg-light rounded border">
+                    <span class="text-muted small d-block">Net Distance</span>
+                    <span class="fw-bold text-primary fs-6">{{ calculationResult.distanceKm }} km</span>
+                  </div>
+                </div>
+
+                <div class="col-sm-4">
+                  <div class="p-3 bg-light rounded border">
+                    <span class="text-muted small d-block">Configured Rate</span>
+                    <span class="fw-bold text-dark fs-6">₹{{ calculationResult.ratePerKm ?? calculationResult.farePerKm }}/km</span>
+                  </div>
+                </div>
+
+                <div class="col-sm-4">
+                  <div class="p-3 bg-light rounded border">
+                    <span class="text-muted small d-block">Minimum Threshold</span>
+                    <span class="fw-bold text-dark fs-6">₹{{ calculationResult.minimumFare }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Formula Explainer Box -->
+              <div class="mt-4 p-3 border rounded bg-white">
+                <div class="fw-bold text-dark small mb-1 d-flex align-items-center gap-1">
+                  <mat-icon style="font-size: 16px; width: 16px; height: 16px; color: #059669;">check_circle</mat-icon>
+                  Engine Pricing Breakdown
+                </div>
+                <div class="text-muted small">
+                  {{ calculationResult.distanceKm }} km × ₹{{ calculationResult.ratePerKm ?? calculationResult.farePerKm }}/km = 
+                  <strong>₹{{ (calculationResult.distanceKm * (calculationResult.ratePerKm ?? calculationResult.farePerKm)).toFixed(2) }}</strong>
+                  <span *ngIf="calculationResult.distanceKm * (calculationResult.ratePerKm ?? calculationResult.farePerKm) < calculationResult.minimumFare">
+                    (below min fare threshold ₹{{ calculationResult.minimumFare }} → raised to ₹{{ calculationResult.calculatedFare }})
+                  </span>
+                  <span *ngIf="calculationResult.distanceKm * (calculationResult.ratePerKm ?? calculationResult.farePerKm) >= calculationResult.minimumFare">
+                    (rounded up to nearest rupee ₹{{ calculationResult.calculatedFare }})
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

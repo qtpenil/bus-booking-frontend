@@ -115,7 +115,12 @@ export interface RouteDetailsDialogData {
                     <span class="time-chip dep">Dep: +{{ formatDuration(stop.departureOffsetMinutes) }}</span>
                   </div>
                 </div>
-                <div class="node-subtitle">Waypoint Stop #{{ stop.stopOrder || (i + 1) }}</div>
+                <div class="node-subtitle d-flex align-items-center gap-2">
+                  <span>Waypoint Stop #{{ stop.stopOrder || (i + 1) }}</span>
+                  <span *ngIf="stop.distanceFromOriginKm" class="badge bg-light text-dark border px-2 py-0" style="font-size: 0.7rem;">
+                    {{ stop.distanceFromOriginKm }} km from origin
+                  </span>
+                </div>
               </div>
             </div>
 
