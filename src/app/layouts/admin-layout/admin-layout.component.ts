@@ -64,7 +64,8 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       title: 'NETWORK',
       items: [
         { label: 'Manage Cities', route: '/admin/cities', icon: 'location_city' },
-        { label: 'Manage Routes', route: '/admin/routes', icon: 'alt_route' }
+        { label: 'Manage Routes', route: '/admin/routes', icon: 'alt_route' },
+        { label: 'Fare Configurations', route: '/admin/fare-configurations', icon: 'payments' }
       ]
     },
     {

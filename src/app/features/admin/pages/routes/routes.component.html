@@ -127,7 +127,7 @@
                     </div>
 
                     <!-- City Select -->
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                       <mat-form-field appearance="outline" class="w-100 mb-0" subscriptSizing="dynamic">
                         <mat-label>Stop City</mat-label>
                         <mat-select formControlName="cityId">
@@ -138,18 +138,27 @@
                       </mat-form-field>
                     </div>
 
-                    <!-- Arrival Offset -->
+                    <!-- Distance from Origin -->
                     <div class="col-md-3">
                       <mat-form-field appearance="outline" class="w-100 mb-0" subscriptSizing="dynamic">
-                        <mat-label>Arrival Offset (+min)</mat-label>
+                        <mat-label>Distance from Origin (km)</mat-label>
+                        <input matInput type="number" step="0.1" formControlName="distanceFromOriginKm" placeholder="e.g. 75">
+                        <span matSuffix class="text-muted small me-2">km</span>
+                      </mat-form-field>
+                    </div>
+
+                    <!-- Arrival Offset -->
+                    <div class="col-md-2">
+                      <mat-form-field appearance="outline" class="w-100 mb-0" subscriptSizing="dynamic">
+                        <mat-label>Arr Offset (+min)</mat-label>
                         <input matInput type="number" formControlName="arrivalOffsetMinutes" placeholder="e.g. 60">
                       </mat-form-field>
                     </div>
 
                     <!-- Departure Offset -->
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                       <mat-form-field appearance="outline" class="w-100 mb-0" subscriptSizing="dynamic">
-                        <mat-label>Departure Offset (+min)</mat-label>
+                        <mat-label>Dep Offset (+min)</mat-label>
                         <input matInput type="number" formControlName="departureOffsetMinutes" placeholder="e.g. 75">
                       </mat-form-field>
                     </div>

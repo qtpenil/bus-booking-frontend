@@ -1,0 +1,75 @@
+.fare-tabs-bar {
+  display: flex;
+  gap: 0.5rem;
+  background: #f1f5f9;
+  padding: 0.35rem;
+  border-radius: 12px;
+  width: fit-content;
+
+  .tab-btn {
+    border: none;
+    background: transparent;
+    padding: 0.55rem 1.1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #64748b;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    .tab-pill {
+      background: #e2e8f0;
+      color: #334155;
+      font-size: 0.75rem;
+      padding: 0.1rem 0.45rem;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    &:hover {
+      color: #0f172a;
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    &.active {
+      background: #ffffff;
+      color: #b71c1c;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+
+      .tab-pill {
+        background: #fee2e2;
+        color: #b71c1c;
+      }
+    }
+  }
+}
+
+.fare-result-banner {
+  background: linear-gradient(135deg, #fef2f2 0%, #fff1f2 100%);
+  border: 1px solid #fecaca;
+  box-shadow: 0 4px 12px rgba(183, 28, 28, 0.08);
+}
+
+.fade-in {
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

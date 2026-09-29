@@ -76,6 +76,7 @@ export class RoutesComponent implements OnInit {
     this.stops.push(this.fb.group({
       cityId: ['', Validators.required],
       stopOrder: [this.stops.length + 1, [Validators.required, Validators.min(1)]],
+      distanceFromOriginKm: ['', [Validators.required, Validators.min(0.01)]],
       arrivalOffsetMinutes: ['', [Validators.required, Validators.min(0)]],
       departureOffsetMinutes: ['', [Validators.required, Validators.min(0)]]
     }));

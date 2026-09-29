@@ -8,5 +8,6 @@ export const API_URLS = {
   ROUTES: `${environment.api.gatewayUrl}/api/v1/routes`,
   CITIES: `${environment.api.gatewayUrl}/api/v1/cities`,
   SCHEDULES: `${environment.api.gatewayUrl}/api/v1/schedules`,
-  NOTIFICATIONS: `${environment.api.gatewayUrl}/api/notifications`
+  NOTIFICATIONS: `${environment.api.gatewayUrl}/api/notifications`,
+  FARE_CONFIGURATIONS: `${environment.api.gatewayUrl}/api/v1/fare-configurations`
 };
