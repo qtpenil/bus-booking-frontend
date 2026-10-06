@@ -192,12 +192,22 @@ export class SeatSelectionComponent implements OnInit {
     });
 
     const rowCounts = Array.from(rowMap.values()).map(seats => seats.length);
-    const minSeatsInRow = Math.min(...rowCounts);
+    // Determine the standard row size using the most frequent row seat count (mode)
+    const countFrequency = new Map<number, number>();
+    rowCounts.forEach(c => countFrequency.set(c, (countFrequency.get(c) || 0) + 1));
+    let standardSeatCount = 0;
+    let maxFreq = 0;
+    countFrequency.forEach((freq, count) => {
+      if (freq > maxFreq) {
+        maxFreq = freq;
+        standardSeatCount = count;
+      }
+    });
 
-    // Find max column count among standard (non-bench) rows
+    // Find max column count among standard rows
     let regularMaxCol = 0;
     rowMap.forEach((seatsInRow) => {
-      if (seatsInRow.length === minSeatsInRow || rowCounts.length === 1) {
+      if (seatsInRow.length === standardSeatCount || rowCounts.length === 1) {
         const maxInThisRow = Math.max(...seatsInRow.map(s => s.columnNo));
         if (maxInThisRow > regularMaxCol) regularMaxCol = maxInThisRow;
       }

@@ -116,11 +116,20 @@ export class SeatLayoutBuilderDialog implements OnInit {
     });
 
     const rowCounts = Array.from(rowMap.values()).map(r => r.length);
-    const minSeatsInRow = Math.min(...rowCounts);
+    const countFrequency = new Map<number, number>();
+    rowCounts.forEach(c => countFrequency.set(c, (countFrequency.get(c) || 0) + 1));
+    let standardSeatCount = 0;
+    let maxFreq = 0;
+    countFrequency.forEach((freq, count) => {
+      if (freq > maxFreq) {
+        maxFreq = freq;
+        standardSeatCount = count;
+      }
+    });
 
     let regularMaxCol = 0;
     rowMap.forEach((seatsInRow) => {
-      if (seatsInRow.length === minSeatsInRow || rowCounts.length === 1) {
+      if (seatsInRow.length === standardSeatCount || rowCounts.length === 1) {
         const m = Math.max(...seatsInRow.map(s => s.columnNo));
         if (m > regularMaxCol) regularMaxCol = m;
       }
